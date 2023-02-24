@@ -1,4 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -6,8 +6,10 @@ import Header from "../../components/Header";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CreateIcon from '@mui/icons-material/Create';
+import { mockDataSubcategory } from "../../data/mockData";
 
 const FormCreateProduct = () => {
+  
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
@@ -73,9 +75,14 @@ const FormCreateProduct = () => {
                 label="Sub category"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.subcategory}
+                value={values.subcategory.id}
                 sx={{ gridColumn: "span 1" }}
               >
+                {mockDataSubcategory.map((mockDataSubcategory) => (
+                  <MenuItem key={mockDataSubcategory.id} value={mockDataSubcategory.id}>
+                    {mockDataSubcategory.name}
+                  </MenuItem>
+                ))}
               </TextField>
               <TextField
                 fullWidth
@@ -163,7 +170,7 @@ const checkoutSchema = yup.object().shape({
 const initialValues = {
   id: "",
   name: "",
-  subcategory: {},
+  subcategory: {id: 1, name: 'Category 1'},
   createdate: new Date().toISOString().slice(0, 10),
   price: "",
   description: "",

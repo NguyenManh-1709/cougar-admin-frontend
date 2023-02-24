@@ -81,7 +81,7 @@ const Invoices = () => {
               onClose={handleClose}
               closeAfterTransition
               slots={{ backdrop: Backdrop }}
-              slotProps={{
+              slotprops={{
                 backdrop: {
                   timeout: 500,
                 },

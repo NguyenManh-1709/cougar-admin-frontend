@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CreateIcon from '@mui/icons-material/Create';
+import { useState } from "react";
 
 const FormCreateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -14,10 +15,18 @@ const FormCreateUser = () => {
     console.log(values);
   };
 
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
+  
+
   return (
     <Box m="20px">
       <Header title="CREATE ACCOUNT" subtitle="For administrator only" />
-
+      <Box display="flex" mb='30px' justifyContent="center" style={{minHeight: '300px', background:'#1F2A40'}}>
+        {avatarPreview && <img style={{width: '300px'}} src={avatarPreview} alt={avatarFile.name} />}
+        {!avatarPreview && <img style={{width: '300px'}} src={"../../assets/user.png"} alt="Default" />}
+      </Box>
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -51,7 +60,7 @@ const FormCreateUser = () => {
                 name="username"
                 error={!!touched.username && !!errors.username}
                 helperText={touched.username && errors.username}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -64,7 +73,7 @@ const FormCreateUser = () => {
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -77,7 +86,22 @@ const FormCreateUser = () => {
                 name="fullname"
                 error={!!touched.fullname && !!errors.fullname}
                 helperText={touched.fullname && errors.fullname}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <TextField
+                type="file"
+                label="Avatar"
+                variant="outlined"
+                value={values.image}
+                inputProps={{
+                  multiple: false
+                }}
+                onChange={(event) => {
+                  const file = event.target.files[0];
+                  setAvatarFile(file);
+                  setAvatarPreview(URL.createObjectURL(file));
+                }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -90,7 +114,7 @@ const FormCreateUser = () => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -103,7 +127,7 @@ const FormCreateUser = () => {
                 name="phone"
                 error={!!touched.phone && !!errors.phone}
                 helperText={touched.phone && errors.phone}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -173,6 +197,7 @@ const initialValues = {
   email: "",
   phone: "",
   createdate: new Date().toISOString().slice(0, 10),
+  image: "",
 };
 
 export default FormCreateUser;

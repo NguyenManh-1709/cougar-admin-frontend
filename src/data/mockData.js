@@ -27,6 +27,12 @@ export const mockDataUser = [
   },
 ];
 
+export const mockDataSubcategory = [
+  {id:1, name: 'Category 1'},
+  {id:2, name: 'Category 2'},
+  {id:3, name: 'Category 3'}
+]
+
 export const mockDataProduct = [
   {
     id: 1,
