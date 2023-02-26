@@ -6,27 +6,29 @@ import Header from "../../components/Header";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CreateIcon from '@mui/icons-material/Create';
-import { useState } from "react";
+import CloudinaryUploader from "../../components/CloudinaryUploader";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 
 const FormCreateUser = () => {
+
+  const baseUploadImageUrl = `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`
+  const urlUploaded = useSelector((state) => state.uploadImageStore.url).slice(baseUploadImageUrl.length).trim()
+
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
+    values.image = urlUploaded;
     console.log(values);
   };
-
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
-
-  
 
   return (
     <Box m="20px">
       <Header title="CREATE ACCOUNT" subtitle="For administrator only" />
-      <Box display="flex" mb='30px' justifyContent="center" style={{minHeight: '300px', background:'#1F2A40'}}>
-        {avatarPreview && <img style={{width: '300px'}} src={avatarPreview} alt={avatarFile.name} />}
-        {!avatarPreview && <img style={{width: '300px'}} src={"../../assets/user.png"} alt="Default" />}
+      
+      <Box mb="30px" p="10px" height="300px" border="1px solid gray">
+        <CloudinaryUploader/>
       </Box>
+
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -89,18 +91,15 @@ const FormCreateUser = () => {
                 sx={{ gridColumn: "span 1" }}
               />
               <TextField
-                type="file"
-                label="Avatar"
-                variant="outlined"
-                value={values.image}
-                inputProps={{
-                  multiple: false
-                }}
-                onChange={(event) => {
-                  const file = event.target.files[0];
-                  setAvatarFile(file);
-                  setAvatarPreview(URL.createObjectURL(file));
-                }}
+                fullWidth
+                disabled
+                variant="filled"
+                type="text"
+                label="ImageUrl"
+                value={urlUploaded}
+                name="fullname"
+                error={!!touched.fullname && !!errors.fullname}
+                helperText={touched.fullname && errors.fullname}
                 sx={{ gridColumn: "span 1" }}
               />
               <TextField
