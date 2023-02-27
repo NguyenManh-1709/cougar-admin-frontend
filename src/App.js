@@ -28,7 +28,7 @@ function App() {
               <Route path="/users" element={<User />} />
               <Route path="/products" element={<Product />} />
               <Route path="/invoices" element={<Invoices />} />
-              <Route path="/createuser" element={<FormCreateUser />} />
+              <Route path="/form-user/:id" element={<FormCreateUser />} />
               <Route path="/createproduct" element={<FormCreateProduct />} />
             </Routes>
           </main>

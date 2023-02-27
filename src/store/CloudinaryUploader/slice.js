@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
-const imageSlice = createSlice ({
+const imageSlice = createSlice({
   name: "image",
   initialState: {
     url: "",
@@ -23,10 +23,12 @@ const imageSlice = createSlice ({
   },
 });
 
-export const confirmationClick = createAsyncThunk('', async (formData) => {
-    const res = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,formData);
-    return res.data.secure_url;
+export const confirmationClick = createAsyncThunk('image/confirmationClick', async (dataURL) => {
+  const response = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    file: dataURL,
+    upload_preset: `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`,
+  });
+  return response.data.secure_url;
 });
 
 export default imageSlice;

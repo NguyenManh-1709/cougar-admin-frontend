@@ -1,54 +1,68 @@
 import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from 'react';
-import { Image } from 'cloudinary-react';
 import { useDispatch } from 'react-redux';
-import { confirmationClick } from '../store/CloudinaryUploaderSlice/slice';
-import { useSelector } from "react-redux/es/hooks/useSelector";
+import { confirmationClick } from '../store/CloudinaryUploader/slice';
+import AvatarEditor from 'react-avatar-editor';
 
 const CloudinaryUploader = () => {
-  const urlUploaded = useSelector((state) => state.uploadImageStore.url)
-  
   const dispatch = useDispatch();
 
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const [fileUpload, setFileUpload] = useState(new File([""], ""))
+  const [file, setFile] = useState(null);
+  const [editor, setEditor] = useState(null);
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0.5, y: 0.5 });
+  const [errorFile, setErrorFile] = useState();
 
-  const handleFileInputChange = (event) => {
-    const file = event.target.files[0];
-    setFileUpload(file)
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setImagePreviewUrl(reader.result);
-    };
-    setIsConfirmed(true);
-  };
-
-  const handleConfirmationClick = (event) => {
-    event.preventDefault();
-    setIsConfirmed(false);
-    const formData = new FormData();
-    formData.append('file', fileUpload);
-    formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
-    try {
-      dispatch(confirmationClick(formData))
-
-    } catch (error) {
-      console.log('Error uploading image to Cloudinary: ', error);
+  function handleFileChange(event) {
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (event.target.files[0] && allowedTypes.includes(event.target.files[0].type)) {
+      setFile(event.target.files[0]);
+      setErrorFile("");
+    } else {
+      event.target.value = "";
+      setErrorFile("Please choose an image file! .JPG or .PNG");
     }
-    setImagePreviewUrl("");
-  };
+  }
+
+  function handleScaleChange(event) {
+    setScale(parseFloat(event.target.value));
+  }
+
+  function handlePositionChange(position) {
+    setPosition(position);
+  }
+
+  function handleSave() {
+    if (editor) {
+      const canvas = editor.getImage();
+      const dataURL = canvas.toDataURL();
+      try {
+        dispatch(confirmationClick(dataURL))
+      } catch (error) {
+        console.log('Error uploading image to Cloudinary: ', error);
+      }
+    }
+  }
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" height="300px">
+    <Box>
       <Box display="flex" justifyContent="space-between" flexDirection="column" gap="10px">
-        <TextField type="file" variant="filled" onChange={handleFileInputChange} />
-        {isConfirmed && <Button variant="contained" color="secondary" onClick={handleConfirmationClick}>Confirm And Upload</Button> }
-      </Box>
-      <Box>
-        {imagePreviewUrl && <img width={200} height={200} src={imagePreviewUrl} alt="preview" />}
-        {urlUploaded && <Image width={200} height={200} cloudName="YOUR_CLOUD_NAME" publicId={urlUploaded} />}
+        <AvatarEditor
+          ref={setEditor}
+          image={file}
+          width={300}
+          height={300}
+          border={25}
+          color={[180,180,180]}
+          borderRadius={360}
+          scale={scale}
+          position={position}
+          onPositionChange={handlePositionChange}
+        />
+        {errorFile && <h3 style={{background: "#B4B4B4", color: "#8B0000", textAlign: "center", padding: "2px"}}>{errorFile}</h3>}
+        <TextField type="file" variant="outlined" onChange={handleFileChange} style={{ width: "350px" }} />
+        <TextField type="range" variant="outlined" min="1" max="1.1" step="0.1" value={scale} onChange={handleScaleChange} style={{ width: "350px" }} />
+        {file && <Button variant="contained" style={{ background: "#1F2A40", color: "white", width: "350px" }} onClick={handleSave}>Confirm And Upload</Button>}
       </Box>
     </Box>
   );

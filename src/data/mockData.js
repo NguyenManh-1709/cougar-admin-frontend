@@ -2,28 +2,34 @@ import { tokens } from "../theme";
 
 export const mockDataUser = [
   {
-    username: "jonsnow",
+    id: "1",
+    password: "123456",
     fullname: "Jon Snow",
-    phone: "(665)121-5454",
     email: "jonsnow@gmail.com",
-    createdate: "01-01-2023",
-    status: 0,
+    phone: "(665)121-5454",
+    createdate: "2023-01-01",
+    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
+    authorities: "ADMIN"
   },
   {
-    username: "cerseilannister",
+    id: "2",
+    password: "123456",
     fullname: "Cersei Lannister",
-    phone: "(421)314-2288",
     email: "cerseilannister@gmail.com",
-    createdate: "01-02-2023",
-    status: 1,
+    phone: "(421)314-2288",
+    createdate: "2023-02-01",
+    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
+    authorities: "USER"
   },
   {
-    username: "jaimelannister",
+    id: "3",
+    password: "123456",
     fullname: "Jaime Lannister",
-    phone: "(422)982-6739",
     email: "jaimelannister@gmail.com",
-    createdate: "01-02-2023",
-    status: 0,
+    phone: "(422)982-6739",
+    createdate: "2023-02-01",
+    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
+    authorities: "ADMIN"
   },
 ];
 

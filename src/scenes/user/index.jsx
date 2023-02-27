@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataUser } from "../../data/mockData";
@@ -11,9 +11,8 @@ const User = () => {
 
   const columns = [
     { 
-      field: "username", 
-      headerName: "USERNAME",
-      flex: 1,
+      field: "id", 
+      headerName: "ID",
     },
     {
       field: "fullname",
@@ -37,32 +36,31 @@ const User = () => {
       flex: 1,
     },
     {
-      field: "status",
-      headerName: "Status",
-      headerAlign: "center",
+      field: "authorities",
+      headerName: "ROLE",
       flex: 1,
-      renderCell: ({ row: { status } }) => {
-        return (
-          <Box
-            width="30%"
-            m="0 auto"
-            p="5px"
-            display="flex"
-            justifyContent="center"
-            backgroundColor={
-              status === 0
-                ? colors.greenAccent[700]
-                : colors.redAccent[700]
-            }
-            borderRadius="4px"
-          >
-            <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-              {status === 0
-                ? "Active"
-                : "Inactive"}
-            </Typography>
-          </Box>
-        );
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      headerAlign: 'center',
+      renderCell: ({ row: { id, authorities } }) => {
+        if (authorities === "ADMIN") {
+          return (
+            <Link
+              to={`/form-user/${id}`}
+              style={{ 
+                textDecoration: 'none',
+                background: "#1F2A40",
+                color: "white",
+                width: "100%",
+                textAlign: "center"
+              }}
+            >
+              Edit
+            </Link>
+          );
+        }
       },
     },
   ];
@@ -103,15 +101,15 @@ const User = () => {
         }}
       >
         <DataGrid 
+          sx={{fontSize: "1rem"}}
           rows={mockDataUser} 
           columns={columns} 
-          getRowId={(row) => row.username} 
+          getRowId={(row) => row.id} 
           components={{ Toolbar: GridToolbar }}/>
       </Box>
       <Box display="flex" justifyContent="end" mt="20px" >
-        
         <Link 
-          to={"/createuser"} 
+          to={"/form-user/0"}
           style={{ 
             textDecoration: 'none',
             background: "#1F2A40",
