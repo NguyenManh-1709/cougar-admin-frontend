@@ -1,0 +1,1 @@
+export const invoicesState = (state) => state.invoiceStore.invoices

@@ -1,37 +1,67 @@
 import { tokens } from "../theme";
 
-export const mockDataUser = [
+export const productsRowsDemoData = [
   {
     id: "1",
-    password: "123456",
-    fullname: "Jon Snow",
-    email: "jonsnow@gmail.com",
-    phone: "(665)121-5454",
-    createdate: "2023-01-01",
-    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
-    authorities: "ADMIN"
+    product: {name: "Product 1"},
+    SKU: "ABCD01",
+    createDate: "2022-12-12",
+    qtyInStock: "100",
+    price: "25$",
+    image: "product1.png",
   },
   {
     id: "2",
-    password: "123456",
-    fullname: "Cersei Lannister",
-    email: "cerseilannister@gmail.com",
-    phone: "(421)314-2288",
-    createdate: "2023-02-01",
-    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
-    authorities: "USER"
+    product: {name: "Product 2"},
+    SKU: "ABCD02",
+    createDate: "2022-12-12",
+    qtyInStock: "89",
+    price: "50$",
+    image: "product2.png",
   },
   {
     id: "3",
-    password: "123456",
-    fullname: "Jaime Lannister",
-    email: "jaimelannister@gmail.com",
-    phone: "(422)982-6739",
-    createdate: "2023-02-01",
-    avatar: "https://res.cloudinary.com/dmjh7imwd/image/upload/v1677503421/CougarStore/user_aqqvrd.png",
-    authorities: "ADMIN"
+    product: {name: "Product 3"},
+    SKU: "ABCD02",
+    createDate: "2022-12-12",
+    qtyInStock: "15",
+    price: "169$",
+    image: "product3.png",
+  }
+]
+
+export const invoicesRowsDemoData = [
+  {
+    id: "1",
+    user: {fullname: "Demo 1"},
+    userPaymentMethod: {paymentType: {value: "Tiền mặt"}},
+    createDate: "2023-01-01",
+    address: {addressLine: "HCM"},
+    deliveryMethod: {name: "Nhanh"},
+    orderTotal: "$100",
+    orderStatus: true,
   },
-];
+  {
+    id: "2",
+    user: {fullname: "Demo 1"},
+    userPaymentMethod: {paymentType: {value: "Chuyển khoản"}},
+    createDate: "2023-01-02",
+    address: {addressLine: "HCM"},
+    deliveryMethod: {name: "Chậm"},
+    orderTotal: "$122",
+    orderStatus: true,
+  },
+  {
+    id: "3",
+    user: {fullname: "Demo 2"},
+    userPaymentMethod: {paymentType: {value: "Ví điện tử"}},
+    createDate: "2023-02-28",
+    address: {addressLine: "HN"},
+    deliveryMethod: {name: "Nhanh"},
+    orderTotal: "$300",
+    orderStatus: false,
+  }
+]
 
 export const mockDataSubcategory = [
   {id:1, name: 'Category 1'},
@@ -39,331 +69,165 @@ export const mockDataSubcategory = [
   {id:3, name: 'Category 3'}
 ]
 
-export const mockDataProduct = [
-  {
-    id: 1,
-    name: 'Sản phẩm 1',
-    subcategory: {id:1, name: 'Category 1'},
-    createdate: "01-01-2023", 
-    price: 100,
-    description: 'Đây là sản phẩm 1',
-    image: 'sp1.png'
-  },
-  {
-    id: 2,
-    name: 'Sản phẩm 2',
-    subcategory: {id:2, name: 'Category 2'},
-    createdate: "01-01-2023", 
-    price: 200,
-    description: 'Đây là sản phẩm 2',
-    image: 'sp2.png'
-  },
-  {
-    id: 3,
-    name: 'Sản phẩm 3',
-    subcategory: {id:3, name: 'Category 3'},
-    createdate: "01-01-2023", 
-    price: 300,
-    description: 'Đây là sản phẩm 3',
-    image: 'sp3.png'
-  },
-];
-
-export const mockDataInvoices = [
-  {
-    id: 1,
-    customer: {
-      username: "jonsnow",
-      fullname: "Jon Snow",
-      phone: "(665)121-5454",
-      email: "jonsnow@gmail.com",
-      createdate: "01-01-2023",
-      status: 0,
-    },
-    total: "800",
-    date: "03/12/2022",
-    details: [
-      {
-        id: 1,
-        product: {
-          id: 1,
-          name: 'Sản phẩm 1',
-          subcategory: {id:1, name: 'Category 1'},
-          createdate: "01-01-2023", 
-          price: 100,
-          description: 'Đây là sản phẩm 1',
-          image: 'sp1.png'
-        }, 
-        quantity: 5,
-      },
-      {
-        id: 2,
-        product: {
-          id: 3,
-          name: 'Sản phẩm 3',
-          subcategory: {id:3, name: 'Category 3'},
-          createdate: "01-01-2023", 
-          price: 300,
-          description: 'Đây là sản phẩm 3',
-          image: 'sp3.png'
-        },
-        quantity: 1
-      },
-    ],
-  },
-  {
-    id: 2,
-    customer: {
-      username: "jonsnow",
-      fullname: "Jon Snow",
-      phone: "(665)121-5454",
-      email: "jonsnow@gmail.com",
-      createdate: "01-01-2023",
-      status: 0,
-    },
-    total: "700",
-    date: "06/15/2021",
-    details: [
-      {
-        id: 1,
-        product: {
-          id: 1,
-          name: 'Sản phẩm 1',
-          subcategory: {id:1, name: 'Category 1'},
-          createdate: "01-01-2023", 
-          price: 100,
-          description: 'Đây là sản phẩm 1',
-          image: 'sp1.png'
-        }, 
-        quantity: 1,
-      },
-      {
-        id: 2,
-        product: {
-          id: 3,
-          name: 'Sản phẩm 3',
-          subcategory: {id:3, name: 'Category 3'},
-          createdate: "01-01-2023", 
-          price: 300,
-          description: 'Đây là sản phẩm 3',
-          image: 'sp3.png'
-        },
-        quantity: 2
-      },
-    ],
-  },
-];
-
-export const mockTransactions = [
-  {
-    txId: "01e4dsa",
-    user: "johndoe",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "0315dsaa",
-    user: "jackdower",
-    date: "2022-04-01",
-    cost: "133.45",
-  },
-  {
-    txId: "01e4dsa",
-    user: "aberdohnny",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "51034szv",
-    user: "goodmanave",
-    date: "2022-11-05",
-    cost: "200.95",
-  },
-  {
-    txId: "0a123sb",
-    user: "stevebower",
-    date: "2022-11-02",
-    cost: "13.55",
-  },
-  {
-    txId: "01e4dsa",
-    user: "aberdohnny",
-    date: "2021-09-01",
-    cost: "43.95",
-  },
-  {
-    txId: "120s51a",
-    user: "wootzifer",
-    date: "2019-04-15",
-    cost: "24.20",
-  },
-  {
-    txId: "0315dsaa",
-    user: "jackdower",
-    date: "2022-04-01",
-    cost: "133.45",
-  },
-];
-
 export const mockLineData = [
   {
-    id: "japan",
+    id: "Users",
     color: tokens("dark").greenAccent[500],
     data: [
       {
-        x: "plane",
+        x: "Jan",
         y: 101,
       },
       {
-        x: "helicopter",
+        x: "Feb",
         y: 75,
       },
       {
-        x: "boat",
+        x: "Mar",
         y: 36,
       },
       {
-        x: "train",
+        x: "Apr",
         y: 216,
       },
       {
-        x: "subway",
+        x: "May",
         y: 35,
       },
       {
-        x: "bus",
+        x: "Jun",
         y: 236,
       },
       {
-        x: "car",
+        x: "Jul",
         y: 88,
       },
       {
-        x: "moto",
+        x: "Aug",
         y: 232,
       },
       {
-        x: "bicycle",
+        x: "Sep",
         y: 281,
       },
       {
-        x: "horse",
+        x: "Oct",
         y: 1,
       },
       {
-        x: "skateboard",
+        x: "Nov",
         y: 35,
       },
       {
-        x: "others",
+        x: "Dec",
         y: 14,
       },
     ],
   },
   {
-    id: "france",
+    id: "Products",
     color: tokens("dark").blueAccent[300],
     data: [
       {
-        x: "plane",
+        x: "Jan",
         y: 212,
       },
       {
-        x: "helicopter",
+        x: "Feb",
         y: 190,
       },
       {
-        x: "boat",
+        x: "Mar",
         y: 270,
       },
       {
-        x: "train",
+        x: "Apr",
         y: 9,
       },
       {
-        x: "subway",
+        x: "May",
         y: 75,
       },
       {
-        x: "bus",
+        x: "Jun",
         y: 175,
       },
       {
-        x: "car",
+        x: "Jul",
         y: 33,
       },
       {
-        x: "moto",
+        x: "Aug",
         y: 189,
       },
       {
-        x: "bicycle",
+        x: "Sep",
         y: 97,
       },
       {
-        x: "horse",
+        x: "Oct",
         y: 87,
       },
       {
-        x: "skateboard",
+        x: "Nov",
         y: 299,
       },
       {
-        x: "others",
+        x: "Dec",
         y: 251,
       },
     ],
   },
   {
-    id: "us",
+    id: "Money",
     color: tokens("dark").redAccent[200],
     data: [
       {
-        x: "plane",
+        x: "Jan",
         y: 191,
       },
       {
-        x: "helicopter",
+        x: "Feb",
         y: 136,
       },
       {
-        x: "boat",
+        x: "Mar",
         y: 91,
       },
       {
-        x: "train",
+        x: "Apr",
         y: 190,
       },
       {
-        x: "subway",
+        x: "May",
         y: 211,
       },
       {
-        x: "bus",
+        x: "Jun",
         y: 152,
       },
       {
-        x: "car",
+        x: "Jul",
         y: 189,
       },
       {
-        x: "moto",
+        x: "Aug",
         y: 152,
       },
       {
-        x: "bicycle",
+        x: "Sep",
         y: 8,
       },
       {
-        x: "horse",
+        x: "Oct",
         y: 197,
       },
       {
-        x: "skateboard",
+        x: "Nov",
         y: 107,
       },
       {
-        x: "others",
+        x: "Dec",
         y: 170,
       },
     ],

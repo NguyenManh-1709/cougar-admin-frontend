@@ -5,19 +5,27 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CreateIcon from '@mui/icons-material/Create';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import CloudinaryUploader from "../../components/CloudinaryUploader";
 import { useSelector } from "react-redux/es/hooks/useSelector";
+import { useDispatch } from "react-redux";
+import { userPost } from "../../store/User/api";
+import { userPut } from "../../store/User/api";
+import { useParams } from 'react-router-dom';
 
 const FormCreateUser = () => {
+  const { user } = useParams();
+  const decodedUser = JSON.parse(decodeURIComponent(user));
+
   const baseUploadImageUrl = `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`
   const imageUrl = useSelector((state) => state.uploadImageStore.url).slice(baseUploadImageUrl.length).trim()
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const dispatch = useDispatch();
 
   const handleFormSubmit = (values) => {
     values.avatar = imageUrl;
-    console.log(values)
+    values.id === "" ? dispatch(userPost(values)) : dispatch(userPut(values));
   };
 
   return (
@@ -27,7 +35,7 @@ const FormCreateUser = () => {
         <CloudinaryUploader />
         <Formik
           onSubmit={handleFormSubmit}
-          initialValues={initialValues}
+          initialValues={decodedUser}
           validationSchema={checkoutSchema}
         >
           {({
@@ -38,7 +46,7 @@ const FormCreateUser = () => {
             handleChange,
             handleSubmit,
           }) => (
-            <form onSubmit={handleSubmit} style={{width: "100%"}}>
+            <form onSubmit={handleSubmit} style={{ width: "100%" }}>
               <Box
                 display="grid"
                 gap="30px"
@@ -85,7 +93,7 @@ const FormCreateUser = () => {
                   helperText={touched.fullname && errors.fullname}
                   sx={{ gridColumn: "span 4" }}
                 />
-                
+
                 <TextField
                   fullWidth
                   variant="filled"
@@ -130,16 +138,14 @@ const FormCreateUser = () => {
                   disabled
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.createdate}
-                  name="createdate"
-                  error={!!touched.createdate && !!errors.createdate}
-                  helperText={touched.createdate && errors.createdate}
+                  value={values.createDate}
+                  name="createDate"
                   sx={{ gridColumn: "span 4" }}
                 />
               </Box>
               <Box display="flex" justifyContent="space-between" mt="20px">
                 <Link
-                  to={"/users"}
+                  to={"/management"}
                   style={{
                     textDecoration: 'none',
                     background: "#1F2A40",
@@ -150,7 +156,7 @@ const FormCreateUser = () => {
                 >
                   <Box display="flex" alignItems="center">
                     <ArrowBackIcon></ArrowBackIcon>
-                    <Box ml="5px">Back to list users</Box>
+                    <Box ml="5px">Back to management</Box>
                   </Box>
                 </Link>
                 <Button type="submit" variant="contained" style={{
@@ -158,8 +164,8 @@ const FormCreateUser = () => {
                   color: "white",
                 }}>
                   <Box display="flex" alignItems="center">
-                    <CreateIcon></CreateIcon>
-                    <Box ml="5px">Create</Box>
+                    <SaveAltIcon></SaveAltIcon>
+                    <Box ml="5px">Save</Box>
                   </Box>
                 </Button>
               </Box>
@@ -179,15 +185,5 @@ const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
   phone: yup.string().matches(phoneRegExp, "Phone number is not valid").required("required"),
 });
-
-const initialValues = {
-  id: "",
-  password: "",
-  fullname: "",
-  email: "",
-  phone: "",
-  createdate: new Date().toISOString().slice(0, 10),
-  avatar: "",
-};
 
 export default FormCreateUser;

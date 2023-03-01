@@ -5,10 +5,9 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import LogoutIcon from '@mui/icons-material/Logout';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -119,23 +118,16 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Users"
-              to="/users"
-              icon={<PeopleOutlinedIcon />}
+              title="Management"
+              to="/management"
+              icon={<SettingsIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Products"
-              to="/products"
-              icon={<CheckBoxOutlineBlankIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Invoices"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
+              title="Log out"
+              to="/"
+              icon={<LogoutIcon />}
               selected={selected}
               setSelected={setSelected}
             />
