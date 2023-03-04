@@ -6,12 +6,16 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useSelector } from "react-redux";
+import { customListOfUsersWithRolesState } from "../../store/User/selector";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
   return (
     <MenuItem
       active={selected === title}
@@ -32,6 +36,9 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+
+  const userLogedIn = useSelector(customListOfUsersWithRolesState).find(user => { return user.id === 7 });
+  // const userLogedIn = null;
 
   return (
     <Box
@@ -77,19 +84,19 @@ const Sidebar = () => {
                 <Typography variant="h3" color={colors.grey[100]}>
                   Cougar Store
                 </Typography>
-                
+
               </Box>
             )}
           </MenuItem>
 
-          {!isCollapsed && (
+          {(!isCollapsed && userLogedIn) && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${userLogedIn.avatar}`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -100,38 +107,51 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Nguyễn Đình Mạnh
+                  {userLogedIn.fullname}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
+                <Typography variant="h5" color={colors.greenAccent[300]}>
                   Administrator
                 </Typography>
               </Box>
             </Box>
           )}
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
-              title="Dashboard"
-              to="/"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Management"
-              to="/management"
-              icon={<SettingsIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Log out"
-              to="/"
-              icon={<LogoutIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-          </Box>
+          {userLogedIn && (
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              <Item
+                title="Dashboard"
+                to="/dashboard"
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Management"
+                to="/management"
+                icon={<SettingsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Log out"
+                to="/"
+                icon={<LogoutIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </Box>
+          )}
+          {!userLogedIn && (
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              <Item
+                title="Login"
+                to="/"
+                icon={<LoginIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </Box>
+          )}
         </Menu>
       </ProSidebar>
     </Box>

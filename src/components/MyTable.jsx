@@ -1,5 +1,6 @@
 import { Box, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { useState } from "react";
 import { tokens } from "../theme";
 import Header from "./Header";
 
@@ -10,6 +11,12 @@ const MyTable = (props) => {
   const columns = props.columns;
   const rows = props.rows;
   const title = props.title;
+
+  const [pageSize, setPageSize] = useState(10);
+
+  const handlePageSizeChange = (params) => {
+    setPageSize(params.pageSize);
+  };
 
   return (
     <Box>
@@ -38,19 +45,23 @@ const MyTable = (props) => {
             borderTop: "none",
             backgroundColor: colors.blueAccent[700],
           },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
             color: `${colors.grey[100]} !important`,
           },
+          "& .MuiDataGrid-selectedRowCount": {
+            // display: "none"
+          }
         }}
       >
         <DataGrid 
           sx={{fontSize: "1rem"}}
-          rows={rows} 
+          rows={rows}
           columns={columns} 
           getRowId={(row) => row.id}
+          isRowSelectable={() => {return false}}
+          pageSize={pageSize}
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          onPageSizeChange={handlePageSizeChange}
           components={{ Toolbar: GridToolbar }}/>
       </Box>
     </Box>

@@ -1,0 +1,1 @@
+export const subCategoriesState = (state) => state.subCategoriesStore.subCategories

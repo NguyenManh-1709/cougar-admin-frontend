@@ -13,16 +13,16 @@ import { useSelector } from "react-redux";
 import { customListOfUsersWithRolesState } from "../../store/User/selector";
 import { productItemsState } from "../../store/ProductItem/selector";
 import { invoicesState } from "../../store/Invoice/selector";
+import { invoicesDetailsState } from "../../store/InvoiceDetail/selector"
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // const firstDayOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
   const usersWithRoles = useSelector(customListOfUsersWithRolesState);
   const productItems = useSelector(productItemsState);
   const invoices = useSelector(invoicesState);
+  const invoicesDetails = useSelector(invoicesDetailsState);
 
   function calculateGrowthPercentage(arr) {
     const firstDayOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -47,24 +47,39 @@ const Dashboard = () => {
 
 
 
-  const totalsByUserMap = new Map();
-
+  const totalOrderGroupByUserMap = new Map();
+  
   for (const invoice of invoices) {
     const { user, orderTotal } = invoice;
     const { id: userId, fullname } = user;
 
-    if (totalsByUserMap.has(userId)) {
-      const { orderTotal: total } = totalsByUserMap.get(userId);
-      totalsByUserMap.set(userId, { fullname, orderTotal: total + orderTotal });
+    if (totalOrderGroupByUserMap.has(userId)) {
+      const { orderTotal: total } = totalOrderGroupByUserMap.get(userId);
+      totalOrderGroupByUserMap.set(userId, { fullname, orderTotal: total + orderTotal });
     } else {
-      totalsByUserMap.set(userId, { fullname, orderTotal });
+      totalOrderGroupByUserMap.set(userId, { fullname, orderTotal });
     }
   }
 
   const topTenUsersWhoBuyTheMost = Array
-    .from(totalsByUserMap, ([userId, { fullname, orderTotal }]) => ({ userId, fullname, orderTotal }))
+    .from(totalOrderGroupByUserMap, ([userId, { fullname, orderTotal }]) => ({ userId, fullname, orderTotal }))
     .sort((a, b) => b.orderTotal - a.orderTotal)
     .slice(0, 10);
+
+  const tempArr = [];
+  const tempMap = new Map();
+  invoicesDetails.forEach(({ productItem, qty }) => {
+    const { id: productItemId, product } = productItem;
+    const temp = tempMap.get(productItemId);
+    tempMap.set(productItemId, temp ? { ...temp, qty: temp.qty + qty } : { product, qty });
+  });
+  for (const [productItemId, { product, ...props }] of tempMap) {
+    tempArr.push({ productItemId, productName: product.name, ...props });
+  }
+
+  const topTenBestSellingProducts = tempArr.sort((a, b) => b.qty - a.qty).slice(0, 10);
+
+
 
   return (
     <Box m="20px">
@@ -73,7 +88,7 @@ const Dashboard = () => {
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
       </Box>
 
-      {/* GRID & CHARTS */}
+      {/* GRID */}
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
@@ -184,7 +199,7 @@ const Dashboard = () => {
 
         {/* ROW 2 */}
         <Box
-          gridColumn="span 8"
+          gridColumn="span 4"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
         >
@@ -248,23 +263,76 @@ const Dashboard = () => {
                   color={colors.greenAccent[500]}
                   variant="h5"
                   fontWeight="600"
-                  fontSize="1.3rem"
+                  fontSize="1rem"
                 >
                   {item.fullname}
                 </Typography>
                 <Typography color={colors.grey[100]} variant="h6">
-                  USER-ID: {item.userId}
+                  User-id: {item.userId}
                 </Typography>
               </Box>
               <Box
-                backgroundColor={colors.greenAccent[500]}
-                color="#000"
+                backgroundColor={colors.grey[100]}
+                color={colors.grey[900]}
                 p="5px"
                 borderRadius="4px"
                 fontSize="1.2rem"
                 fontWeight="600"
               >
                 ${item.orderTotal}
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        <Box
+          gridColumn="span 4"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+          overflow="auto"
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            colors={colors.grey[100]}
+            p="15px"
+          >
+            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+              Top 10 best selling products
+            </Typography>
+          </Box>
+          {topTenBestSellingProducts.map((item, i) => (
+            <Box
+              key={`${item.productItemId}-${i}`}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              borderBottom={`4px solid ${colors.primary[500]}`}
+              p="15px"
+            >
+              <Box>
+                <Typography
+                  color={colors.greenAccent[500]}
+                  variant="h5"
+                  fontWeight="600"
+                  fontSize="1rem"
+                >
+                  {item.productName}
+                </Typography>
+                <Typography color={colors.grey[100]} variant="h6">
+                  Product-item-id: {item.productItemId}
+                </Typography>
+              </Box>
+              <Box
+                backgroundColor={colors.grey[100]}
+                color={colors.grey[900]}
+                p="5px"
+                borderRadius="4px"
+                fontSize="1.2rem"
+                fontWeight="600"
+              >
+                {item.qty}
               </Box>
             </Box>
           ))}
