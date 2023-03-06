@@ -10,7 +10,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useSelector } from "react-redux";
-import { customListOfUsersWithRolesState } from "../../store/User/selector";
+import { userLogedInState } from "../../store/Login/selector";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -37,8 +37,7 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
-  const userLogedIn = useSelector(customListOfUsersWithRolesState).find(user => { return user.id === 7 });
-  // const userLogedIn = null;
+  const userLogedIn = useSelector(userLogedInState);
 
   return (
     <Box
@@ -92,13 +91,15 @@ const Sidebar = () => {
           {(!isCollapsed && userLogedIn) && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${userLogedIn.avatar}`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                {userLogedIn.avatar && (
+                  <img
+                    alt="profile-user"
+                    width="100px"
+                    height="100px"
+                    src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${userLogedIn.avatar}`}
+                    style={{ cursor: "pointer", borderRadius: "50%" }}
+                  />
+                )}
               </Box>
               <Box textAlign="center">
                 <Typography

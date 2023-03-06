@@ -15,7 +15,16 @@ const productItemSlice = createSlice({
         state.status = "loading";
       })
       .addCase(productItemGetAll.fulfilled, (state, action) => {
-        state.productItems = action.payload;
+        const itemsToAdd = action.payload.map(({ color, size, ...rest }) => {
+          return {
+            ...rest.productItem,
+            color,
+            size
+          };
+        });
+        
+        state.productItems.push(...itemsToAdd);
+
         state.status = "idle";
       })
   },

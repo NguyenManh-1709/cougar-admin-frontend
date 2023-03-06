@@ -64,6 +64,8 @@ const ProductCard = (props) => {
                     <Typography fontSize={"1rem"} paragraph>SubCategory: {productItem.product.subcategory.name}</Typography>
                     <Typography fontSize={"1rem"} paragraph>Brand: {productItem.product.brand.name}</Typography>
                     <Typography fontSize={"1rem"} paragraph>SKU: {productItem.sku}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Size: {productItem.size}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Color: {productItem.color}</Typography>
                     <Typography fontSize={"1rem"} paragraph>Price: {productItem.price}</Typography>
                     <Typography fontSize={"1rem"} paragraph>Quantity: {productItem.qtyInStock}</Typography>
                     <Typography fontSize={"1rem"} paragraph>Create date: {productItem.createDate}</Typography>

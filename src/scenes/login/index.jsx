@@ -3,28 +3,18 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import LoginIcon from '@mui/icons-material/Login';
-// import { login } from "../../store/Login/api";
-// import { userLogedInTokenState } from "../../store/Login/selector";
-// import { userLogedInState } from "../../store/Login/selector";
-// import { useSelector } from "react-redux";
+import { login } from "../../store/Login/api";
+import { useDispatch } from "react-redux";
+import { loginStatusState } from "../../store/Login/selector";
+import { useSelector } from "react-redux";
 
 const FormLogin = () => {
-
-    // const userLogedInToken = useSelector(userLogedInTokenState);
-    // const userLogedIn = useSelector(userLogedInState);
+    const dispatch = useDispatch();
+    const loginStatus = useSelector(loginStatusState);
 
     const handleFormSubmit = (values) => {
-        // Call API LOGIN
-        // login();
-
-        // Nếu userLogedInToken tồn tại (Đã login thành công) thì chuyển hướng đến dashboard
-        // if (userLogedInToken != null) {
-        //     window.location.href = '/dashboard';
-        // }
-
-        console.log(values);
+        dispatch(login(values));
     };
-
 
     const initialValues = { email: "", password: "" };
     return (
@@ -34,7 +24,7 @@ const FormLogin = () => {
                 <Formik
                     onSubmit={handleFormSubmit}
                     initialValues={initialValues}
-                    validationSchema={checkoutSchema}
+                    validationSchema={loginSchema}
                 >
                     {({
                         values,
@@ -80,6 +70,7 @@ const FormLogin = () => {
                                     <Box ml="5px">Login</Box>
                                 </Box>
                             </Button>
+                            <Box sx={{textAlign: "center"}}>{loginStatus}</Box>
                         </form>
                     )}
                 </Formik>
@@ -88,7 +79,7 @@ const FormLogin = () => {
     );
 };
 
-const checkoutSchema = yup.object().shape({
+const loginSchema = yup.object().shape({
     email: yup.string().email("invalid email").required("required"),
     password: yup.string().required("required"),
 });

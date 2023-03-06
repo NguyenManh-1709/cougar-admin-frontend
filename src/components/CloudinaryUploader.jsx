@@ -1,8 +1,10 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, Slider, TextField } from "@mui/material";
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { confirmationClick } from '../store/CloudinaryUploader/slice';
 import AvatarEditor from 'react-avatar-editor';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const CloudinaryUploader = () => {
   const dispatch = useDispatch();
@@ -53,7 +55,7 @@ const CloudinaryUploader = () => {
           width={300}
           height={300}
           border={25}
-          color={[180,180,180]}
+          color={[180,180,180,0.5]}
           borderRadius={360}
           scale={scale}
           position={position}
@@ -61,7 +63,11 @@ const CloudinaryUploader = () => {
         />
         {errorFile && <h3 style={{background: "#B4B4B4", color: "#8B0000", textAlign: "center", padding: "2px"}}>{errorFile}</h3>}
         <TextField type="file" variant="outlined" onChange={handleFileChange} style={{ width: "350px" }} />
-        <TextField type="range" variant="outlined" min="1" max="1.1" step="0.1" value={scale} onChange={handleScaleChange} style={{ width: "350px" }} />
+        <Box display="flex" alignItems="center" gap="10px" style={{ width: "350px" }}>
+          <RemoveCircleOutlineIcon onClick={() => {setScale(((scale - 0.05)<0.5) ? 0.5 : (scale - 0.05))}} style={{cursor: "pointer"}}/>
+          <Slider value={scale} onChange={handleScaleChange} min={0.5} max={2} step={0.01}  color="success"/>
+          <AddCircleOutlineIcon onClick={() => {setScale(((scale + 0.05)>2 ? 2 : (scale + 0.05)))}} style={{cursor: "pointer"}}/>
+        </Box>
         {file && <Button variant="contained" style={{ background: "#1F2A40", color: "white", width: "350px" }} onClick={handleSave}>Confirm And Upload</Button>}
       </Box>
     </Box>

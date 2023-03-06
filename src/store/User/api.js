@@ -16,11 +16,6 @@ export const userGetUserOnly = createAsyncThunk('user/getUserOnly', async () => 
     return response.data;
 });
 
-export const userGetById = createAsyncThunk('user/getById', async (user) => {
-    const response = await axios.get(`http://localhost:8080/rest/users/${user.id}`);
-    return response.data;
-});
-
 export const userPost = createAsyncThunk('user/post', async (user) => {
     const response = await axios.post(`http://localhost:8080/rest/users`, user);
     return response.data;
@@ -29,10 +24,5 @@ export const userPost = createAsyncThunk('user/post', async (user) => {
 export const userPut = createAsyncThunk('user/put', async (user) => {
     const response = await axios.put(`http://localhost:8080/rest/users`, user);
     return response.data;
-});
-
-export const userDelete = createAsyncThunk('user/delete', async (id) => {
-    await axios.delete(`http://localhost:8080/rest/users/${id}`);
-    return id;
 });
 
