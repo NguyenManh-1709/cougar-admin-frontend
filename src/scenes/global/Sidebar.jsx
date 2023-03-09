@@ -97,7 +97,16 @@ const Sidebar = () => {
                     width="100px"
                     height="100px"
                     src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${userLogedIn.avatar}`}
-                    style={{ cursor: "pointer", borderRadius: "50%" }}
+                    style={{ borderRadius: "50%" }}
+                  />
+                )}
+                {!userLogedIn.avatar && (
+                  <img
+                    alt="profile-user"
+                    width="100px"
+                    height="100px"
+                    src={`https://res.cloudinary.com/dmjh7imwd/image/upload/v1678190935/CougarStore/149071_s8mfea.png`}
+                    style={{ borderRadius: "50%" }}
                   />
                 )}
               </Box>

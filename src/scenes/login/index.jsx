@@ -7,16 +7,19 @@ import { login } from "../../store/Login/api";
 import { useDispatch } from "react-redux";
 import { loginStatusState } from "../../store/Login/selector";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const FormLogin = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const loginStatus = useSelector(loginStatusState);
 
     const handleFormSubmit = (values) => {
         dispatch(login(values));
+        navigate("/dashboard");
     };
 
-    const initialValues = { email: "", password: "" };
+    const initialValues = { email: "manhnd@gmail.com", password: "123456" };
     return (
         <Box m="20px">
             <Header title="Login" subtitle="For administrator only" />

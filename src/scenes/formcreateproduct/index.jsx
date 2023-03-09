@@ -18,7 +18,7 @@ const FormCreateProduct = () => {
 
   return (
     <Box m="20px">
-      <Header title="CREATE PRODUCT"/>
+      <Header title="PRODUCT"/>
 
       <Formik
         onSubmit={handleFormSubmit}

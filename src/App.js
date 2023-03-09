@@ -50,10 +50,10 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={<FormLogin />} />
+              <Route path="/" element={!loginStatus ? <FormLogin /> : <Navigate to={-1} />} />
               <Route path="/dashboard" element={loginStatus ? <Dashboard /> : <Navigate to="/" />} />
               <Route path="/form-user/:user" element={loginStatus ? <FormCreateUser /> : <Navigate to="/" />} />
-              <Route path="/createproduct" element={loginStatus ? <FormCreateProduct /> : <Navigate to="/" />} />
+              <Route path="/createproduct/:id" element={loginStatus ? <FormCreateProduct /> : <Navigate to="/" />} />
               <Route path="/management" element={loginStatus ? <Management /> : <Navigate to="/" />} />
             </Routes>
           </main>

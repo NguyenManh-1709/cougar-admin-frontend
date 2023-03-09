@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import { Tooltip } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -25,6 +26,7 @@ const ExpandMore = styled((props) => {
 const ProductCard = (props) => {
     const { productItem } = props;
     const [expanded, setExpanded] = React.useState(false);
+    const navigate = useNavigate();
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -45,7 +47,9 @@ const ProductCard = (props) => {
             </CardContent>
             <CardActions disableSpacing>
                 <Tooltip title="Edit">
-                    <IconButton>
+                    <IconButton onClick={() => {
+                        navigate(`/createproduct/${productItem.id}`);
+                    }}>
                         <EditIcon />
                     </IconButton>
                 </Tooltip>
