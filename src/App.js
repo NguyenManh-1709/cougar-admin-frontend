@@ -3,22 +3,19 @@ import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
-import Management from "./scenes/manager";
 import FormCreateUser from "./scenes/formcreateuser";
 import FormCreateProduct from "./scenes/formcreateproduct";
 import FormLogin from "./scenes/login";
+import Invoice from "./scenes/invoice";
+import User from "./scenes/user";
+import Product from "./scenes/product";
+import { Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import { useDispatch, useSelector } from "react-redux";
-import { authorityGetAll } from "./store/Authority/api";
-import { productItemGetAll } from "./store/ProductItem/api";
-import { invoiceGetAll } from "./store/Invoice/api";
-import { invoiceDetailsGetAll } from "./store/InvoiceDetail/api";
-import { categoriesGetAll } from "./store/Category/api";
-import { subCategoriesGetAll } from "./store/SubCategory/api";
-import { getUserById } from "./store/Login/api";
-import { Navigate } from 'react-router-dom';
-import { loginStatusState } from "./store/Login/selector";
+
+import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById } from "./store/apis";
+import { loginStatusState } from "./store/selectors";
 
 function App() {
   const dispatch = useDispatch();
@@ -52,9 +49,11 @@ function App() {
             <Routes>
               <Route path="/" element={!loginStatus ? <FormLogin /> : <Navigate to={-1} />} />
               <Route path="/dashboard" element={loginStatus ? <Dashboard /> : <Navigate to="/" />} />
-              <Route path="/form-user/:user" element={loginStatus ? <FormCreateUser /> : <Navigate to="/" />} />
+              <Route path="/form-user/:id" element={loginStatus ? <FormCreateUser /> : <Navigate to="/" />} />
               <Route path="/createproduct/:id" element={loginStatus ? <FormCreateProduct /> : <Navigate to="/" />} />
-              <Route path="/management" element={loginStatus ? <Management /> : <Navigate to="/" />} />
+              <Route path="/invoices" element={loginStatus ? <Invoice /> : <Navigate to="/" />} />
+              <Route path="/users" element={loginStatus ? <User /> : <Navigate to="/" />} />
+              <Route path="/products" element={loginStatus ? <Product /> : <Navigate to="/" />} />
             </Routes>
           </main>
         </div>

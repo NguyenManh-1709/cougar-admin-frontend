@@ -8,9 +8,11 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import SettingsIcon from '@mui/icons-material/Settings';
+import GroupIcon from '@mui/icons-material/Group';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { useSelector } from "react-redux";
-import { userLogedInState } from "../../store/Login/selector";
+import { userLogedInState } from "../../store/selectors";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -136,9 +138,23 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
               <Item
-                title="Management"
-                to="/management"
-                icon={<SettingsIcon />}
+                title="Users"
+                to="/users"
+                icon={<GroupIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Products"
+                to="/products"
+                icon={<CheckBoxOutlineBlankIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Invoices"
+                to="/invoices"
+                icon={<ReceiptIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />

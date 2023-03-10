@@ -3,11 +3,11 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import LoginIcon from '@mui/icons-material/Login';
-import { login } from "../../store/Login/api";
 import { useDispatch } from "react-redux";
-import { loginStatusState } from "../../store/Login/selector";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../store/apis";
+import { loginStatusState } from "../../store/selectors";
 
 const FormLogin = () => {
     const dispatch = useDispatch();

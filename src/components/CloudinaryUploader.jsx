@@ -1,7 +1,7 @@
 import { Box, Button, Slider, TextField } from "@mui/material";
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { confirmationClick } from '../store/CloudinaryUploader/slice';
+import { uploadAvatarToCloud } from "../store/apis";
 import AvatarEditor from 'react-avatar-editor';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -39,7 +39,7 @@ const CloudinaryUploader = () => {
       const canvas = editor.getImage();
       const dataURL = canvas.toDataURL();
       try {
-        dispatch(confirmationClick(dataURL))
+        dispatch(uploadAvatarToCloud(dataURL))
       } catch (error) {
         console.log('Error uploading image to Cloudinary: ', error);
       }

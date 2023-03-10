@@ -1,28 +1,25 @@
-import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
+import { Box, Typography, useTheme } from "@mui/material";
+import Header from "../../components/Header";
+import LineChart from "../../components/LineChart";
+import StatBox from "../../components/StatBox";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PaidIcon from '@mui/icons-material/Paid';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import StatBox from "../../components/StatBox";
+import { usersWithRolesState, productItemsState, invoicesState, invoiceDetailsState } from "../../store/selectors";
 import { useSelector } from "react-redux";
-import { customListOfUsersWithRolesState } from "../../store/User/selector";
-import { productItemsState } from "../../store/ProductItem/selector";
-import { invoicesState } from "../../store/Invoice/selector";
-import { invoicesDetailsState } from "../../store/InvoiceDetail/selector"
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const usersWithRoles = useSelector(customListOfUsersWithRolesState);
+  const usersWithRoles = useSelector(usersWithRolesState);
   const productItems = useSelector(productItemsState);
   const invoices = useSelector(invoicesState);
-  const invoicesDetails = useSelector(invoicesDetailsState);
+  const invoicesDetails = useSelector(invoiceDetailsState);
 
   function calculateGrowthPercentage(arr) {
     const firstDayOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
