@@ -19,7 +19,7 @@ const FormLogin = () => {
         navigate("/dashboard");
     };
 
-    const initialValues = { email: "manhnd@gmail.com", password: "123456" };
+    const initialValues = { email: "", password: "" };
     return (
         <Box m="20px">
             <Header title="Login" subtitle="For administrator only" />

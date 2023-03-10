@@ -47,13 +47,13 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={!loginStatus ? <FormLogin /> : <Navigate to={-1} />} />
-              <Route path="/dashboard" element={loginStatus ? <Dashboard /> : <Navigate to="/" />} />
-              <Route path="/form-user/:id" element={loginStatus ? <FormCreateUser /> : <Navigate to="/" />} />
-              <Route path="/createproduct/:id" element={loginStatus ? <FormCreateProduct /> : <Navigate to="/" />} />
-              <Route path="/invoices" element={loginStatus ? <Invoice /> : <Navigate to="/" />} />
-              <Route path="/users" element={loginStatus ? <User /> : <Navigate to="/" />} />
-              <Route path="/products" element={loginStatus ? <Product /> : <Navigate to="/" />} />
+              <Route path="/" element={loginStatus !== "Successfully!" ? <FormLogin /> : <Navigate to={-1} />} />
+              <Route path="/dashboard" element={loginStatus === "Successfully!" ? <Dashboard /> : <Navigate to="/" />} />
+              <Route path="/form-user/:id" element={loginStatus === "Successfully!" ? <FormCreateUser /> : <Navigate to="/" />} />
+              <Route path="/createproduct/:id" element={loginStatus === "Successfully!" ? <FormCreateProduct /> : <Navigate to="/" />} />
+              <Route path="/invoices" element={loginStatus === "Successfully!" ? <Invoice /> : <Navigate to="/" />} />
+              <Route path="/users" element={loginStatus === "Successfully!" ? <User /> : <Navigate to="/" />} />
+              <Route path="/products" element={loginStatus === "Successfully!" ? <Product /> : <Navigate to="/" />} />
             </Routes>
           </main>
         </div>
