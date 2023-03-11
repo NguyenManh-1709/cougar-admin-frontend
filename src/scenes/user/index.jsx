@@ -32,6 +32,12 @@ const User = () => {
             field: "createDate",
             headerName: "CREATEDATE",
             flex: 1,
+            renderCell: ({ row: { createDate } }) => {
+                const temp = new Date(createDate).toISOString().slice(0, 10);
+                return (
+                    temp
+                );
+            },
         },
         {
             field: "role",

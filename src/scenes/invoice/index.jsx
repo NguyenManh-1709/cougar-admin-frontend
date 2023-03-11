@@ -1,8 +1,12 @@
-import { Box, Button, List, ListItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Button, List, ListItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from "@mui/material";
 import { useState } from "react";
 import { invoicesState, invoiceDetailsState } from "../../store/selectors";
 import MyTable from "../../components/MyTable";
 import { useSelector } from "react-redux";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { invoiceStatusPut } from "../../store/apis";
+import { useDispatch } from "react-redux";
+import { tokens } from "../../theme";
 
 const style = {
   position: 'absolute',
@@ -17,6 +21,9 @@ const style = {
 };
 
 const Invoice = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const dispatch = useDispatch();
   const invoiceDetails = useSelector(invoiceDetailsState);
   const invoices = useSelector(invoicesState);
 
@@ -38,6 +45,16 @@ const Invoice = () => {
       });
     setInvoiceDetailsToShow(resultToShow);
   };
+
+  const handleChangeInvoiceStatus = (id) => {
+    const temp = invoices.find(item => item.id === id);
+    const invoiceToUpdate = {
+      ...temp,
+      orderStatus: temp.orderStatus === null ? false : !temp.orderStatus
+    };
+
+    dispatch(invoiceStatusPut(invoiceToUpdate));
+  }
 
   const handleCloseInvoiceDetails = () => setOpenInvoiceDetails(false);
 
@@ -72,6 +89,13 @@ const Invoice = () => {
     {
       field: "createDate",
       headerName: "CREATE DATE",
+      flex: 1,
+      renderCell: ({ row: { createDate } }) => {
+        const temp = new Date(createDate).toISOString().slice(0,10);
+        return (
+          temp
+        );
+      },
     },
     {
       field: "address",
@@ -111,16 +135,38 @@ const Invoice = () => {
     {
       field: "orderStatus",
       headerName: "STATUS",
+      flex: 1,
       renderCell: ({ row: { orderStatus } }) => {
+        const color = orderStatus === null ? colors.primary[100] : orderStatus ? colors.greenAccent[400] : colors.blueAccent[300];
         return (
-          <Box>
+          <Box sx={{color: color}}>
             {orderStatus === null ? "Pending" : orderStatus ? "Completed" : "Processing"}
           </Box>
         );
       },
     },
     {
-      field: "",
+      field: "changeStatus",
+      headerName: "",
+      flex: 1,
+      renderCell: ({ row: { id, orderStatus } }) => {
+        return (
+          <Box sx={{ width: "100%" }}>
+            {orderStatus !== true &&
+              <Button
+                variant="contained"
+                sx={{ background: "#3E4396", color: "#FFF", width: "100%" }}
+                onClick={() => handleChangeInvoiceStatus(id)}
+              >
+                {orderStatus === null ? "Xác nhận đơn hàng" : orderStatus ? "" : "Xác nhận đã giao hàng"}
+              </Button>
+            }
+          </Box>
+        );
+      },
+    },
+    {
+      field: "show-details",
       headerName: "",
       renderCell: ({ row: { id } }) => {
         return (
@@ -128,7 +174,9 @@ const Invoice = () => {
             variant="contained"
             sx={{ background: "#3E4396", color: "#FFF" }}
             onClick={() => handleOpenInvoiceDetails(id)}
-          >SHOW DETAILS</Button>
+          >
+            <VisibilityIcon />
+          </Button>
         );
       },
     },

@@ -76,3 +76,9 @@ export const userPut = createAsyncThunk('userPut', async (user) => {
   const response = await axios.put(`http://localhost:8080/rest/users`, user);
   return response.data;
 });
+
+// Put invoice (status)
+export const invoiceStatusPut = createAsyncThunk('invoiceStatusPut', async (invoice) => {
+  const response = await axios.put(`http://localhost:8080/rest/shopOrders/changeStatus`, invoice);
+  return response.data;
+});

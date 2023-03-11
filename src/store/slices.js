@@ -12,6 +12,7 @@ import {
   userPost,
   userPut,
   getUserById,
+  invoiceStatusPut,
 } from "./apis";
 
 const mySlice = createSlice({
@@ -118,6 +119,16 @@ const mySlice = createSlice({
         state.status = "idle";
       })
 
+      // Put invoiceStatus
+      .addCase(invoiceStatusPut.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(invoiceStatusPut.fulfilled, (state, action) => {
+        const invoiceUpdated = action.payload;
+        state.invoices = state.invoices.map(item => item.id === invoiceUpdated.id ? invoiceUpdated : item);
+        state.status = "idle";
+      })
+
       // GET ALL INVOICE DETAILS
       .addCase(invoiceDetailsGetAll.pending, (state) => {
         state.status = "loading";
@@ -132,14 +143,15 @@ const mySlice = createSlice({
         state.status = "loading";
       })
       .addCase(productItemGetAll.fulfilled, (state, action) => {
-        const temp = action.payload.map(({ color, size, ...rest }) => {
-          return {
-            ...rest.productItem,
-            color,
-            size
-          };
-        });
-        state.productItems.push(...temp);
+        const temp = action.payload.reduce((accumulator, currentValue) => {
+          const { color, size, ...rest } = currentValue;
+          const newProductItem = rest.productItem;
+          newProductItem.color = currentValue.color;
+          newProductItem.size = currentValue.size;
+          accumulator.push(newProductItem);
+          return accumulator;
+        }, []);
+        state.productItems = temp;
         state.status = "idle";
       })
 
