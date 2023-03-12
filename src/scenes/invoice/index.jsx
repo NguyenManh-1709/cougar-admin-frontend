@@ -25,7 +25,7 @@ const Invoice = () => {
   const colors = tokens(theme.palette.mode);
   const dispatch = useDispatch();
   const invoiceDetails = useSelector(invoiceDetailsState);
-  const invoices = useSelector(invoicesState);
+  const invoices = useSelector(invoicesState).filter(item => item.orderStatus !== null);
 
   // Show Invoice Details
   const [openInvoiceDetails, setOpenInvoiceDetails] = useState(false);
@@ -50,9 +50,8 @@ const Invoice = () => {
     const temp = invoices.find(item => item.id === id);
     const invoiceToUpdate = {
       ...temp,
-      orderStatus: temp.orderStatus === null ? false : !temp.orderStatus
+      orderStatus: temp.orderStatus + 1
     };
-
     dispatch(invoiceStatusPut(invoiceToUpdate));
   }
 
@@ -91,7 +90,7 @@ const Invoice = () => {
       headerName: "CREATE DATE",
       flex: 1,
       renderCell: ({ row: { createDate } }) => {
-        const temp = new Date(createDate).toISOString().slice(0,10);
+        const temp = new Date(createDate).toISOString().slice(0, 10);
         return (
           temp
         );
@@ -137,10 +136,28 @@ const Invoice = () => {
       headerName: "STATUS",
       flex: 1,
       renderCell: ({ row: { orderStatus } }) => {
-        const color = orderStatus === null ? colors.primary[100] : orderStatus ? colors.greenAccent[400] : colors.blueAccent[300];
+        const text = orderStatus === 0 
+          ? "Pending" 
+          : orderStatus === 1 
+            ? "Processing" 
+            : orderStatus === 2 
+              ? "In transit" 
+              : orderStatus === 3 
+                ? "Completed" 
+                : "";
+
+        const color = orderStatus === 0 
+          ? colors.primary[100] 
+          : orderStatus === 1 
+            ? colors.redAccent[300] 
+            : orderStatus === 2 
+              ? colors.blueAccent[300] 
+              : orderStatus === 3 
+                ? colors.greenAccent[400] 
+                : "";
         return (
-          <Box sx={{color: color}}>
-            {orderStatus === null ? "Pending" : orderStatus ? "Completed" : "Processing"}
+          <Box sx={{ color: color }}>
+            {text}
           </Box>
         );
       },
@@ -150,15 +167,22 @@ const Invoice = () => {
       headerName: "",
       flex: 1,
       renderCell: ({ row: { id, orderStatus } }) => {
+        const text = orderStatus === 0 
+          ? "Change to Processing" 
+          : orderStatus === 1 
+            ? "Change to In transit" 
+            : orderStatus === 2 
+              ? "Change to Completed" 
+              : "";
         return (
           <Box sx={{ width: "100%" }}>
-            {orderStatus !== true &&
+            {(orderStatus in [1,2,3]) &&
               <Button
                 variant="contained"
                 sx={{ background: "#3E4396", color: "#FFF", width: "100%" }}
                 onClick={() => handleChangeInvoiceStatus(id)}
               >
-                {orderStatus === null ? "Xác nhận đơn hàng" : orderStatus ? "" : "Xác nhận đã giao hàng"}
+                {text}
               </Button>
             }
           </Box>
