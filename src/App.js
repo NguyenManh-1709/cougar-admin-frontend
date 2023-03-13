@@ -14,7 +14,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 
-import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById } from "./store/apis";
+import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll } from "./store/apis";
 import { loginStatusState } from "./store/selectors";
 
 function App() {
@@ -32,6 +32,7 @@ function App() {
       dispatch(invoiceDetailsGetAll());
       dispatch(categoriesGetAll());
       dispatch(subCategoriesGetAll());
+      dispatch(productGetAll());
     }
   }, [dispatch, userLogedIn])
 

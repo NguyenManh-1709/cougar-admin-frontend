@@ -82,3 +82,9 @@ export const invoiceStatusPut = createAsyncThunk('invoiceStatusPut', async (invo
   const response = await axios.put(`http://localhost:8080/rest/shopOrders/changeStatus`, invoice);
   return response.data;
 });
+
+// Get All Products
+export const productGetAll = createAsyncThunk('productGetAll', async () => {
+  const response = await axios.get(`http://localhost:8080/rest/products`);
+  return response.data;
+});

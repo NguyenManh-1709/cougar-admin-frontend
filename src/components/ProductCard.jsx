@@ -24,7 +24,7 @@ const ExpandMore = styled((props) => {
 }));
 
 const ProductCard = (props) => {
-    const { productItem } = props;
+    const { product } = props;
     const [expanded, setExpanded] = React.useState(false);
     const navigate = useNavigate();
 
@@ -37,18 +37,18 @@ const ProductCard = (props) => {
             <CardMedia
                 sx={{ background: "lightgray", width: "100%", height: "368px", objectFit: "contain" }}
                 component="img"
-                image={`https://res.cloudinary.com/dmjh7imwd/image/upload/${productItem.image}`}
+                image={`https://res.cloudinary.com/dmjh7imwd/image/upload/${product.image}`}
                 alt=""
             />
             <CardContent>
                 <Typography variant="body2" fontSize={"1.3rem"}>
-                    {productItem.product.name}
+                    {product.name}
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
                 <Tooltip title="Edit">
                     <IconButton onClick={() => {
-                        navigate(`/createproduct/${productItem.id}`);
+                        navigate(`/createproduct/${product.id}`);
                     }}>
                         <EditIcon />
                     </IconButton>
@@ -64,15 +64,11 @@ const ProductCard = (props) => {
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
-                    <Typography fontSize={"1rem"} paragraph>Category: {productItem.product.subcategory.category.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>SubCategory: {productItem.product.subcategory.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Brand: {productItem.product.brand.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>SKU: {productItem.sku}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Size: {productItem.size}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Color: {productItem.color}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Price: {productItem.price}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Quantity: {productItem.qtyInStock}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Create date: {productItem.createDate}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Category: {product.subcategory.category.name}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>SubCategory: {product.subcategory.name}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Brand: {product.brand.name}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Create date: {product.createDate}</Typography>
+                    <Typography fontSize={"1rem"} paragraph>Description: {product.description}</Typography>
                 </CardContent>
             </Collapse>
         </Card>

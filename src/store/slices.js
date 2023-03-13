@@ -13,6 +13,7 @@ import {
   userPut,
   getUserById,
   invoiceStatusPut,
+  productGetAll,
 } from "./apis";
 
 const mySlice = createSlice({
@@ -28,6 +29,7 @@ const mySlice = createSlice({
     userLogedIn: null,
     loginStatus: null,
     productItems: [],
+    products: []
   },
   reducers: {
     // ...
@@ -199,6 +201,15 @@ const mySlice = createSlice({
 
         state.usersWithRoles = updatedArr;
         state.status = "successfully";
+      })
+
+      // GET ALL PRODUCTS
+      .addCase(productGetAll.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(productGetAll.fulfilled, (state, action) => {
+        state.products = action.payload;
+        state.status = "idle";
       })
   },
 });

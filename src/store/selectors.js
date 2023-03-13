@@ -8,3 +8,4 @@ export const urlImageUploadedState = (state) => state.myStore.urlImageUploaded
 export const productItemsState = (state) => state.myStore.productItems
 export const userLogedInState = (state) => state.myStore.userLogedIn
 export const loginStatusState = (state) => state.myStore.loginStatus
+export const productsState = (state) => state.myStore.products
