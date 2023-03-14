@@ -4,19 +4,56 @@ import * as yup from "yup";
 import Header from "../../components/Header";
 import LoginIcon from '@mui/icons-material/Login';
 import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../store/apis";
-import { loginStatusState } from "../../store/selectors";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FormLogin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const loginStatus = useSelector(loginStatusState);
 
     const handleFormSubmit = (values) => {
-        dispatch(login(values));
-        navigate("/dashboard");
+        dispatch(login(values)).then((response) => {
+            if (response.type === "login/rejected") {
+                toast.error("Please check your email or password again!", {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+            } else {
+                if (response.payload.roles.includes("ADMIN")) {
+                    toast.success("Successfully!", {
+                        position: "top-right",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: false,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                } else {
+                    toast.error("Please login with admin account!", {
+                        position: "top-right",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: false,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                }
+            }
+        });
+
+        setTimeout(()=>{navigate("/dashboard")}, 1000);
     };
 
     const initialValues = { email: "", password: "" };
@@ -73,7 +110,6 @@ const FormLogin = () => {
                                     <Box ml="5px">Login</Box>
                                 </Box>
                             </Button>
-                            <Box sx={{textAlign: "center"}}>{loginStatus}</Box>
                         </form>
                     )}
                 </Formik>

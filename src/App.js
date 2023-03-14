@@ -13,6 +13,7 @@ import { Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
 
 import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll } from "./store/apis";
 import { loginStatusState } from "./store/selectors";
@@ -40,26 +41,27 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-          <Sidebar isSidebar={isSidebar} />
-          <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
-            <Routes>
-              <Route path="/" element={loginStatus !== "Successfully!" ? <FormLogin /> : <Navigate to={-1} />} />
-              <Route path="/dashboard" element={loginStatus === "Successfully!" ? <Dashboard /> : <Navigate to="/" />} />
-              <Route path="/form-user/:id" element={loginStatus === "Successfully!" ? <FormCreateUser /> : <Navigate to="/" />} />
-              <Route path="/createproduct/:id" element={loginStatus === "Successfully!" ? <FormCreateProduct /> : <Navigate to="/" />} />
-              <Route path="/invoices" element={loginStatus === "Successfully!" ? <Invoice /> : <Navigate to="/" />} />
-              <Route path="/users" element={loginStatus === "Successfully!" ? <User /> : <Navigate to="/" />} />
-              <Route path="/products" element={loginStatus === "Successfully!" ? <Product /> : <Navigate to="/" />} />
-            </Routes>
-          </main>
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            <Sidebar isSidebar={isSidebar} />
+            <main className="content">
+              <Topbar setIsSidebar={setIsSidebar} />
+              <Routes>
+                <Route path="/" element={(loginStatus === null || loginStatus === false) ? <FormLogin /> : <Navigate to={-1} />} />
+                <Route path="/dashboard" element={loginStatus === true ? <Dashboard /> : <Navigate to="/" />} />
+                <Route path="/form-user/:id" element={loginStatus === true ? <FormCreateUser /> : <Navigate to="/" />} />
+                <Route path="/createproduct/:id" element={loginStatus === true ? <FormCreateProduct /> : <Navigate to="/" />} />
+                <Route path="/invoices" element={loginStatus === true ? <Invoice /> : <Navigate to="/" />} />
+                <Route path="/users" element={loginStatus === true ? <User /> : <Navigate to="/" />} />
+                <Route path="/products" element={loginStatus === true ? <Product /> : <Navigate to="/" />} />
+              </Routes>
+              <ToastContainer/>
+            </main>
+          </div>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
   );
 }
 

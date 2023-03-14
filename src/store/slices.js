@@ -46,16 +46,16 @@ const mySlice = createSlice({
         if (action.payload.roles.includes("ADMIN")) {
           state.userLogedIn = action.payload;
           sessionStorage.setItem('userLogedIn', JSON.stringify(action.payload));
-          state.loginStatus = "Successfully!";
+          state.loginStatus = true;
         } else {
           state.userLogedIn = null;
-          state.loginStatus = "Please login with admin account!";
+          state.loginStatus = false;
         }
       })
 
       .addCase(login.rejected, (state) => {
         state.userLogedIn = null;
-        state.loginStatus = "Please check your email or password again!";
+        state.loginStatus = false;
       })
 
       // RELOAD USER LOGED IN INFO WHEN F5
@@ -65,7 +65,7 @@ const mySlice = createSlice({
       .addCase(getUserById.fulfilled, (state, action) => {
         const { password, ...temp } = action.payload;
         state.userLogedIn = temp;
-        state.loginStatus = "Successfully!";
+        state.loginStatus = true;
         state.status = "idle";
       })
 

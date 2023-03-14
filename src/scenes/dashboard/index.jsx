@@ -1,7 +1,6 @@
 import { tokens } from "../../theme";
 import { Box, Typography, useTheme } from "@mui/material";
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
 import StatBox from "../../components/StatBox";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
@@ -12,7 +11,72 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { usersWithRolesState, productItemsState, invoicesState, invoiceDetailsState } from "../../store/selectors";
 import { useSelector } from "react-redux";
 
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts";
+
 const Dashboard = () => {
+  const dataChart = [
+    {
+      name: "Jan",
+      profit: 100,
+      cost: 1000,
+    },
+    {
+      name: "Feb",
+      profit: 50,
+      cost: 500,
+    },
+    {
+      name: "Mar",
+      profit: 30,
+      cost: 300,
+    },
+    {
+      name: "Apr",
+      profit: 200,
+      cost: 2000,
+    },
+    {
+      name: "May",
+      profit: 70,
+      cost: 700,
+    },
+    {
+      name: "Jun",
+      profit: 80,
+      cost: 800,
+    },
+    {
+      name: "Jul",
+      profit: 60,
+      cost: 600,
+    },
+    {
+      name: "Aug",
+      profit: 65,
+      cost: 650,
+    },
+    {
+      name: "Sep",
+      profit: 115,
+      cost: 1150,
+    },
+    {
+      name: "Oct",
+      profit: 230,
+      cost: 2300,
+    },
+    {
+      name: "Nov",
+      profit: 500,
+      cost: 5000,
+    },
+    {
+      name: "Dec",
+      profit: 1000,
+      cost: 10000,
+    },
+  ];
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -45,7 +109,7 @@ const Dashboard = () => {
 
 
   const totalOrderGroupByUserMap = new Map();
-  
+
   for (const invoice of invoices) {
     const { user, orderTotal } = invoice;
     const { id: userId, fullname } = user;
@@ -213,7 +277,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Revenue Generated
+                Chart
               </Typography>
               {/* <Typography
                 variant="h3"
@@ -224,8 +288,27 @@ const Dashboard = () => {
               </Typography> */}
             </Box>
           </Box>
-          <Box height="90%" m="-20px 0 -20px 0">
-            <LineChart isDashboard={true} />
+          <Box width="100%" height="100%">
+            {/* Chart */}
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={dataChart}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 50,
+                }}
+                barSize={30}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={() => { return true }} />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Legend />
+                <Bar dataKey="cost" stackId="a" fill="#E0E0E0" />
+                <Bar dataKey="profit" stackId="a" fill="#4CCE94" />
+              </BarChart>
+            </ResponsiveContainer>
           </Box>
         </Box>
         <Box

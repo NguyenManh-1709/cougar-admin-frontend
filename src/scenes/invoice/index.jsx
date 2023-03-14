@@ -102,17 +102,17 @@ const Invoice = () => {
       flex: 1,
       renderCell: ({ row: { address } }) => {
         if (address != null) {
+          const temp = address.unitNumber + ", " + address.addressLine + ", " + address.district;
+          const toShow = temp.length > 15 ? temp.slice(0,15)+"..." : temp.length;
           return (
-            address.unitNumber + ", " +
-            address.addressLine + ", " +
-            address.district
+            toShow
           );
         }
       },
     },
     {
       field: "deliveryMethod",
-      headerName: "DELIVERY MOTHOD",
+      headerName: "DELIVERY METHOD",
       flex: 1,
       renderCell: ({ row: { deliveryMethod } }) => {
         if (deliveryMethod != null) {
@@ -137,13 +137,13 @@ const Invoice = () => {
       flex: 1,
       renderCell: ({ row: { orderStatus } }) => {
         const text = orderStatus === 0 
-          ? "Pending" 
+          ? "PENDING" 
           : orderStatus === 1 
-            ? "Processing" 
+            ? "PROCESSING" 
             : orderStatus === 2 
-              ? "In transit" 
+              ? "IN TRANSIT" 
               : orderStatus === 3 
-                ? "Completed" 
+                ? "COMPLETED" 
                 : "";
 
         const color = orderStatus === 0 
@@ -163,8 +163,8 @@ const Invoice = () => {
       },
     },
     {
-      field: "changeStatus",
-      headerName: "",
+      field: "CHANGE STATUS",
+      headerName: "CHANGE STATUS",
       flex: 1,
       renderCell: ({ row: { id, orderStatus } }) => {
         const text = orderStatus === 0 
@@ -190,8 +190,9 @@ const Invoice = () => {
       },
     },
     {
-      field: "show-details",
-      headerName: "",
+      field: "SHOW DETAILS",
+      headerName: "SHOW DETAILS",
+      flex: 1,
       renderCell: ({ row: { id } }) => {
         return (
           <Button
