@@ -8,9 +8,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useDispatch } from "react-redux";
-import { uploadAvatarToCloud, userPost, userPut } from "../../store/apis";
+import { userPostAndUploadAvatarToCloud, userPost, userPutAndUploadAvatarToCloud, userPut } from "../../store/apis";
 import { useParams } from 'react-router-dom';
-import { usersWithRolesState, urlAvatarUploadedState } from "../../store/selectors";
+import { usersWithRolesState } from "../../store/selectors";
 import { useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
@@ -52,52 +52,54 @@ const FormCreateUser = () => {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0.5, y: 0.5 });
   const [errorFile, setErrorFile] = useState();
-  const [avatarChangedStatus, setAvatarChangedStatus] = useState(false);
+  const [validFile, setValidFile] = useState(false);
 
   function handleFileChange(event) {
     const allowedTypes = ['image/jpeg', 'image/png'];
     if (event.target.files[0] && allowedTypes.includes(event.target.files[0].type)) {
       setFile(event.target.files[0]);
       setErrorFile("");
+      setValidFile(true);
     } else {
       event.target.value = "";
+      setFile(null);
       setErrorFile("Please choose an image file! .JPG or .PNG");
+      setValidFile(false);
     }
   }
 
   function handleScaleChange(event) {
     setScale(parseFloat(event.target.value));
+    setValidFile(true);
   }
 
   function handlePositionChange(position) {
     setPosition(position);
+    setValidFile(true);
   }
-
-  function handleUploadAvatarToCloud() {
-    if (editor) {
-      const canvas = editor.getImage();
-      const dataURL = canvas.toDataURL();
-      try {
-        dispatch(uploadAvatarToCloud(dataURL));
-        setAvatarChangedStatus(true);
-      } catch (error) {
-        console.log('Error uploading image to Cloudinary: ', error);
-      }
-    }
-  }
-
-  const baseUploadImageUrl = `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`;
-  const avatarUrl = useSelector(urlAvatarUploadedState);
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
-    if (avatarChangedStatus) {
-      values.avatar = avatarUrl.replace(baseUploadImageUrl, "");
+    if (values.id === "") {
+      if (validFile) {
+        const canvas = editor.getImage();
+        const dataURL = canvas.toDataURL();
+        dispatch(userPostAndUploadAvatarToCloud([values, dataURL]));
+      } else {
+        dispatch(userPost(values));
+      }
+    } else {
+      if (validFile) {
+        const canvas = editor.getImage();
+        const dataURL = canvas.toDataURL();
+        dispatch(userPutAndUploadAvatarToCloud([values, dataURL]));
+      } else {
+        dispatch(userPut(values));
+      }
     }
 
-    values.id === "" ? dispatch(userPost(values)) : dispatch(userPut(values));
-    navigate("/users");
+    setTimeout(() => { navigate("/users") }, 1000);
   };
 
   return (
@@ -122,12 +124,23 @@ const FormCreateUser = () => {
               />
               {errorFile && <h3 style={{ background: "#B4B4B4", color: "#8B0000", textAlign: "center", padding: "2px" }}>{errorFile}</h3>}
               <TextField type="file" variant="outlined" onChange={handleFileChange} style={{ width: "350px" }} />
-              <Box display="flex" alignItems="center" gap="10px" style={{ width: "350px" }}>
-                <RemoveCircleOutlineIcon onClick={() => { setScale(((scale - 0.05) < 0.5) ? 0.5 : (scale - 0.05)) }} style={{ cursor: "pointer" }} />
-                <Slider value={scale} onChange={handleScaleChange} min={0.5} max={2} step={0.01} color="success" />
-                <AddCircleOutlineIcon onClick={() => { setScale(((scale + 0.05) > 2 ? 2 : (scale + 0.05))) }} style={{ cursor: "pointer" }} />
-              </Box>
-              {file && <Button variant="contained" style={{ background: "#1F2A40", color: "white", width: "350px" }} onClick={handleUploadAvatarToCloud}>Confirm And Upload</Button>}
+              {file && (
+                <Box display="flex" alignItems="center" gap="10px" style={{ width: "350px" }}>
+                  <RemoveCircleOutlineIcon
+                    onClick={() => {
+                      setScale(((scale - 0.05) < 0.5) ? 0.5 : (scale - 0.05));
+                      setValidFile(true);
+                    }}
+                    style={{ cursor: "pointer" }} />
+                  <Slider value={scale} onChange={handleScaleChange} min={0.5} max={2} step={0.01} color="success" />
+                  <AddCircleOutlineIcon
+                    onClick={() => {
+                      setScale(((scale + 0.05) > 2 ? 2 : (scale + 0.05)))
+                      setValidFile(true);
+                    }}
+                    style={{ cursor: "pointer" }} />
+                </Box>
+              )}
             </Box>
           </Box>
 
@@ -153,18 +166,6 @@ const FormCreateUser = () => {
                     "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
                   }}
                 >
-                  {/* <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="number"
-                    label="Id will be generated automatically."
-                    disabled
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.id}
-                    name="id"
-                    sx={{ gridColumn: "span 4" }}
-                  /> */}
                   <TextField
                     fullWidth
                     variant="filled"
@@ -191,7 +192,6 @@ const FormCreateUser = () => {
                     helperText={touched.fullname && errors.fullname}
                     sx={{ gridColumn: "span 4" }}
                   />
-
                   <TextField
                     fullWidth
                     variant="filled"
@@ -218,28 +218,6 @@ const FormCreateUser = () => {
                     helperText={touched.phone && errors.phone}
                     sx={{ gridColumn: "span 4" }}
                   />
-                  {/* <TextField
-                    fullWidth
-                    disabled
-                    variant="outlined"
-                    type="text"
-                    label="Avatar link will be automatically generated when uploading an image successfully!"
-                    value={values.avatar}
-                    name="avatar"
-                    sx={{ gridColumn: "span 4" }}
-                  /> */}
-                  {/* <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="date"
-                    label="Create date (MM-dd-yyyy)"
-                    disabled
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.createDate}
-                    name="createDate"
-                    sx={{ gridColumn: "span 4" }}
-                  /> */}
                 </Box>
                 <Box display="flex" justifyContent="space-between" mt="20px">
                   <Link

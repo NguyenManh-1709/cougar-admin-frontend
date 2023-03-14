@@ -4,7 +4,6 @@ import {
   categoriesGetAll,
   subCategoriesGetAll,
   uploadImageToCloud,
-  uploadAvatarToCloud,
   invoiceGetAll,
   invoiceDetailsGetAll,
   login,
@@ -14,6 +13,8 @@ import {
   getUserById,
   invoiceStatusPut,
   productGetAll,
+  userPostAndUploadAvatarToCloud,
+  userPutAndUploadAvatarToCloud
 } from "./apis";
 
 const mySlice = createSlice({
@@ -23,7 +24,6 @@ const mySlice = createSlice({
     categories: [],
     subCategories: [],
     urlImageUploaded: "",
-    urlAvatarUploaded: "",
     invoices: [],
     invoiceDetails: [],
     userLogedIn: null,
@@ -157,15 +157,6 @@ const mySlice = createSlice({
         state.status = "idle";
       })
 
-      // UPLOAD AVATAR TO CLOUD
-      .addCase(uploadAvatarToCloud.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(uploadAvatarToCloud.fulfilled, (state, action) => {
-        state.urlAvatarUploaded = action.payload;
-        state.status = "idle";
-      })
-
       // UPLOAD PRODUCT IMAGE TO CLOUD
       .addCase(uploadImageToCloud.pending, (state) => {
         state.status = "loading";
@@ -186,11 +177,39 @@ const mySlice = createSlice({
         state.status = "idle";
       })
 
+      // CREATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
+      .addCase(userPostAndUploadAvatarToCloud.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(userPostAndUploadAvatarToCloud.fulfilled, (state, action) => {
+        const userSaved = action.payload;
+        userSaved.role = ["ADMIN"];
+        state.usersWithRoles.push(userSaved);
+        state.status = "idle";
+      })
+
       // UPDATE USER (ROLE ADMIN)
       .addCase(userPut.pending, (state) => {
         state.status = "loading";
       })
       .addCase(userPut.fulfilled, (state, action) => {
+        const userUpdated = action.payload;
+        const updatedArr = state.usersWithRoles.map(item => {
+          if (item.id === userUpdated.id) {
+            return { ...userUpdated, role: item.role };
+          }
+          return item;
+        });
+
+        state.usersWithRoles = updatedArr;
+        state.status = "successfully";
+      })
+
+      // UPDATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
+      .addCase(userPutAndUploadAvatarToCloud.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(userPutAndUploadAvatarToCloud.fulfilled, (state, action) => {
         const userUpdated = action.payload;
         const updatedArr = state.usersWithRoles.map(item => {
           if (item.id === userUpdated.id) {

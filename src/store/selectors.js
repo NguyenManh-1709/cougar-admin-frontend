@@ -3,7 +3,6 @@ export const categoriesState = (state) => state.myStore.categories
 export const invoicesState = (state) => state.myStore.invoices
 export const invoiceDetailsState = (state) => state.myStore.invoiceDetails
 export const subCategoriesState = (state) => state.myStore.subCategories
-export const urlAvatarUploadedState = (state) => state.myStore.urlAvatarUploaded
 export const urlImageUploadedState = (state) => state.myStore.urlImageUploaded
 export const productItemsState = (state) => state.myStore.productItems
 export const userLogedInState = (state) => state.myStore.userLogedIn
