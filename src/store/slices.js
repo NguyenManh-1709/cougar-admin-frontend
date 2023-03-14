@@ -27,7 +27,7 @@ const mySlice = createSlice({
     invoices: [],
     invoiceDetails: [],
     userLogedIn: null,
-    loginStatus: null,
+    loginStatus: false,
     productItems: [],
     products: []
   },
@@ -43,13 +43,12 @@ const mySlice = createSlice({
         state.status = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
-        if (action.payload.roles.includes("ADMIN")) {
-          state.userLogedIn = action.payload;
-          sessionStorage.setItem('userLogedIn', JSON.stringify(action.payload));
-          state.loginStatus = true;
-        } else {
+        if (action.payload === null) {
           state.userLogedIn = null;
           state.loginStatus = false;
+        } else {
+          state.userLogedIn = action.payload;
+          state.loginStatus = true;
         }
       })
 

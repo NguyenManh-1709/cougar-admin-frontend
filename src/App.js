@@ -25,7 +25,7 @@ function App() {
   const loginStatus = useSelector(loginStatusState);
 
   useEffect(() => {
-    if (userLogedIn) {
+    if (userLogedIn || loginStatus) {
       dispatch(getUserById(userLogedIn.id));
       dispatch(authorityGetAll());
       dispatch(productItemGetAll());
@@ -35,7 +35,7 @@ function App() {
       dispatch(subCategoriesGetAll());
       dispatch(productGetAll());
     }
-  }, [dispatch, userLogedIn])
+  }, [dispatch, userLogedIn, loginStatus])
 
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -49,7 +49,7 @@ function App() {
             <main className="content">
               <Topbar setIsSidebar={setIsSidebar} />
               <Routes>
-                <Route path="/" element={(loginStatus === null || loginStatus === false) ? <FormLogin /> : <Navigate to={-1} />} />
+                <Route path="/" element={(loginStatus === false) ? <FormLogin /> : <Navigate to={-1} />} />
                 <Route path="/dashboard" element={loginStatus === true ? <Dashboard /> : <Navigate to="/" />} />
                 <Route path="/form-user/:id" element={loginStatus === true ? <FormCreateUser /> : <Navigate to="/" />} />
                 <Route path="/createproduct/:id" element={loginStatus === true ? <FormCreateProduct /> : <Navigate to="/" />} />

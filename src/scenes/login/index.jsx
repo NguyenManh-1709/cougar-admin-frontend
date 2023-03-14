@@ -21,30 +21,30 @@ const FormLogin = () => {
                     autoClose: 1000,
                     hideProgressBar: false,
                     closeOnClick: true,
-                    pauseOnHover: false,
+                    pauseOnHover: true,
                     draggable: true,
                     progress: undefined,
                     theme: "light",
                 });
             } else {
-                if (response.payload.roles.includes("ADMIN")) {
-                    toast.success("Successfully!", {
-                        position: "top-right",
-                        autoClose: 1000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: false,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "light",
-                    });
-                } else {
+                if (response.payload === null) {
                     toast.error("Please login with admin account!", {
                         position: "top-right",
                         autoClose: 1000,
                         hideProgressBar: false,
                         closeOnClick: true,
-                        pauseOnHover: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                    });
+                } else {
+                    toast.success("Successfully!", {
+                        position: "top-right",
+                        autoClose: 1000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
                         draggable: true,
                         progress: undefined,
                         theme: "light",
@@ -52,7 +52,6 @@ const FormLogin = () => {
                 }
             }
         });
-
         setTimeout(()=>{navigate("/dashboard")}, 1000);
     };
 

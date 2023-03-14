@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
+import jwt_decode from "jwt-decode";
 
 // Get All Authorities => Custom list user with roles
 export const authorityGetAll = createAsyncThunk('authorityGetAll', async () => {
@@ -42,8 +43,21 @@ export const invoiceDetailsGetAll = createAsyncThunk('invoiceDetailsGetAll', asy
 
 // Login
 export const login = createAsyncThunk('login', async (credentials) => {
-  const response = await axios.post('http://localhost:8080/api/auth/signin', credentials);
-  return response.data;
+  const loginResponse = await axios.post('http://localhost:8080/api/auth/signin', credentials);
+
+  const accessToken = loginResponse.data.accessToken;
+  const decoded = jwt_decode(accessToken);
+  if (decoded.scope.includes("ADMIN")) {
+    const userResponse = await axios.get(`http://localhost:8080/rest/users/${decoded.id}`);
+    const userLogedIn = userResponse.data;
+    // const userLogedInHasRole = {...userLogedIn, role: decoded.scope}
+    
+    sessionStorage.setItem('accessToken', JSON.stringify(accessToken));
+    sessionStorage.setItem('userLogedIn', JSON.stringify(userLogedIn));
+    return userLogedIn;
+  } else {
+    return null;
+  }
 });
 
 // Get User By Id
