@@ -29,7 +29,7 @@ const mySlice = createSlice({
     userLogedIn: null,
     loginStatus: false,
     productItems: [],
-    products: []
+    products: [],
   },
   reducers: {
     // ...
@@ -39,9 +39,6 @@ const mySlice = createSlice({
     builder
 
       // DO LOG IN
-      .addCase(login.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(login.fulfilled, (state, action) => {
         if (action.payload === null) {
           state.userLogedIn = null;
@@ -51,7 +48,6 @@ const mySlice = createSlice({
           state.loginStatus = true;
         }
       })
-
       .addCase(login.rejected, (state) => {
         state.userLogedIn = null;
         state.loginStatus = false;
@@ -75,7 +71,6 @@ const mySlice = createSlice({
 
       .addCase(authorityGetAll.fulfilled, (state, action) => {
         const authorities = action.payload;
-
         const usersWithRoles = authorities.reduce((users, auth) => {
           const { user, role } = auth;
           const userIndex = users.findIndex(item => item.id === user.id);
@@ -166,31 +161,26 @@ const mySlice = createSlice({
       })
 
       // CREATE USER (ROLE ADMIN)
-      .addCase(userPost.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(userPost.fulfilled, (state, action) => {
         const userSaved = action.payload;
         userSaved.role = ["ADMIN"];
         state.usersWithRoles.push(userSaved);
         state.status = "idle";
       })
+      .addCase(userPost.rejected, (state, action) => {
+      })
 
       // CREATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
-      .addCase(userPostAndUploadAvatarToCloud.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(userPostAndUploadAvatarToCloud.fulfilled, (state, action) => {
         const userSaved = action.payload;
         userSaved.role = ["ADMIN"];
         state.usersWithRoles.push(userSaved);
         state.status = "idle";
       })
+      .addCase(userPostAndUploadAvatarToCloud.rejected, (state, action) => {
+      })
 
       // UPDATE USER (ROLE ADMIN)
-      .addCase(userPut.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(userPut.fulfilled, (state, action) => {
         const userUpdated = action.payload;
         const updatedArr = state.usersWithRoles.map(item => {
@@ -203,11 +193,10 @@ const mySlice = createSlice({
         state.usersWithRoles = updatedArr;
         state.status = "successfully";
       })
+      .addCase(userPut.rejected, (state, action) => {
+      })
 
       // UPDATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
-      .addCase(userPutAndUploadAvatarToCloud.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(userPutAndUploadAvatarToCloud.fulfilled, (state, action) => {
         const userUpdated = action.payload;
         const updatedArr = state.usersWithRoles.map(item => {
@@ -219,6 +208,8 @@ const mySlice = createSlice({
 
         state.usersWithRoles = updatedArr;
         state.status = "successfully";
+      })
+      .addCase(userPutAndUploadAvatarToCloud.rejected, (state, action) => {
       })
 
       // GET ALL PRODUCTS

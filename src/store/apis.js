@@ -76,47 +76,86 @@ export const productItemGetAll = createAsyncThunk('productItemGetAll', async () 
   return response.data;
 });
 
-// Post user (Role = "ADMIN")
-export const userPost = createAsyncThunk('userPost', async (user) => {
-  const response = await axios.post(`http://localhost:8080/rest/users`, user);
+// Put invoice (status)
+export const invoiceStatusPut = createAsyncThunk('invoiceStatusPut', async (invoice) => {
+  const response = await axios.put(`http://localhost:8080/rest/shopOrders/changeStatus`, invoice);
   return response.data;
 });
 
-// const cloudinary = require('cloudinary').v2;
-// cloudinary.config({
-//   cloud_name: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.REACT_APP_CLOUDINARY_API_KEY,
-//   api_secret: process.env.REACT_APP_CLOUDINARY_API_SECRET,
-// });
-export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploadAvatarToCloud', async ([values, dataURL]) => {
-  // CREATE NEW USER
-  const userRes = await axios.post(`http://localhost:8080/rest/users`, values);
-
-  // CREATE FormData (to custom name) AND UPLOAD TO CLOUD
-  const formData = new FormData();
-  formData.append('file', dataURL);
-  formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
-  formData.append('public_id', `avatar-user-id-${userRes.data.id}`);
-  // formData.append('overwrite', true);
-  const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-
-  // UPDATE USER WITH AVATAR
-  const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
-  const userUpdated = { ...userRes.data, avatar: url };
-  const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
-
+// Get All Products
+export const productGetAll = createAsyncThunk('productGetAll', async () => {
+  const response = await axios.get(`http://localhost:8080/rest/products`);
   return response.data;
+});
+
+
+
+
+
+// Post user (Role = "ADMIN")
+export const userPost = createAsyncThunk('userPost', async (user, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`http://localhost:8080/rest/users`, user);
+    return response.data;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
+});
+
+export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploadAvatarToCloud', async ([values, dataURL], { rejectWithValue }) => {
+  try {
+    const userResponse = await axios.post(`http://localhost:8080/rest/users`, values);
+
+    const formData = new FormData();
+    formData.append('file', dataURL);
+    formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
+    formData.append('public_id', `avatar-user-id-${userResponse.data.id}`);
+    const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    // UPDATE USER WITH AVATAR
+    const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
+    const userUpdated = { ...userResponse.data, avatar: url };
+
+    try {
+      const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
+      return response.data;
+    } catch (error) {
+      if (error.response.data) {
+        return rejectWithValue(error.response.data);
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
 });
 
 // Put user (Role = "ADMIN")
-export const userPut = createAsyncThunk('userPut', async (user) => {
-  const response = await axios.put(`http://localhost:8080/rest/users`, user);
-  return response.data;
+export const userPut = createAsyncThunk('userPut', async (user, { rejectWithValue }) => {
+  try {
+    const response = await axios.put(`http://localhost:8080/rest/users`, user);
+    return response.data;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
 });
 
-export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadAvatarToCloud', async ([values, dataURL]) => {
+export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadAvatarToCloud', async ([values, dataURL], { rejectWithValue }) => {
   // CREATE FormData (to custom name) AND UPLOAD TO CLOUD
   const formData = new FormData();
   formData.append('file', dataURL);
@@ -130,19 +169,16 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
   // UPDATE USER WITH AVATAR
   const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
   const userUpdated = { ...values, avatar: url };
-  const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
 
-  return response.data;
-});
-
-// Put invoice (status)
-export const invoiceStatusPut = createAsyncThunk('invoiceStatusPut', async (invoice) => {
-  const response = await axios.put(`http://localhost:8080/rest/shopOrders/changeStatus`, invoice);
-  return response.data;
-});
-
-// Get All Products
-export const productGetAll = createAsyncThunk('productGetAll', async () => {
-  const response = await axios.get(`http://localhost:8080/rest/products`);
-  return response.data;
+  
+  try {
+    const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
+    return response.data;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
 });

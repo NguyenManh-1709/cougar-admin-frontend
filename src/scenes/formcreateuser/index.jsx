@@ -15,6 +15,7 @@ import { useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { toast } from "react-toastify";
 
 const FormCreateUser = () => {
   const { id } = useParams();
@@ -24,14 +25,11 @@ const FormCreateUser = () => {
   const usersWithRoles = useSelector(usersWithRolesState);
 
   const initialValues = {
-    id: "",
     password: "",
     fullname: "",
     phone: "",
     email: "",
-    createDate: new Date().toISOString().split('T')[0],
     avatar: "",
-    resetPasswordToken: "",
   }
 
   const userSelected = (idTypeNumber === 0) ? initialValues : (() => {
@@ -47,7 +45,7 @@ const FormCreateUser = () => {
   // UPLOAD AVATAR
   const dispatch = useDispatch();
 
-  const [file, setFile] = useState(() => { return (userSelected.avatar === "" ? null : `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/${userSelected.avatar}`) });
+  const [file, setFile] = useState(() => { return ((userSelected.avatar === null || userSelected.avatar === "") ? null : `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/${userSelected.avatar}`) });
   const [editor, setEditor] = useState(null);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0.5, y: 0.5 });
@@ -80,176 +78,224 @@ const FormCreateUser = () => {
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = (values) => {
-    if (values.id === "") {
-      if (validFile) {
-        const canvas = editor.getImage();
-        const dataURL = canvas.toDataURL();
-        dispatch(userPostAndUploadAvatarToCloud([values, dataURL]));
-      } else {
-        dispatch(userPost(values));
-      }
+  const handleCreateUser = (values) => {
+    if (validFile) {
+      const canvas = editor.getImage();
+      const dataURL = canvas.toDataURL();
+      dispatch(userPostAndUploadAvatarToCloud([values, dataURL])).then((response) => {
+        if (response.type === "userPostAndUploadAvatarToCloud/rejected") {
+          toast.error(response.payload.message, {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          toast.success("Successfully!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          setTimeout(() => { navigate("/users") }, 1000);
+        }
+      });
     } else {
-      if (validFile) {
-        const canvas = editor.getImage();
-        const dataURL = canvas.toDataURL();
-        dispatch(userPutAndUploadAvatarToCloud([values, dataURL]));
-      } else {
-        dispatch(userPut(values));
-      }
+      dispatch(userPost(values)).then((response) => {
+        if (response.type === "userPost/rejected") {
+          toast.error(response.payload.message, {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          toast.success("Successfully!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          setTimeout(() => { navigate("/users") }, 1000);
+        }
+      });
     }
-
-    setTimeout(() => { navigate("/users") }, 1000);
   };
+
+  const handleUpdateUser = (values) => {
+    console.log(values);
+    console.log(validFile);
+  }
 
   return (
     <Box m="20px">
       <Header title="FORM USER" subtitle="For administrator only" />
 
-      {userSelected && (
-        <Box display="flex" gap="30px">
-          <Box>
-            <Box display="flex" justifyContent="space-between" flexDirection="column" gap="10px">
-              <AvatarEditor
-                ref={setEditor}
-                image={file}
-                width={300}
-                height={300}
-                border={25}
-                color={[180, 180, 180, 0.5]}
-                borderRadius={360}
-                scale={scale}
-                position={position}
-                onPositionChange={handlePositionChange}
-              />
-              {errorFile && <h3 style={{ background: "#B4B4B4", color: "#8B0000", textAlign: "center", padding: "2px" }}>{errorFile}</h3>}
-              <TextField type="file" variant="outlined" onChange={handleFileChange} style={{ width: "350px" }} />
-              {file && (
-                <Box display="flex" alignItems="center" gap="10px" style={{ width: "350px" }}>
-                  <RemoveCircleOutlineIcon
-                    onClick={() => {
-                      setScale(((scale - 0.05) < 0.5) ? 0.5 : (scale - 0.05));
-                      setValidFile(true);
-                    }}
-                    style={{ cursor: "pointer" }} />
-                  <Slider value={scale} onChange={handleScaleChange} min={0.5} max={2} step={0.01} color="success" />
-                  <AddCircleOutlineIcon
-                    onClick={() => {
-                      setScale(((scale + 0.05) > 2 ? 2 : (scale + 0.05)))
-                      setValidFile(true);
-                    }}
-                    style={{ cursor: "pointer" }} />
-                </Box>
-              )}
+      {/* CREATE */}
+      {
+        (idTypeNumber === 0 && userSelected) && (
+          <Box display="flex" gap="30px">
+            <Box>
+              <Box display="flex" justifyContent="space-between" flexDirection="column" gap="10px">
+                <AvatarEditor
+                  ref={setEditor}
+                  image={file}
+                  width={300}
+                  height={300}
+                  border={25}
+                  color={[180, 180, 180, 0.5]}
+                  borderRadius={360}
+                  scale={scale}
+                  position={position}
+                  onPositionChange={handlePositionChange}
+                />
+                {errorFile && <h3 style={{ background: "#B4B4B4", color: "#8B0000", textAlign: "center", padding: "2px" }}>{errorFile}</h3>}
+                <TextField type="file" variant="outlined" onChange={handleFileChange} style={{ width: "350px" }} />
+                {file && (
+                  <Box display="flex" alignItems="center" gap="10px" style={{ width: "350px" }}>
+                    <RemoveCircleOutlineIcon
+                      onClick={() => {
+                        setScale(((scale - 0.05) < 0.5) ? 0.5 : (scale - 0.05));
+                        setValidFile(true);
+                      }}
+                      style={{ cursor: "pointer" }} />
+                    <Slider value={scale} onChange={handleScaleChange} min={0.5} max={2} step={0.01} color="success" />
+                    <AddCircleOutlineIcon
+                      onClick={() => {
+                        setScale(((scale + 0.05) > 2 ? 2 : (scale + 0.05)))
+                        setValidFile(true);
+                      }}
+                      style={{ cursor: "pointer" }} />
+                  </Box>
+                )}
+              </Box>
             </Box>
-          </Box>
 
-          <Formik
-            onSubmit={handleFormSubmit}
-            initialValues={userSelected}
-            validationSchema={checkoutSchema}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleBlur,
-              handleChange,
-              handleSubmit,
-            }) => (
-              <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-                <Box
-                  display="grid"
-                  gap="30px"
-                  gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                  sx={{
-                    "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    type="password"
-                    label="Password"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.password}
-                    name="password"
-                    error={!!touched.password && !!errors.password}
-                    helperText={touched.password && errors.password}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="Fullname"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.fullname}
-                    name="fullname"
-                    error={!!touched.fullname && !!errors.fullname}
-                    helperText={touched.fullname && errors.fullname}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    type="email"
-                    label="Email"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.email}
-                    name="email"
-                    error={!!touched.email && !!errors.email}
-                    helperText={touched.email && errors.email}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="Phone"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.phone}
-                    name="phone"
-                    error={!!touched.phone && !!errors.phone}
-                    helperText={touched.phone && errors.phone}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                </Box>
-                <Box display="flex" justifyContent="space-between" mt="20px">
-                  <Link
-                    to={"/users"}
-                    style={{
-                      textDecoration: 'none',
-                      background: "#1F2A40",
-                      color: "white",
-                      padding: "10px",
-                      borderRadius: "5px",
+            <Formik
+              onSubmit={handleCreateUser}
+              initialValues={userSelected}
+              validationSchema={checkoutSchema}
+            >
+              {({
+                values,
+                errors,
+                touched,
+                handleBlur,
+                handleChange,
+                handleSubmit,
+              }) => (
+                <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+                  <Box
+                    display="grid"
+                    gap="30px"
+                    gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                    sx={{
+                      "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
                     }}
                   >
-                    <Box display="flex" alignItems="center">
-                      <ArrowBackIcon></ArrowBackIcon>
-                      <Box ml="5px">Back to management users</Box>
-                    </Box>
-                  </Link>
-                  <Button type="submit" variant="contained" style={{
-                    background: "#1F2A40",
-                    color: "white",
-                  }}>
-                    <Box display="flex" alignItems="center">
-                      <SaveAltIcon></SaveAltIcon>
-                      <Box ml="5px">Save</Box>
-                    </Box>
-                  </Button>
-                </Box>
-              </form>
-            )}
-          </Formik>
-        </Box>
-      )}
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      type="password"
+                      label="Password"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.password}
+                      name="password"
+                      error={!!touched.password && !!errors.password}
+                      helperText={touched.password && errors.password}
+                      sx={{ gridColumn: "span 4" }}
+                    />
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      type="text"
+                      label="Fullname"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.fullname}
+                      name="fullname"
+                      error={!!touched.fullname && !!errors.fullname}
+                      helperText={touched.fullname && errors.fullname}
+                      sx={{ gridColumn: "span 4" }}
+                    />
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      type="email"
+                      label="Email"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.email}
+                      name="email"
+                      error={!!touched.email && !!errors.email}
+                      helperText={touched.email && errors.email}
+                      sx={{ gridColumn: "span 4" }}
+                    />
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      type="text"
+                      label="Phone"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.phone}
+                      name="phone"
+                      error={!!touched.phone && !!errors.phone}
+                      helperText={touched.phone && errors.phone}
+                      sx={{ gridColumn: "span 4" }}
+                    />
+                  </Box>
+                  <Box display="flex" justifyContent="space-between" mt="20px">
+                    <Link
+                      to={"/users"}
+                      style={{
+                        textDecoration: 'none',
+                        background: "#1F2A40",
+                        color: "white",
+                        padding: "10px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <Box display="flex" alignItems="center">
+                        <ArrowBackIcon></ArrowBackIcon>
+                        <Box ml="5px">Back to management users</Box>
+                      </Box>
+                    </Link>
+                    <Button type="submit" variant="contained" style={{
+                      background: "#1F2A40",
+                      color: "white",
+                    }}>
+                      <Box display="flex" alignItems="center">
+                        <SaveAltIcon></SaveAltIcon>
+                        <Box ml="5px">Create</Box>
+                      </Box>
+                    </Button>
+                  </Box>
+                </form>
+              )}
+            </Formik>
+          </Box>
+        )
+      }
+
+      {/* UPDATE */}
     </Box>
   );
 };
