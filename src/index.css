@@ -37,3 +37,8 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* No fill when hover chart in dashboard */
+.recharts-tooltip-cursor {
+  fill: transparent;
+}

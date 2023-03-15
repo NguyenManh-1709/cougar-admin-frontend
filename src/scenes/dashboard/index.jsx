@@ -4,79 +4,16 @@ import Header from "../../components/Header";
 import StatBox from "../../components/StatBox";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import GroupIcon from '@mui/icons-material/Group';
 import PaidIcon from '@mui/icons-material/Paid';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { usersWithRolesState, productItemsState, invoicesState, invoiceDetailsState } from "../../store/selectors";
 import { useSelector } from "react-redux";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip, LabelList } from "recharts";
 
 const Dashboard = () => {
-  const dataChart = [
-    {
-      name: "Jan",
-      profit: 100,
-      cost: 1000,
-    },
-    {
-      name: "Feb",
-      profit: 50,
-      cost: 500,
-    },
-    {
-      name: "Mar",
-      profit: 30,
-      cost: 300,
-    },
-    {
-      name: "Apr",
-      profit: 200,
-      cost: 2000,
-    },
-    {
-      name: "May",
-      profit: 70,
-      cost: 700,
-    },
-    {
-      name: "Jun",
-      profit: 80,
-      cost: 800,
-    },
-    {
-      name: "Jul",
-      profit: 60,
-      cost: 600,
-    },
-    {
-      name: "Aug",
-      profit: 65,
-      cost: 650,
-    },
-    {
-      name: "Sep",
-      profit: 115,
-      cost: 1150,
-    },
-    {
-      name: "Oct",
-      profit: 230,
-      cost: 2300,
-    },
-    {
-      name: "Nov",
-      profit: 500,
-      cost: 5000,
-    },
-    {
-      name: "Dec",
-      profit: 1000,
-      cost: 10000,
-    },
-  ];
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -85,29 +22,90 @@ const Dashboard = () => {
   const invoices = useSelector(invoicesState);
   const invoicesDetails = useSelector(invoiceDetailsState);
 
-  function calculateGrowthPercentage(arr) {
-    const firstDayOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const temp = arr.filter(user => new Date(user.createDate) < firstDayOfCurrentMonth);
-    const growthPercenttage = ((arr.length - temp.length) / temp.length * 100).toFixed(1);
-    return growthPercenttage;
+  const today = new Date();
+
+  // Thống kê tổng số lượng user và phần trăm tăng của tháng hiện tại so với trước
+  const userStatistics = (() => {
+    const totalUserCreatedInThisMonth = usersWithRoles.filter(user => {
+      const userCreateDate = new Date(user.createDate);
+      return userCreateDate.getMonth() === today.getMonth() && userCreateDate.getFullYear() === today.getFullYear();
+    }).length;
+    return {
+      total: usersWithRoles.length,
+      percentGrowth: (totalUserCreatedInThisMonth / (usersWithRoles.length - totalUserCreatedInThisMonth) * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số lượng hóa đơn và phần trăm tăng của tháng hiện tại so với trước
+  const invoiceStatistics = (() => {
+    const totalInvoiceCreatedInThisMonth = invoices.filter(invoice => {
+      const invoiceCreateDate = new Date(invoice.createDate);
+      return invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear();
+    }).length;
+    return {
+      total: invoices.length,
+      percentGrowth: (totalInvoiceCreatedInThisMonth / (invoices.length - totalInvoiceCreatedInThisMonth) * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số lượng productItem và phần trăm tăng của tháng hiện tại so với trước
+  const productItemStatistics = (() => {
+    const totalProductItemCreatedInThisMonth = productItems.filter(invoice => {
+      const productItemCreateDate = new Date(invoice.createDate);
+      return productItemCreateDate.getMonth() === today.getMonth() && productItemCreateDate.getFullYear() === today.getFullYear();
+    }).length;
+    return {
+      total: productItems.length,
+      percentGrowth: (totalProductItemCreatedInThisMonth / (productItems.length - totalProductItemCreatedInThisMonth) * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số tiền thu được và phần trăm tăng của tháng hiện tại so với trước
+  const moneyStatistics = (() => {
+    const [totalMoneyInThisMonth, totalMoney] = invoices.reduce(([temp, temp2], { createDate, orderTotal }) => {
+      const invoiceCreateDate = new Date(createDate);
+      return [
+        (invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear()) ? temp + orderTotal : temp,
+        temp2 + orderTotal,
+      ];
+    }, [0, 0]);
+    return {
+      total: totalMoney,
+      percentGrowth: (totalMoneyInThisMonth / (totalMoney - totalMoneyInThisMonth) * 100).toFixed(1)
+    }
+  })();
+
+  // Thống kê Cost và Profit(Mặc định 30%) 12 tháng trong năm hiện tại
+  const monthsText = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const revenueStatistics = monthsText.map((month, index) => {
+    const monthNumber = index + 1;
+    const totalRevenue = invoices
+      .filter(invoice => new Date(invoice.createDate).getFullYear() === today.getFullYear() && new Date(invoice.createDate).getMonth() + 1 === monthNumber)
+      .reduce((acc, invoice) => acc + parseInt(invoice.orderTotal), 0);
+    const cost = (totalRevenue * 0.7) % 1 !== 0 ? (totalRevenue * 0.7).toFixed(1) : (totalRevenue * 0.7);
+    const profit = totalRevenue - cost;
+    return { month, Revenue: totalRevenue, Cost: cost, Profit: profit };
+  });
+
+  // Custom tooltip for chart
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "10px" }}>
+          <Typography sx={{ color: "#FFF", textAlign: "center", marginBottom: "10px", borderBottom: "1px solid #FFF" }}>{`${label}`}</Typography>
+          <Typography sx={{ color: "#6495ED" }}>{`${payload[0].name} : ${payload[0].value}`}</Typography>
+          <Typography sx={{ color: "#FFD700" }}>{`${payload[1].name} : ${payload[1].value}`}</Typography>
+          <Typography sx={{ color: "#228B22" }}>{`${payload[2].name} : ${payload[2].value}`}</Typography>
+        </Box>
+      );
+    }
+    return null;
   };
 
-  const totalOrderSum = invoices.reduce((sum, invoice) => sum + invoice.orderTotal, 0);
-  function tempFN(arr) {
-    const firstDayOfCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const tempArr = arr.filter(temp => new Date(temp.createDate) < firstDayOfCurrentMonth);
-    const tempTotal = tempArr.reduce((sum, invoice) => sum + invoice.orderTotal, 0);
-    const growthPercenttage = ((totalOrderSum - tempTotal) / tempTotal * 100).toFixed(1);
-    return growthPercenttage;
-  };
-
-  const userGrowthPercentage = calculateGrowthPercentage(usersWithRoles);
-  const productItemGrowthPercentage = calculateGrowthPercentage(productItems);
-  const invoiceGrowthPercentage = calculateGrowthPercentage(invoices);
-  const moneyGrowthPercentage = tempFN(invoices);
 
 
 
+  // Thống kê top 10 user mua nhiều nhất
   const totalOrderGroupByUserMap = new Map();
 
   for (const invoice of invoices) {
@@ -127,6 +125,9 @@ const Dashboard = () => {
     .sort((a, b) => b.orderTotal - a.orderTotal)
     .slice(0, 10);
 
+
+
+  // Thống kê top 10 sản phẩm bán chạy chất
   const tempArr = [];
   const tempMap = new Map();
   invoicesDetails.forEach(({ productItem, qty }) => {
@@ -146,7 +147,7 @@ const Dashboard = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header title="DASHBOARD" />
       </Box>
 
       {/* GRID */}
@@ -154,9 +155,10 @@ const Dashboard = () => {
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         gridAutoRows="140px"
-        gap="30px"
+        gap="20px"
       >
         {/* ROW 1 */}
+        {/* <CircularProgress /> */}
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
@@ -165,18 +167,18 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={usersWithRoles.length}
+            title={userStatistics.total}
             subtitle="Users"
-            progress={1 - userGrowthPercentage / 100}
+            progress={1 - userStatistics.percentGrowth / 100}
             increase={
               <Box display="flex" alignItems="center" gap="10px">
-                {userGrowthPercentage > 0 && <TrendingUpIcon />}
-                {userGrowthPercentage < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{userGrowthPercentage + " %"}</Box>
+                {userStatistics.percentGrowth > 0 && <TrendingUpIcon />}
+                {userStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
+                <Box>{userStatistics.percentGrowth + " %"}</Box>
               </Box>
             }
             icon={
-              <PersonAddIcon
+              <GroupIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -190,14 +192,14 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={productItems.length}
+            title={productItemStatistics.total}
             subtitle="Products"
-            progress={1 - productItemGrowthPercentage / 100}
+            progress={1 - productItemStatistics.percentGrowth / 100}
             increase={
               <Box display="flex" alignItems="center" gap="10px">
-                {productItemGrowthPercentage > 0 && <TrendingUpIcon />}
-                {productItemGrowthPercentage < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{productItemGrowthPercentage + " %"}</Box>
+                {productItemStatistics.percentGrowth > 0 && <TrendingUpIcon />}
+                {productItemStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
+                <Box>{productItemStatistics.percentGrowth + " %"}</Box>
               </Box>
             }
             icon={
@@ -215,14 +217,14 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={invoices.length}
+            title={invoiceStatistics.total}
             subtitle="Invoices"
-            progress={1 - invoiceGrowthPercentage / 100}
+            progress={1 - invoiceStatistics.percentGrowth / 100}
             increase={
               <Box display="flex" alignItems="center" gap="10px">
-                {invoiceGrowthPercentage > 0 && <TrendingUpIcon />}
-                {invoiceGrowthPercentage < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{invoiceGrowthPercentage + " %"}</Box>
+                {invoiceStatistics.percentGrowth > 0 && <TrendingUpIcon />}
+                {invoiceStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
+                <Box>{invoiceStatistics.percentGrowth + " %"}</Box>
               </Box>
             }
             icon={
@@ -240,14 +242,14 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={totalOrderSum}
+            title={moneyStatistics.total}
             subtitle="Money"
-            progress={1 - moneyGrowthPercentage / 100}
+            progress={1 - moneyStatistics.percentGrowth / 100}
             increase={
               <Box display="flex" alignItems="center" gap="10px">
-                {moneyGrowthPercentage > 0 && <TrendingUpIcon />}
-                {moneyGrowthPercentage < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{moneyGrowthPercentage + " %"}</Box>
+                {moneyStatistics.percentGrowth > 0 && <TrendingUpIcon />}
+                {moneyStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
+                <Box>{moneyStatistics.percentGrowth + " %"}</Box>
               </Box>
             }
             icon={
@@ -263,54 +265,8 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Chart
-              </Typography>
-              {/* <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                $59,342.32
-              </Typography> */}
-            </Box>
-          </Box>
-          <Box width="100%" height="100%">
-            {/* Chart */}
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={dataChart}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 50,
-                }}
-                barSize={30}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={() => { return true }} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Legend />
-                <Bar dataKey="cost" stackId="a" fill="#E0E0E0" />
-                <Bar dataKey="profit" stackId="a" fill="#4CCE94" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
+          overflow="auto"
+        ></Box>
         <Box
           gridColumn="span 4"
           gridRow="span 3"
@@ -335,7 +291,7 @@ const Dashboard = () => {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
+              borderBottom={`2px solid ${colors.primary[500]}`}
               p="15px"
             >
               <Box>
@@ -388,7 +344,7 @@ const Dashboard = () => {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
+              borderBottom={`2px solid ${colors.primary[500]}`}
               p="15px"
             >
               <Box>
@@ -416,6 +372,60 @@ const Dashboard = () => {
               </Box>
             </Box>
           ))}
+        </Box>
+
+        {/* ROW 3 */}
+        <Box
+          gridColumn="span 12"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            p="0 30px"
+            display="flex"
+            height="15%"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                Revenue - Cost - Profit of {today.getFullYear()}
+              </Typography>
+            </Box>
+          </Box>
+          <Box width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={revenueStatistics}
+                margin={{
+                  right: 60,
+                  left: 20,
+                  bottom: 20,
+                }}
+                barSize={20}
+              >
+                <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
+                <XAxis dataKey="month" />
+                <Tooltip content={<CustomTooltip />} />
+                <YAxis />
+                <Legend />
+                <Bar dataKey="Revenue" fill="#6495ED">
+                  <LabelList dataKey="Revenue" position="top" fill="#6495ED" />
+                </Bar>
+                <Bar dataKey="Cost" fill="#FFD700">
+                  <LabelList dataKey="Cost" position="top" fill="#FFD700" />
+                </Bar>
+                <Bar dataKey="Profit" fill="#228B22">
+                  <LabelList dataKey="Profit" position="top" fill="#228B22" />
+                </Bar>
+
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
         </Box>
       </Box>
     </Box>
