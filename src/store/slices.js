@@ -33,6 +33,18 @@ const mySlice = createSlice({
   },
   reducers: {
     // ...
+    logout: (state) => {
+      state.usersWithRoles = [];
+      state.categories = [];
+      state.subCategories = [];
+      state.urlImageUploaded = "";
+      state.invoices = [];
+      state.invoiceDetails = [];
+      state.userLogedIn = null;
+      state.loginStatus = false;
+      state.productItems = [];
+      state.products = [];
+    },
   },
 
   extraReducers: (builder) => {

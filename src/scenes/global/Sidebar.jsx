@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -13,6 +13,8 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { useSelector } from "react-redux";
 import { userLogedInState } from "../../store/selectors";
+import mySlice from "../../store/slices";
+import { useDispatch } from "react-redux";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -38,8 +40,15 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const dispatch = useDispatch();
 
   const userLogedIn = useSelector(userLogedInState);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("userLogedIn");
+    dispatch(mySlice.actions.logout());
+  }
 
   return (
     <Box
@@ -158,13 +167,15 @@ const Sidebar = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              <Item
-                title="Log out"
-                to="/"
-                icon={<LogoutIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+              <Button
+                style={{ color: colors.grey[100], padding: "10px 0px 10px 28px"}}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleLogout()
+                }}>
+                <LogoutIcon sx={{marginRight: "17px"}}/>
+                {!isCollapsed && <Box>Logout</Box>}
+              </Button>
             </Box>
           )}
           {!userLogedIn && (
