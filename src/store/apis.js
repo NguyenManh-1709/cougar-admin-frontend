@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 
 // Get All Authorities => Custom list user with roles
 export const authorityGetAll = createAsyncThunk('authorityGetAll', async () => {
@@ -42,21 +42,25 @@ export const invoiceDetailsGetAll = createAsyncThunk('invoiceDetailsGetAll', asy
 });
 
 // Login
-export const login = createAsyncThunk('login', async (credentials) => {
-  const loginResponse = await axios.post('http://localhost:8080/api/auth/signin', credentials);
+export const login = createAsyncThunk('login', async (credentials, { rejectWithValue }) => {
+  try {
+    const loginResponse = await axios.post('http://localhost:8080/api/auth/signin', credentials);
 
-  const accessToken = loginResponse.data.accessToken;
-  const decoded = jwt_decode(accessToken);
-  if (decoded.scope.includes("ADMIN")) {
-    const userResponse = await axios.get(`http://localhost:8080/rest/users/${decoded.id}`);
-    const userLogedIn = userResponse.data;
-    // const userLogedInHasRole = {...userLogedIn, role: decoded.scope}
-    
-    sessionStorage.setItem('accessToken', JSON.stringify(accessToken));
-    sessionStorage.setItem('userLogedIn', JSON.stringify(userLogedIn));
-    return userLogedIn;
-  } else {
-    return null;
+    const isAdmin = loginResponse.data.SHARE_USER.roles.find(obj => (obj.authority === "ADMIN"));
+
+    if (isAdmin) {
+      sessionStorage.setItem('accessToken', JSON.stringify(loginResponse.data.accessToken));
+      sessionStorage.setItem('userLogedIn', JSON.stringify(loginResponse.data.SHARE_USER));
+      return loginResponse.data.SHARE_USER;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
   }
 });
 
@@ -93,7 +97,7 @@ export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploa
   formData.append('file', dataURL);
   formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
   formData.append('public_id', `avatar-user-id-${userRes.data.id}`);
-      // formData.append('overwrite', true);
+  // formData.append('overwrite', true);
   const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
@@ -118,7 +122,7 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
   formData.append('file', dataURL);
   formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
   formData.append('public_id', `avatar-user-id-${values.id}`);
-      // formData.append('overwrite', true);
+  // formData.append('overwrite', true);
   const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
