@@ -52,7 +52,7 @@ const User = () => {
                 if (role.includes('ADMIN')) {
                     return (
                         <Link
-                            to={`/form-user/${id}`}
+                            to={`/edit-admin/${id}`}
                             style={{
                                 textDecoration: 'none',
                                 background: "#1F2A40",
@@ -79,7 +79,7 @@ const User = () => {
 
             <Box display="flex" justifyContent="end" mt="10px">
                 <Link
-                    to="/form-user/0"
+                    to="/create-admin"
                     style={{
                         textDecoration: 'none',
                         background: "#1F2A40",

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
-import FormCreateUser from "./scenes/formcreateuser";
+import FormCreateUser from "./scenes/create-user";
 import FormCreateProduct from "./scenes/formcreateproduct";
 import FormLogin from "./scenes/login";
 import Invoice from "./scenes/invoice";
@@ -18,6 +18,7 @@ import { ToastContainer } from "react-toastify";
 
 import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll } from "./store/apis";
 import { loginStatusState } from "./store/selectors";
+import FormEditUser from "./scenes/edit-user";
 
 function App() {
   const dispatch = useDispatch();
@@ -52,7 +53,8 @@ function App() {
               <Routes>
                 <Route path="/" element={(loginStatus === false) ? <FormLogin /> : <Navigate to={-1} />} />
                 <Route path="/dashboard" element={loginStatus === true ? <Dashboard /> : <Navigate to="/" />} />
-                <Route path="/form-user/:id" element={loginStatus === true ? <FormCreateUser /> : <Navigate to="/" />} />
+                <Route path="/create-admin" element={loginStatus === true ? <FormCreateUser /> : <Navigate to="/" />} />
+                <Route path="/edit-admin/:id" element={loginStatus === true ? <FormEditUser /> : <Navigate to="/" />} />
                 <Route path="/createproduct/:id" element={loginStatus === true ? <FormCreateProduct /> : <Navigate to="/" />} />
                 <Route path="/invoices" element={loginStatus === true ? <Invoice /> : <Navigate to="/" />} />
                 <Route path="/users" element={loginStatus === true ? <User /> : <Navigate to="/" />} />
