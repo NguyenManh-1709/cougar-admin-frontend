@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -39,7 +39,7 @@ const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+  const [selected, setSelected] = useState("Login");
   const dispatch = useDispatch();
 
   const userLogedIn = useSelector(userLogedInState);
@@ -167,15 +167,23 @@ const Sidebar = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              <Button
-                style={{ color: colors.grey[100], padding: "10px 0px 10px 28px"}}
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleLogout()
-                }}>
-                <LogoutIcon sx={{marginRight: "17px"}}/>
-                {!isCollapsed && <Box>Logout</Box>}
-              </Button>
+              <MenuItem
+                active={selected === "Logout"}
+                style={{
+                  color: colors.grey[100],
+                }}
+                onClick={() => setSelected("Logout")}
+                icon={<LogoutIcon />}
+              >
+                <Typography>Logout</Typography>
+                <Link
+                  to={"/"}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleLogout()
+                  }}
+                />
+              </MenuItem>
             </Box>
           )}
           {!userLogedIn && (

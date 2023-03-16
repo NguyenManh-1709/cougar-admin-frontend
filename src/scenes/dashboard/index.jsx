@@ -81,12 +81,12 @@ const Dashboard = () => {
   const monthsText = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const revenueStatistics = monthsText.map((month, index) => {
     const monthNumber = index + 1;
-    const totalRevenue = paidInvoices
+    const revenue = paidInvoices
       .filter(invoice => new Date(invoice.createDate).getFullYear() === today.getFullYear() && new Date(invoice.createDate).getMonth() + 1 === monthNumber)
       .reduce((acc, invoice) => acc + parseInt(invoice.orderTotal), 0);
-    const cost = (totalRevenue * 0.7) % 1 !== 0 ? (totalRevenue * 0.7).toFixed(1) : (totalRevenue * 0.7);
-    const profit = totalRevenue - cost;
-    return { month, Revenue: totalRevenue, Cost: cost, Profit: profit };
+    const cogs = (revenue * 0.7) % 1 !== 0 ? (revenue * 0.7).toFixed(1) : (revenue * 0.7);
+    const grossProfit = revenue - cogs;
+    return { month, revenue, cogs, grossProfit };
   });
 
   // Custom tooltip for chart
@@ -131,9 +131,7 @@ const Dashboard = () => {
         }
         return acc;
       }, {})
-  )
-    .sort((a, b) => b.qty - a.qty)
-    .slice(0, 10);
+  ).sort((a, b) => b.qty - a.qty).slice(0, 10);
 
   return (
     <Box m="20px">
@@ -357,7 +355,7 @@ const Dashboard = () => {
             p="0 30px"
             display="flex"
             height="15%"
-            justifyContent="space-between"
+            justifyContent="center"
             alignItems="center"
           >
             <Box>
@@ -366,7 +364,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Revenue - Cost - Profit of {today.getFullYear()}
+                Revenue, COGS, and Gross Profit Chart
               </Typography>
             </Box>
           </Box>
@@ -386,16 +384,15 @@ const Dashboard = () => {
                 <Tooltip content={<CustomTooltipRevenueChart />} />
                 <YAxis />
                 <Legend />
-                <Bar dataKey="Revenue" fill="#6495ED">
-                  <LabelList dataKey="Revenue" position="top" fill="#6495ED" />
+                <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
+                  <LabelList dataKey="revenue" position="top" fill="#6495ED" />
                 </Bar>
-                <Bar dataKey="Cost" fill="#FFD700">
-                  <LabelList dataKey="Cost" position="top" fill="#FFD700" />
+                <Bar dataKey="cogs" fill="#FFD700" name="COGS (Cost of goods sold)">
+                  <LabelList dataKey="cogs" position="top" fill="#FFD700"/>
                 </Bar>
-                <Bar dataKey="Profit" fill="#228B22">
-                  <LabelList dataKey="Profit" position="top" fill="#228B22" />
+                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
+                  <LabelList dataKey="grossProfit" position="top" fill="#228B22" />
                 </Bar>
-
               </BarChart>
             </ResponsiveContainer>
           </Box>
