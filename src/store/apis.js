@@ -88,9 +88,19 @@ export const productGetAll = createAsyncThunk('productGetAll', async () => {
   return response.data;
 });
 
-
-
-
+// Change Password
+export const changePassword = createAsyncThunk('changePassword', async (values, { rejectWithValue }) => {
+  try {
+    const response = await axios.post("http://localhost:8080/api/auth/change-password", values);
+    return response;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
+});
 
 // Post user (Role = "ADMIN")
 export const userPost = createAsyncThunk('userPost', async (user, { rejectWithValue }) => {
@@ -170,7 +180,7 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
   const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
   const userUpdated = { ...values, avatar: url };
 
-  
+
   try {
     const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
     return response.data;

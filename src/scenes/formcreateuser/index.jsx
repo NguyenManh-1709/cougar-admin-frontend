@@ -8,7 +8,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import { useDispatch } from "react-redux";
-import { userPostAndUploadAvatarToCloud, userPost, userPutAndUploadAvatarToCloud, userPut } from "../../store/apis";
+// import { userPostAndUploadAvatarToCloud, userPost, userPutAndUploadAvatarToCloud, userPut } from "../../store/apis";
+import { userPostAndUploadAvatarToCloud, userPost } from "../../store/apis";
 import { useParams } from 'react-router-dom';
 import { usersWithRolesState } from "../../store/selectors";
 import { useState } from "react";
@@ -138,10 +139,10 @@ const FormCreateUser = () => {
     }
   };
 
-  const handleUpdateUser = (values) => {
-    console.log(values);
-    console.log(validFile);
-  }
+  // const handleUpdateUser = (values) => {
+  //   console.log(values);
+  //   console.log(validFile);
+  // }
 
   return (
     <Box m="20px">

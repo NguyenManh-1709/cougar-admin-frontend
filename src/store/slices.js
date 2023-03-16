@@ -14,7 +14,8 @@ import {
   invoiceStatusPut,
   productGetAll,
   userPostAndUploadAvatarToCloud,
-  userPutAndUploadAvatarToCloud
+  userPutAndUploadAvatarToCloud,
+  changePassword
 } from "./apis";
 
 const mySlice = createSlice({
@@ -240,6 +241,12 @@ const mySlice = createSlice({
       .addCase(productGetAll.fulfilled, (state, action) => {
         state.products = action.payload;
         state.status = "idle";
+      })
+
+      // CHANGE PASSWORD
+      .addCase(changePassword.fulfilled, (state, action) => {
+      })
+      .addCase(changePassword.rejected, (state, action) => {
       })
   },
 });

@@ -9,6 +9,7 @@ import FormLogin from "./scenes/login";
 import Invoice from "./scenes/invoice";
 import User from "./scenes/user";
 import Product from "./scenes/product";
+import ChangePassword from "./scenes/change-password";
 import { Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/invoices" element={loginStatus === true ? <Invoice /> : <Navigate to="/" />} />
                 <Route path="/users" element={loginStatus === true ? <User /> : <Navigate to="/" />} />
                 <Route path="/products" element={loginStatus === true ? <Product /> : <Navigate to="/" />} />
+                <Route path="/change-password" element={loginStatus === true ? <ChangePassword /> : <Navigate to="/" />} />
               </Routes>
               <ToastContainer/>
             </main>

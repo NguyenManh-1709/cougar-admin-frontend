@@ -11,6 +11,7 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import GroupIcon from '@mui/icons-material/Group';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useSelector } from "react-redux";
 import { userLogedInState } from "../../store/selectors";
 import mySlice from "../../store/slices";
@@ -164,6 +165,13 @@ const Sidebar = () => {
                 title="Invoices"
                 to="/invoices"
                 icon={<ReceiptIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Change password"
+                to="/change-password"
+                icon={<SettingsIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
