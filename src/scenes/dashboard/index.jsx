@@ -8,7 +8,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import PaidIcon from '@mui/icons-material/Paid';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import { usersWithRolesState, productItemsState, invoicesState, invoiceDetailsState } from "../../store/selectors";
+import { usersWithRolesState, invoicesState, invoiceDetailsState, productsState } from "../../store/selectors";
 import { useSelector } from "react-redux";
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip, LabelList } from "recharts";
@@ -18,9 +18,11 @@ const Dashboard = () => {
   const colors = tokens(theme.palette.mode);
 
   const usersWithRoles = useSelector(usersWithRolesState);
-  const productItems = useSelector(productItemsState);
+  const products = useSelector(productsState);
   const invoices = useSelector(invoicesState);
   const invoicesDetails = useSelector(invoiceDetailsState);
+
+  const paidInvoices = invoices.filter(item => item.orderStatus === 3);
 
   const today = new Date();
 
@@ -38,31 +40,31 @@ const Dashboard = () => {
 
   // Thống kê tổng số lượng hóa đơn và phần trăm tăng của tháng hiện tại so với trước
   const invoiceStatistics = (() => {
-    const totalInvoiceCreatedInThisMonth = invoices.filter(invoice => {
+    const totalInvoiceCreatedInThisMonth = paidInvoices.filter(invoice => {
       const invoiceCreateDate = new Date(invoice.createDate);
       return invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear();
     }).length;
     return {
-      total: invoices.length,
-      percentGrowth: (totalInvoiceCreatedInThisMonth / (invoices.length - totalInvoiceCreatedInThisMonth) * 100).toFixed(1),
+      total: paidInvoices.length,
+      percentGrowth: (totalInvoiceCreatedInThisMonth / (paidInvoices.length - totalInvoiceCreatedInThisMonth) * 100).toFixed(1),
     }
   })();
 
   // Thống kê tổng số lượng productItem và phần trăm tăng của tháng hiện tại so với trước
-  const productItemStatistics = (() => {
-    const totalProductItemCreatedInThisMonth = productItems.filter(invoice => {
-      const productItemCreateDate = new Date(invoice.createDate);
-      return productItemCreateDate.getMonth() === today.getMonth() && productItemCreateDate.getFullYear() === today.getFullYear();
+  const productStatistics = (() => {
+    const totalProductCreatedInThisMonth = products.filter(invoice => {
+      const productCreateDate = new Date(invoice.createDate);
+      return productCreateDate.getMonth() === today.getMonth() && productCreateDate.getFullYear() === today.getFullYear();
     }).length;
     return {
-      total: productItems.length,
-      percentGrowth: (totalProductItemCreatedInThisMonth / (productItems.length - totalProductItemCreatedInThisMonth) * 100).toFixed(1),
+      total: products.length,
+      percentGrowth: (totalProductCreatedInThisMonth / (products.length - totalProductCreatedInThisMonth) * 100).toFixed(1),
     }
   })();
 
   // Thống kê tổng số tiền thu được và phần trăm tăng của tháng hiện tại so với trước
   const moneyStatistics = (() => {
-    const [totalMoneyInThisMonth, totalMoney] = invoices.reduce(([temp, temp2], { createDate, orderTotal }) => {
+    const [totalMoneyInThisMonth, totalMoney] = paidInvoices.reduce(([temp, temp2], { createDate, orderTotal }) => {
       const invoiceCreateDate = new Date(createDate);
       return [
         (invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear()) ? temp + orderTotal : temp,
@@ -79,7 +81,7 @@ const Dashboard = () => {
   const monthsText = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const revenueStatistics = monthsText.map((month, index) => {
     const monthNumber = index + 1;
-    const totalRevenue = invoices
+    const totalRevenue = paidInvoices
       .filter(invoice => new Date(invoice.createDate).getFullYear() === today.getFullYear() && new Date(invoice.createDate).getMonth() + 1 === monthNumber)
       .reduce((acc, invoice) => acc + parseInt(invoice.orderTotal), 0);
     const cost = (totalRevenue * 0.7) % 1 !== 0 ? (totalRevenue * 0.7).toFixed(1) : (totalRevenue * 0.7);
@@ -88,7 +90,7 @@ const Dashboard = () => {
   });
 
   // Custom tooltip for chart
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltipRevenueChart = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "10px" }}>
@@ -102,46 +104,36 @@ const Dashboard = () => {
     return null;
   };
 
-
-
-
   // Thống kê top 10 user mua nhiều nhất
-  const totalOrderGroupByUserMap = new Map();
-
-  for (const invoice of invoices) {
-    const { user, orderTotal } = invoice;
-    const { id: userId, fullname } = user;
-
-    if (totalOrderGroupByUserMap.has(userId)) {
-      const { orderTotal: total } = totalOrderGroupByUserMap.get(userId);
-      totalOrderGroupByUserMap.set(userId, { fullname, orderTotal: total + orderTotal });
-    } else {
-      totalOrderGroupByUserMap.set(userId, { fullname, orderTotal });
-    }
-  }
-
-  const topTenUsersWhoBuyTheMost = Array
-    .from(totalOrderGroupByUserMap, ([userId, { fullname, orderTotal }]) => ({ userId, fullname, orderTotal }))
-    .sort((a, b) => b.orderTotal - a.orderTotal)
+  const orderTotalByUser = paidInvoices.reduce((totals, { user, orderTotal }) => {
+    const existingTotal = totals[user.id] || 0;
+    return {
+      ...totals,
+      [user.id]: existingTotal + orderTotal
+    };
+  }, {});
+  const topTenUsersWhoBuyTheMost = Object.entries(orderTotalByUser)
+    .map(([userId, orderTotal]) => ({ userInfo: `${usersWithRoles.find(user => user.id === parseInt(userId)).fullname} (ID: ${userId})`, Total: orderTotal }))
+    .sort((a, b) => b.Total - a.Total)
     .slice(0, 10);
 
 
 
   // Thống kê top 10 sản phẩm bán chạy chất
-  const tempArr = [];
-  const tempMap = new Map();
-  invoicesDetails.forEach(({ productItem, qty }) => {
-    const { id: productItemId, product } = productItem;
-    const temp = tempMap.get(productItemId);
-    tempMap.set(productItemId, temp ? { ...temp, qty: temp.qty + qty } : { product, qty });
-  });
-  for (const [productItemId, { product, ...props }] of tempMap) {
-    tempArr.push({ productItemId, productName: product.name, ...props });
-  }
-
-  const topTenBestSellingProducts = tempArr.sort((a, b) => b.qty - a.qty).slice(0, 10);
-
-
+  const topTenBestSellingProducts = Object.values(
+    invoices
+      .filter(invoice => invoice.orderStatus === 3)
+      .flatMap(invoice => invoicesDetails.filter(item => item.shopOrder.id === invoice.id))
+      .reduce((acc, { shopOrder: { orderStatus }, productItem: { product }, qty }) => {
+        if (orderStatus === 3) {
+          const { id: productId, name, image } = product;
+          acc[productId] = { productId, name, image, qty: (acc[productId]?.qty || 0) + qty };
+        }
+        return acc;
+      }, {})
+  )
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, 10);
 
   return (
     <Box m="20px">
@@ -192,14 +184,14 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={productItemStatistics.total}
+            title={productStatistics.total}
             subtitle="Products"
-            progress={1 - productItemStatistics.percentGrowth / 100}
+            progress={1 - productStatistics.percentGrowth / 100}
             increase={
               <Box display="flex" alignItems="center" gap="10px">
-                {productItemStatistics.percentGrowth > 0 && <TrendingUpIcon />}
-                {productItemStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{productItemStatistics.percentGrowth + " %"}</Box>
+                {productStatistics.percentGrowth > 0 && <TrendingUpIcon />}
+                {productStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
+                <Box>{productStatistics.percentGrowth + " %"}</Box>
               </Box>
             }
             icon={
@@ -262,66 +254,47 @@ const Dashboard = () => {
 
         {/* ROW 2 */}
         <Box
-          gridColumn="span 4"
+          gridColumn="span 6"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
-          overflow="auto"
-        ></Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 3"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
         >
           <Box
+            p="0 30px"
             display="flex"
+            height="15%"
             justifyContent="space-between"
             alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
           >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Top 10 users who buy the most
-            </Typography>
-          </Box>
-          {topTenUsersWhoBuyTheMost.map((item, i) => (
-            <Box
-              key={`${item.userId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`2px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                  fontSize="1rem"
-                >
-                  {item.fullname}
-                </Typography>
-                <Typography color={colors.grey[100]} variant="h6">
-                  User-id: {item.userId}
-                </Typography>
-              </Box>
-              <Box
-                backgroundColor={colors.grey[100]}
-                color={colors.grey[900]}
-                p="5px"
-                borderRadius="4px"
-                fontSize="1.2rem"
+            <Box>
+              <Typography
+                variant="h5"
                 fontWeight="600"
+                color={colors.grey[100]}
               >
-                ${item.orderTotal}
-              </Box>
+                Top 10 users who buy the most
+              </Typography>
             </Box>
-          ))}
+          </Box>
+          <Box width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart width={400} height={400} data={topTenUsersWhoBuyTheMost} layout="vertical" margin={{
+                right: 60,
+                left: 20,
+                bottom: 20,
+              }}
+                barSize={15}>
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="userInfo" width={190} tick={{ fill: colors.greenAccent[300], fontSize: "1rem", fontWeight: '600' }} />
+                <Legend />
+                <Bar dataKey="Total" fill="#708090">
+                  <LabelList dataKey="Total" position="right" fill="#708090" />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn="span 6"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
           overflow="auto"
@@ -340,29 +313,29 @@ const Dashboard = () => {
           </Box>
           {topTenBestSellingProducts.map((item, i) => (
             <Box
-              key={`${item.productItemId}-${i}`}
+              key={`${item.productId}-${i}`}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
               borderBottom={`2px solid ${colors.primary[500]}`}
               p="15px"
             >
-              <Box>
+              <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width="100px" />
+              <Box sx={{ flex: 1 }}>
                 <Typography
-                  color={colors.greenAccent[500]}
+                  color={colors.greenAccent[300]}
                   variant="h5"
                   fontWeight="600"
                   fontSize="1rem"
                 >
-                  {item.productName}
+                  {item.name}
                 </Typography>
                 <Typography color={colors.grey[100]} variant="h6">
-                  Product-item-id: {item.productItemId}
+                  ID: {item.productId}
                 </Typography>
               </Box>
               <Box
-                backgroundColor={colors.grey[100]}
-                color={colors.grey[900]}
+                color={colors.grey[100]}
                 p="5px"
                 borderRadius="4px"
                 fontSize="1.2rem"
@@ -410,7 +383,7 @@ const Dashboard = () => {
               >
                 <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
                 <XAxis dataKey="month" />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltipRevenueChart />} />
                 <YAxis />
                 <Legend />
                 <Bar dataKey="Revenue" fill="#6495ED">

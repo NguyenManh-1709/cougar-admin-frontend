@@ -134,6 +134,15 @@ const mySlice = createSlice({
       .addCase(invoiceStatusPut.fulfilled, (state, action) => {
         const invoiceUpdated = action.payload;
         state.invoices = state.invoices.map(item => item.id === invoiceUpdated.id ? invoiceUpdated : item);
+
+        const updatedArr = state.invoiceDetails.map(invoiceDetails => {
+          if (invoiceDetails.shopOrder.id === invoiceUpdated.id) {
+            return { ...invoiceDetails, shopOrder: invoiceUpdated};
+          }
+          return invoiceDetails;
+        });
+        state.invoiceDetails = updatedArr;
+
         state.status = "idle";
       })
 
