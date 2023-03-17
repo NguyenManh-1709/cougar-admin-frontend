@@ -167,7 +167,7 @@ const Dashboard = () => {
             }
             icon={
               <GroupIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
               />
             }
           />
@@ -192,7 +192,7 @@ const Dashboard = () => {
             }
             icon={
               <CheckBoxOutlineBlankIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
               />
             }
           />
@@ -217,7 +217,7 @@ const Dashboard = () => {
             }
             icon={
               <ReceiptOutlinedIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
               />
             }
           />
@@ -242,7 +242,7 @@ const Dashboard = () => {
             }
             icon={
               <PaidIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
               />
             }
           />
