@@ -263,14 +263,17 @@ const Invoice = () => {
                       <Box sx={{ minWidth: "150px" }}>Total</Box> $ {invoiceSelected.orderTotal}
                     </ListItem>
                   </List>
-                  <Stepper activeStep={invoiceSelected.orderStatus} alternativeLabel sx={{ marginTop: "50px" }}>
-                    <Step key={1} sx={{ padding: 0 }}>
+                  <Stepper activeStep={invoiceSelected.orderStatus + 1} alternativeLabel sx={{ marginTop: "50px" }}>
+                    <Step sx={{ padding: 0 }}>
                       <StepLabel>Pending</StepLabel>
                     </Step>
-                    <Step key={2} sx={{ padding: 0 }}>
+                    <Step sx={{ padding: 0 }}>
+                      <StepLabel>Processing</StepLabel>
+                    </Step>
+                    <Step sx={{ padding: 0 }}>
                       <StepLabel>In transit</StepLabel>
                     </Step>
-                    <Step key={3} sx={{ padding: 0 }}>
+                    <Step sx={{ padding: 0 }}>
                       <StepLabel>Completed</StepLabel>
                     </Step>
                   </Stepper>

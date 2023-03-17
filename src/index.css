@@ -49,14 +49,18 @@ body,
 .css-9h48zc-MuiStepLabel-label.Mui-completed,
 .css-2lgwlz-MuiStepLabel-label.Mui-completed {
   color: #008B8B !important;
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
   font-weight: bold !important;
 }
+.css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root,
+.css-2lgwlz-MuiStepLabel-label,
+.css-9h48zc-MuiStepLabel-label,
 .css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
 .css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
 .css-2lgwlz-MuiStepLabel-label.Mui-active,
 .css-9h48zc-MuiStepLabel-label.Mui-active {
   color: #A9A9A9 !important;
-  font-size: 1.2rem;
+  font-size: 1.2rem !important;
   font-weight: bold !important;
 }

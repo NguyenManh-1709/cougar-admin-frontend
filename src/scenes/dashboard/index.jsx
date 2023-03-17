@@ -1,5 +1,5 @@
 import { tokens } from "../../theme";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import StatBox from "../../components/StatBox";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -85,7 +85,7 @@ const Dashboard = () => {
       .filter(invoice => new Date(invoice.createDate).getFullYear() === today.getFullYear() && new Date(invoice.createDate).getMonth() + 1 === monthNumber)
       .reduce((acc, invoice) => acc + parseInt(invoice.orderTotal), 0);
     const cogs = (revenue * 0.7) % 1 !== 0 ? (revenue * 0.7).toFixed(1) : (revenue * 0.7);
-    const grossProfit = revenue - cogs;
+    const grossProfit = (revenue - cogs) % 1 !== 0 ? (revenue - cogs).toFixed(1) : (revenue - cogs);
     return { month, revenue, cogs, grossProfit };
   });
 
@@ -96,7 +96,7 @@ const Dashboard = () => {
         <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "10px" }}>
           <Typography sx={{ color: "#FFF", textAlign: "center", marginBottom: "10px", borderBottom: "1px solid #FFF" }}>{`${label}`}</Typography>
           <Typography sx={{ color: "#6495ED" }}>{`${payload[0].name} : ${payload[0].value}`}</Typography>
-          <Typography sx={{ color: "#FFD700" }}>{`${payload[1].name} : ${payload[1].value}`}</Typography>
+          <Typography sx={{ color: "#DC6A6A" }}>{`${payload[1].name} : ${payload[1].value}`}</Typography>
           <Typography sx={{ color: "#228B22" }}>{`${payload[2].name} : ${payload[2].value}`}</Typography>
         </Box>
       );
@@ -124,11 +124,9 @@ const Dashboard = () => {
     invoices
       .filter(invoice => invoice.orderStatus === 3)
       .flatMap(invoice => invoicesDetails.filter(item => item.shopOrder.id === invoice.id))
-      .reduce((acc, { shopOrder: { orderStatus }, productItem: { product }, qty }) => {
-        if (orderStatus === 3) {
-          const { id: productId, name, image } = product;
-          acc[productId] = { productId, name, image, qty: (acc[productId]?.qty || 0) + qty };
-        }
+      .reduce((acc, { productItem: { product }, qty }) => {
+        const { id: productId, name, image } = product;
+        acc[productId] = { productId, name, image, qty: (acc[productId]?.qty || 0) + qty };
         return acc;
       }, {})
   ).sort((a, b) => b.qty - a.qty).slice(0, 10);
@@ -260,7 +258,7 @@ const Dashboard = () => {
             p="0 30px"
             display="flex"
             height="15%"
-            justifyContent="space-between"
+            justifyContent="center"
             alignItems="center"
           >
             <Box>
@@ -269,7 +267,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Top 10 users who buy the most
+                TOP 10 USERS WHO BUY THE MOST
               </Typography>
             </Box>
           </Box>
@@ -298,51 +296,49 @@ const Dashboard = () => {
           overflow="auto"
         >
           <Box
+            p="0 30px"
             display="flex"
-            justifyContent="space-between"
+            height="15%"
+            justifyContent="center"
             alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
           >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Top 10 best selling products
-            </Typography>
-          </Box>
-          {topTenBestSellingProducts.map((item, i) => (
-            <Box
-              key={`${item.productId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`2px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width="100px" />
-              <Box sx={{ flex: 1 }}>
-                <Typography
-                  color={colors.greenAccent[300]}
-                  variant="h5"
-                  fontWeight="600"
-                  fontSize="1rem"
-                >
-                  {item.name}
-                </Typography>
-                <Typography color={colors.grey[100]} variant="h6">
-                  ID: {item.productId}
-                </Typography>
-              </Box>
-              <Box
-                color={colors.grey[100]}
-                p="5px"
-                borderRadius="4px"
-                fontSize="1.2rem"
+            <Box>
+              <Typography
+                variant="h5"
                 fontWeight="600"
+                color={colors.grey[100]}
               >
-                {item.qty}
-              </Box>
+                TOP 10 BEST SELLING PRODUCTS
+              </Typography>
             </Box>
-          ))}
+          </Box>
+          <TableContainer sx={{ maxHeight: "85%" }} >
+            <Table stickyHeader sx={{ minHeight: "85%" }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }}>IMAGE</TableCell>
+                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center", minWidth: "50px" }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0" }}>NAME</TableCell>
+                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }} align="right">QUANTITY</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {topTenBestSellingProducts.map((item) => (
+                  <TableRow
+                    key={item.productId}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "100px" }}
+                  >
+                    <TableCell sx={{ padding: "0", textAlign: "center" }}>
+                      <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width={90} style={{ padding: "5px" }} />
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center", minWidth: "50px" }}>{item.productId}</TableCell>
+                    <TableCell sx={{ fontSize: "1rem", color: colors.redAccent[400], padding: "0", fontWeight: "800" }}>{item.name}</TableCell>
+                    <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center" }} align="right">{item.qty}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
 
         {/* ROW 3 */}
@@ -364,7 +360,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Revenue, COGS, and Gross Profit Chart
+                REVENUE, COGS, AND GROSS PROFIT CHART
               </Typography>
             </Box>
           </Box>
@@ -387,8 +383,8 @@ const Dashboard = () => {
                 <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
                   <LabelList dataKey="revenue" position="top" fill="#6495ED" />
                 </Bar>
-                <Bar dataKey="cogs" fill="#FFD700" name="COGS (Cost of goods sold)">
-                  <LabelList dataKey="cogs" position="top" fill="#FFD700"/>
+                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
+                  <LabelList dataKey="cogs" position="top" fill="#DC6A6A" />
                 </Bar>
                 <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
                   <LabelList dataKey="grossProfit" position="top" fill="#228B22" />
