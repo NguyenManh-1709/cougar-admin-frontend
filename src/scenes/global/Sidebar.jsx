@@ -141,7 +141,7 @@ const Sidebar = () => {
                   <Link to={"/dashboard"} />
                 </MenuItem>
 
-                <Typography variant="h6" color={"gray"} sx={{ m: "15px 20px 5px 20px" }} >Management</Typography>
+                <Typography variant="h6" color={"gray"} display={isCollapsed ? "none" : undefined} >Management</Typography>
 
                 <MenuItem
                   active={selected === "/users"}
@@ -170,7 +170,7 @@ const Sidebar = () => {
                   <Link to={"/invoices"} />
                 </MenuItem>
 
-                <Typography variant="h6" color={"gray"} sx={{ m: "15px 20px 5px 20px" }} >Your account</Typography>
+                <Typography variant="h6" color={"gray"} display={isCollapsed ? "none" : undefined} >Your account</Typography>
                 <MenuItem
                   active={selected === `/edit-admin/${userLogedIn.id}`}
                   style={{ color: "#FFF" }}

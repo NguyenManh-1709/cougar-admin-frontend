@@ -251,7 +251,7 @@ const Dashboard = () => {
         {/* ROW 2 */}
         <Box
           gridColumn="span 6"
-          gridRow="span 3"
+          gridRow="span 4"
           backgroundColor={colors.primary[400]}
         >
           <Box
@@ -291,7 +291,7 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 6"
-          gridRow="span 3"
+          gridRow="span 4"
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >

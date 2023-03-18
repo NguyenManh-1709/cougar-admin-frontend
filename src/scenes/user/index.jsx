@@ -1,8 +1,9 @@
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import { usersWithRolesState } from "../../store/selectors";
 import MyTable from "../../components/MyTable";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import EditIcon from '@mui/icons-material/Edit';
 
 const User = () => {
     const usersWithRoles = useSelector(usersWithRolesState);
@@ -47,22 +48,23 @@ const User = () => {
         {
             field: "edit",
             headerName: "EDIT",
-            flex: 1,
             renderCell: ({ row: { id, role } }) => {
                 if (role.includes('ADMIN')) {
                     return (
-                        <Link
-                            to={`/edit-admin/${id}`}
-                            style={{
-                                textDecoration: 'none',
-                                background: "#1F2A40",
-                                color: "white",
-                                padding: "10px",
-                                borderRadius: "5px"
-                            }}
-                        >
-                            EDIT
-                        </Link>
+                        <Tooltip title="Edit" placement="right">
+                            <Link
+                                to={`/edit-admin/${id}`}
+                                style={{
+                                    textDecoration: 'none',
+                                    background: "#1F2A40",
+                                    color: "white",
+                                    padding: "10px",
+                                    borderRadius: "5px"
+                                }}
+                            >
+                                <EditIcon/>
+                            </Link>
+                        </Tooltip>
                     );
                 } else { return (<Box></Box>); }
             },

@@ -75,11 +75,9 @@ const Invoice = () => {
       headerName: "PAYMENT METHOD",
       flex: 1,
       renderCell: ({ row: { userPaymentMethod } }) => {
-        if (userPaymentMethod != null) {
-          return (
-            userPaymentMethod.paymentType.value
-          );
-        }
+        return (
+          userPaymentMethod === null ? "Cash on delivery" : userPaymentMethod.paymentType.value
+        );
       },
     },
     {
@@ -248,7 +246,7 @@ const Invoice = () => {
                       <Box sx={{ minWidth: "150px" }}>User</Box> {invoiceSelected.user.fullname}
                     </ListItem>
                     <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Payment method</Box> {invoiceSelected.userPaymentMethod.paymentType.value}
+                      <Box sx={{ minWidth: "150px" }}>Payment method</Box> {invoiceSelected.userPaymentMethod === null ? "Cash on delivery" : invoiceSelected.userPaymentMethod.paymentType.value}
                     </ListItem>
                     <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
                       <Box sx={{ minWidth: "150px" }}>Create date</Box> {invoiceSelected.createDate}
