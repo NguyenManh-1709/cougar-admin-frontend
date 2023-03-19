@@ -38,6 +38,12 @@ const MyTable = (props) => {
             backgroundColor: colors.blueAccent[700],
             borderBottom: "none",
           },
+          "& .css-57oisa-MuiDataGrid-root .MuiDataGrid-columnHeader:focus": {
+            outline: "none !important"
+          },
+          "& .MuiDataGrid-root .MuiDataGrid-cell:focus": {
+            outline: "none !important"
+          },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: colors.primary[400],
           },
@@ -50,6 +56,12 @@ const MyTable = (props) => {
           },
           "& .MuiDataGrid-selectedRowCount": {
             // display: "none"
+          },
+          "& .MuiDataGrid-columnSeparator--sideRight": {
+            display: "none !important"
+          },
+          "& .MuiDataGrid-menuIcon": {
+            display: "none !important"
           }
         }}
       >
