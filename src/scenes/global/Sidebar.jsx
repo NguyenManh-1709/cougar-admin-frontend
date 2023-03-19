@@ -6,6 +6,7 @@ import "react-pro-sidebar/dist/css/styles.css";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import GroupIcon from '@mui/icons-material/Group';
 import ReceiptIcon from '@mui/icons-material/Receipt';
@@ -127,6 +128,14 @@ const Sidebar = () => {
                 >
                   <Typography>Login</Typography>
                   <Link to={"/"} />
+                </MenuItem>
+                <MenuItem
+                  active={selected === "/forgot-password"}
+                  style={{ color: "#FFF" }}
+                  icon={<LockResetIcon />}
+                >
+                  <Typography>Forgot Password</Typography>
+                  <Link to={"/forgot-password"} />
                 </MenuItem>
               </>
             )}

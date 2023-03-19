@@ -102,6 +102,32 @@ export const changePassword = createAsyncThunk('changePassword', async (values, 
   }
 });
 
+export const forgotPassword = createAsyncThunk('forgotPassword', async (email, { rejectWithValue }) => {
+  try {
+    const response = await axios.post('http://localhost:8080/api/auth/forgot-password', email);
+    return response.data;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
+});
+
+export const resetPassword = createAsyncThunk('resetPassword', async ({ password, token }, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`http://localhost:8080/api/auth/reset-password`, { password, token });
+    return response.data;
+  } catch (error) {
+    if (error.response.data) {
+      return rejectWithValue(error.response.data);
+    } else {
+      throw error;
+    }
+  }
+});
+
 // Post user (Role = "ADMIN")
 export const userPost = createAsyncThunk('userPost', async (user, { rejectWithValue }) => {
   try {

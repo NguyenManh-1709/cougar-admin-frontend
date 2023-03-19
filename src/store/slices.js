@@ -15,7 +15,9 @@ import {
   productGetAll,
   userPostAndUploadAvatarToCloud,
   userPutAndUploadAvatarToCloud,
-  changePassword
+  changePassword,
+  forgotPassword,
+  resetPassword
 } from "./apis";
 
 const mySlice = createSlice({
@@ -138,7 +140,7 @@ const mySlice = createSlice({
 
         const updatedArr = state.invoiceDetails.map(invoiceDetails => {
           if (invoiceDetails.shopOrder.id === invoiceUpdated.id) {
-            return { ...invoiceDetails, shopOrder: invoiceUpdated};
+            return { ...invoiceDetails, shopOrder: invoiceUpdated };
           }
           return invoiceDetails;
         });
@@ -248,6 +250,18 @@ const mySlice = createSlice({
       })
       .addCase(changePassword.rejected, (state, action) => {
       })
+
+      //FORGOT PASSWORD
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+      })
+
+      //RESET PASSWORD
+      .addCase(resetPassword.fulfilled, (state, action) => {
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+      });
   },
 });
 
