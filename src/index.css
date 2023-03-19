@@ -79,3 +79,8 @@ path:focus {
 .recharts-text.recharts-pie-label-text > tspan{
   font-size: 1.2rem !important;
 }
+
+.productItem-card .detail{
+  transform: translate(0px, 0px)!important;
+  width: 150%;
+}
