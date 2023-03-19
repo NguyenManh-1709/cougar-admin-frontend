@@ -5,7 +5,6 @@ body,
 #root,
 .app,
 .content {
-  /* height: 100%; */
   width: 100%;
   font-family: "Source Sans Pro", sans-serif;
 }
@@ -52,6 +51,7 @@ body,
   font-size: 1.2rem !important;
   font-weight: bold !important;
 }
+
 .css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root,
 .css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root,
 .css-2lgwlz-MuiStepLabel-label,
@@ -63,4 +63,19 @@ body,
   color: #A9A9A9 !important;
   font-size: 1.2rem !important;
   font-weight: bold !important;
+}
+
+svg:focus,
+g:focus,
+path:focus {
+  outline: none !important;
+}
+
+.recharts-text.recharts-label {
+  stroke: unset !important;
+  fill: white !important;
+}
+
+.recharts-text.recharts-pie-label-text > tspan{
+  font-size: 1.2rem !important;
 }

@@ -44,7 +44,7 @@ const Sidebar = () => {
         height: "100vh",
         top: 0,
         bottom: 0,
-        zIndex: 10000,
+        zIndex: 1000,
         "& .pro-sidebar-inner": {
           background: `#1F2A40 !important`,
         },

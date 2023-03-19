@@ -8,10 +8,10 @@ import GroupIcon from '@mui/icons-material/Group';
 import PaidIcon from '@mui/icons-material/Paid';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import { usersWithRolesState, invoicesState, invoiceDetailsState, productsState } from "../../store/selectors";
+import { usersWithRolesState, invoicesState, invoiceDetailsState, productsState, categoriesState } from "../../store/selectors";
 import { useSelector } from "react-redux";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip, LabelList } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip, LabelList, PieChart, Pie, Cell } from "recharts";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,8 +21,10 @@ const Dashboard = () => {
   const products = useSelector(productsState);
   const invoices = useSelector(invoicesState);
   const invoicesDetails = useSelector(invoiceDetailsState);
+  const categories = useSelector(categoriesState);
 
   const paidInvoices = invoices.filter(item => item.orderStatus === 3);
+  const paidInvoicesDetails = invoicesDetails.filter(item => item.shopOrder.orderStatus === 3)
 
   const today = new Date();
 
@@ -113,17 +115,13 @@ const Dashboard = () => {
     };
   }, {});
   const topTenUsersWhoBuyTheMost = Object.entries(orderTotalByUser)
-    .map(([userId, orderTotal]) => ({ userInfo: `${usersWithRoles.find(user => user.id === parseInt(userId)).fullname} (ID: ${userId})`, Total: orderTotal }))
+    .map(([userId, orderTotal]) => ({ userInfo: `${usersWithRoles.find(user => user.id === parseInt(userId))?.fullname} (ID: ${userId})`, Total: orderTotal }))
     .sort((a, b) => b.Total - a.Total)
     .slice(0, 10);
 
-
-
   // Thống kê top 10 sản phẩm bán chạy chất
   const topTenBestSellingProducts = Object.values(
-    invoices
-      .filter(invoice => invoice.orderStatus === 3)
-      .flatMap(invoice => invoicesDetails.filter(item => item.shopOrder.id === invoice.id))
+    paidInvoicesDetails
       .reduce((acc, { productItem: { product }, qty }) => {
         const { id: productId, name, image } = product;
         acc[productId] = { productId, name, image, qty: (acc[productId]?.qty || 0) + qty };
@@ -131,12 +129,52 @@ const Dashboard = () => {
       }, {})
   ).sort((a, b) => b.qty - a.qty).slice(0, 10);
 
+  // Thống kê selling by categories and sub categories
+  const myColorList = ["#DC6A6A", "#6495ED", "#228B22"];
+  const pieChartColors = categories.map((category, index) => {
+    const colorIndex = index % myColorList.length;
+    return { id: category.id, color: myColorList[colorIndex] };
+  });
+
+  const subCategoriesPieChart = Object.values(
+    paidInvoicesDetails
+    .map(({ qty, productItem: { product: { subcategory: { id, name, category: { id: categoryId, name: categoryName } } } } }) => ({ id, name, categoryId, categoryName, qty }))
+    .reduce((acc, { id, name, categoryId, categoryName, qty }) => {
+      const existingSubCategory = acc.find(item => item.id === id);
+      if (existingSubCategory) {
+        existingSubCategory.qty += qty;
+      } else {
+        acc.push({ id, name, categoryId, categoryName, qty });
+      }
+      return acc;
+    }, []).map(item => ({
+      id: item.id,
+      name: item.name,
+      qty: item.qty,
+      categoryId: item.categoryId,
+      categoryName: item.categoryName,
+      color: pieChartColors.find(color => color.id === item.categoryId)?.color
+    }))).sort((a, b) => a.id - b.id);
+
+  const categoriesPieChart = subCategoriesPieChart.reduce((acc, { categoryId, categoryName, qty }) => {
+    const existingCategory = acc.find(item => item.id === categoryId);
+    if (existingCategory) {
+      existingCategory.qty += qty;
+    } else {
+      acc.push({ id: categoryId, name: categoryName, qty });
+    }
+    return acc;
+  }, []).map(item => ({
+    id: item.id,
+    name: item.name,
+    qty: item.qty,
+    color: pieChartColors.find(color => color.id === item.id)?.color
+  }));
+
   return (
     <Box m="20px">
       {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" />
-      </Box>
+      <Header title="DASHBOARD" />
 
       {/* GRID */}
       <Box
@@ -250,8 +288,107 @@ const Dashboard = () => {
 
         {/* ROW 2 */}
         <Box
-          gridColumn="span 6"
+          gridColumn="span 8"
           gridRow="span 4"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            p="0 30px"
+            display="flex"
+            height="15%"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                REVENUE, COGS, AND GROSS PROFIT CHART
+              </Typography>
+            </Box>
+          </Box>
+          <Box width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={revenueStatistics}
+                margin={{
+                  right: 60,
+                  left: 20,
+                  bottom: 20,
+                }}
+                barSize={15}
+              >
+                <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
+                <XAxis dataKey="month" />
+                <Tooltip content={<CustomTooltipRevenueChart />} />
+                <YAxis />
+                <Legend />
+                <Bar dataKey="revenue" fill="#6495ED" name="Revenue"/>
+                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)"/>
+                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit"/>
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        </Box>
+        <Box
+          gridColumn="span 4"
+          gridRow="span 4"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            p="0 30px"
+            display="flex"
+            height="15%"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
+                BEST SELLING CATEGORIES
+              </Typography>
+            </Box>
+          </Box>
+          <Box width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoriesPieChart}
+                  dataKey="qty"
+                  outerRadius={64}
+                >
+                  <LabelList dataKey="name" />
+                  {categoriesPieChart.map((item) => (
+                    <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
+                  ))}
+                </Pie>
+                <Pie
+                  data={subCategoriesPieChart}
+                  dataKey="qty"
+                  innerRadius={65}
+                  outerRadius={200}
+                  label
+                >
+                  <LabelList dataKey="name" position="right" />
+                  {subCategoriesPieChart.map((item) => (
+                    <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </Box>
+        </Box>
+
+        {/* ROW 3 */}
+        <Box
+          gridColumn="span 6"
+          gridRow="span 3"
           backgroundColor={colors.primary[400]}
         >
           <Box
@@ -291,7 +428,7 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 6"
-          gridRow="span 4"
+          gridRow="span 3"
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >
@@ -339,59 +476,6 @@ const Dashboard = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 12"
-          gridRow="span 3"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            p="0 30px"
-            display="flex"
-            height="15%"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                REVENUE, COGS, AND GROSS PROFIT CHART
-              </Typography>
-            </Box>
-          </Box>
-          <Box width="100%" height="85%">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={revenueStatistics}
-                margin={{
-                  right: 60,
-                  left: 20,
-                  bottom: 20,
-                }}
-                barSize={20}
-              >
-                <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
-                <XAxis dataKey="month" />
-                <Tooltip content={<CustomTooltipRevenueChart />} />
-                <YAxis />
-                <Legend />
-                <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
-                  <LabelList dataKey="revenue" position="top" fill="#6495ED" />
-                </Bar>
-                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
-                  <LabelList dataKey="cogs" position="top" fill="#DC6A6A" />
-                </Bar>
-                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
-                  <LabelList dataKey="grossProfit" position="top" fill="#228B22" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
         </Box>
       </Box>
     </Box>
