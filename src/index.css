@@ -64,3 +64,9 @@ body,
   font-size: 1.2rem !important;
   font-weight: bold !important;
 }
+
+
+.productItem-card .detail{
+  transform: translate(0px, 0px)!important;
+  width: 150%;
+}

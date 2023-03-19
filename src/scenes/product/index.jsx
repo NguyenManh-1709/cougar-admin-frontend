@@ -1,16 +1,21 @@
 import { Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
 // import { useState } from "react";
-import { categoriesState, productsState } from "../../store/selectors";
+import { categoriesState, productsState, productItemsState } from "../../store/selectors";
 import ProductCard from "../../components/ProductCard";
 import Header from "../../components/Header";
 import { useSelector } from "react-redux";
+import { useTheme } from "@emotion/react";
+import { tokens } from "../../theme";
+
 
 const Product = () => {
   // Get data
-  // const productItems = useSelector(productItemsState);
+  const productItems = useSelector(productItemsState);
   const categories = useSelector(categoriesState);
   // const subCategories = useSelector(subCategoriesState);
   const products = useSelector(productsState);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   // const [filterCategory, setFilterCategory] = useState();
   const handleFilterCategory = (e) => {
@@ -28,7 +33,7 @@ const Product = () => {
       <Box>
         <Header title={"MANAGEMENT YOUR PRODUCTS"} />
 
-        <Box display="flex" flexWrap="wrap" alignItems="center">
+        <Box style={{marginBottom: "15px"}} display="flex" flexWrap="wrap" alignItems="center">
           <Typography variant="h5" component="h5" marginRight="20px">
             Categories
           </Typography>
@@ -46,10 +51,10 @@ const Product = () => {
           </FormGroup>
         </Box>
 
-        <Box display="flex" flexWrap="wrap">
-          {products.map((item) => (
-            <Box key={item.id} sx={{ width: "25%", padding: "15px" }}>
-              <ProductCard product={item} />
+        <Box className="row" display="flex" flexWrap="wrap">
+          {productItems.map((item) => (
+            <Box className="col-lg-3 col-md-4 col-sm-6 col-12 p-2" key={item.id}>
+              <ProductCard productItem={item} />
             </Box>
           ))}
         </Box>
