@@ -84,3 +84,24 @@ path:focus {
   transform: translate(0px, 0px)!important;
   width: 150%;
 }
+
+.react-datepicker__input-container > input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  outline: none;
+  background-color: lightgray;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.react-datepicker__current-month {
+  color: #008B8B !important;
+  padding: 5px;
+}
+
+.react-datepicker__month-select, .react-datepicker__year-select {
+  padding: 5px;
+}

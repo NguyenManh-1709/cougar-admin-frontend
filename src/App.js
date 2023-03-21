@@ -12,13 +12,14 @@ import Product from "./scenes/product";
 import ChangePassword from "./scenes/change-password";
 import FormForgotPassword from "./scenes/forgot-password";
 import FormResetPassword from "./scenes/reset-password";
+import Contact from "./scenes/contact";
 import { Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 
-import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll } from "./store/apis";
+import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll, contactGetAll } from "./store/apis";
 import { loginStatusState } from "./store/selectors";
 import FormEditUser from "./scenes/edit-user";
 
@@ -38,6 +39,7 @@ function App() {
       dispatch(categoriesGetAll());
       dispatch(subCategoriesGetAll());
       dispatch(productGetAll());
+      dispatch(contactGetAll());
     }
   }, [dispatch, userLogedIn, loginStatus])
 
@@ -61,6 +63,7 @@ function App() {
                 <Route path="/invoices" element={loginStatus === true ? <Invoice /> : <Navigate to="/" />} />
                 <Route path="/users" element={loginStatus === true ? <User /> : <Navigate to="/" />} />
                 <Route path="/products" element={loginStatus === true ? <Product /> : <Navigate to="/" />} />
+                <Route path="/contacts" element={loginStatus === true ? <Contact /> : <Navigate to="/" />} />
                 <Route path="/change-password" element={loginStatus === true ? <ChangePassword /> : <Navigate to="/" />} />
                 <Route path="/forgot-password" element={!loginStatus === true ? <FormForgotPassword /> : <Navigate to="/" />} />
                 <Route path="/reset-password" element={!loginStatus === true ? <FormResetPassword /> : <Navigate to="/" />} />

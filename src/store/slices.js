@@ -17,8 +17,11 @@ import {
   userPutAndUploadAvatarToCloud,
   changePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  contactGetAll,
 } from "./apis";
+
+
 
 const mySlice = createSlice({
   name: "mySlice",
@@ -33,6 +36,7 @@ const mySlice = createSlice({
     loginStatus: false,
     productItems: [],
     products: [],
+    contacts: []
   },
   reducers: {
     // ...
@@ -251,16 +255,25 @@ const mySlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
       })
 
-      //FORGOT PASSWORD
+      // FORGOT PASSWORD
       .addCase(forgotPassword.fulfilled, (state, action) => {
       })
       .addCase(forgotPassword.rejected, (state, action) => {
       })
 
-      //RESET PASSWORD
+      // RESET PASSWORD
       .addCase(resetPassword.fulfilled, (state, action) => {
       })
       .addCase(resetPassword.rejected, (state, action) => {
+      })
+
+      // GET ALL CONTACTS
+      .addCase(contactGetAll.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(contactGetAll.fulfilled, (state, action) => {
+        state.contacts = action.payload;
+        state.status = "idle";
       });
   },
 });

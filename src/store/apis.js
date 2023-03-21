@@ -218,3 +218,9 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
     }
   }
 });
+
+// Get All Contacts
+export const contactGetAll = createAsyncThunk('contactGetAll', async () => {
+  const response = await axios.get(`http://localhost:8080/api/contacts`);
+  return response.data;
+});

@@ -13,6 +13,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { useSelector } from "react-redux";
 import { userLogedInState } from "../../store/selectors";
 import mySlice from "../../store/slices";
@@ -177,6 +178,15 @@ const Sidebar = () => {
                 >
                   <Typography>Invoices</Typography>
                   <Link to={"/invoices"} />
+                </MenuItem>
+
+                <MenuItem
+                  active={selected === "/contacts"}
+                  style={{ color: "#FFF" }}
+                  icon={<MailOutlineIcon />}
+                >
+                  <Typography>Contact</Typography>
+                  <Link to={"/contacts"} />
                 </MenuItem>
 
                 <Typography variant="h6" color={"gray"} display={isCollapsed ? "none" : undefined} >Your account</Typography>
