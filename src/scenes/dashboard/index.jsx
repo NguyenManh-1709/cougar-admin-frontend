@@ -314,20 +314,26 @@ const Dashboard = () => {
               <BarChart
                 data={revenueStatistics}
                 margin={{
-                  right: 60,
-                  left: 20,
-                  bottom: 20,
+                  right: 50,
+                  left: 10,
+                  bottom: 10,
                 }}
-                barSize={15}
+                barSize={20}
               >
                 <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
                 <XAxis dataKey="month" />
                 <Tooltip content={<CustomTooltipRevenueChart />} />
                 <YAxis />
                 <Legend />
-                <Bar dataKey="revenue" fill="#6495ED" name="Revenue"/>
-                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)"/>
-                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit"/>
+                <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
+                  <LabelList dataKey="revenue" position="top" fill="#6495ED" />
+                </Bar>
+                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
+                  <LabelList dataKey="cogs" position="top" fill="#DC6A6A"></LabelList>
+                </Bar>
+                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
+                  <LabelList dataKey="grossProfit" position="top" fill="#228B22"></LabelList>
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </Box>

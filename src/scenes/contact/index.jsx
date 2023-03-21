@@ -62,9 +62,15 @@ const Contact = () => {
         : contacts;
 
     // Filter date
-    const result = (startDate === null)
-      ? filteredByStatus
-      : filteredByStatus.filter(item => new Date(item.createDate) > startDate && new Date(item.createDate) < endDate)
+    const result = (startDate !== null && endDate !== null)
+      ? filteredByStatus.filter(item => {
+        const createDate = new Date(item.createDate);
+        const start = new Date(startDate).toLocaleDateString();
+        const end = new Date(endDate).toLocaleDateString();
+        const dateStr = createDate.toLocaleDateString();
+        return dateStr >= start && dateStr <= end;
+      })
+      : filteredByStatus;
 
     setContactsToShow(Object.values(result).sort((a, b) => new Date(b.createDate) - new Date(a.createDate)));
   }, [statusFilter, contacts, startDate, endDate])

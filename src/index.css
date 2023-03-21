@@ -71,12 +71,12 @@ path:focus {
   outline: none !important;
 }
 
-.recharts-text.recharts-label {
+.recharts-pie .recharts-text.recharts-label {
   stroke: unset !important;
   fill: white !important;
 }
 
-.recharts-text.recharts-pie-label-text > tspan{
+.recharts-pie .recharts-text.recharts-pie-label-text > tspan{
   font-size: 1.2rem !important;
 }
 

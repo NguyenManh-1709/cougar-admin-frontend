@@ -99,7 +99,7 @@ const Invoice = () => {
       renderCell: ({ row: { address } }) => {
         if (address != null) {
           const temp = address.unitNumber + ", " + address.addressLine + ", " + address.district;
-          const toShow = temp.length > 15 ? temp.slice(0, 15) + "..." : temp.length;
+          const toShow = temp.length > 15 ? temp.slice(0, 15) + "..." : temp + "...";
           return (
             toShow
           );

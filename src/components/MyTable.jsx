@@ -62,6 +62,12 @@ const MyTable = (props) => {
           },
           "& .MuiDataGrid-menuIcon": {
             display: "none !important"
+          },
+          "& .MuiTablePagination-selectLabel.css-1rt5bto-MuiTablePagination-selectLabel": {
+            marginBottom: "0"
+          }, 
+          "& .MuiTablePagination-displayedRows.css-7ms3qr-MuiTablePagination-displayedRows": {
+            marginBottom: "0"
           }
         }}
       >
