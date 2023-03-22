@@ -1,5 +1,6 @@
 import { tokens } from "../../theme";
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
 import Header from "../../components/Header";
 import StatBox from "../../components/StatBox";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -99,11 +100,24 @@ const Dashboard = () => {
   const CustomTooltipRevenueChart = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "10px" }}>
+        <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "8px" }}>
           <Typography sx={{ color: "#FFF", textAlign: "center", marginBottom: "10px", borderBottom: "1px solid #FFF" }}>{`${label}`}</Typography>
           <Typography sx={{ color: "#6495ED" }}>{`${payload[0].name} : ${payload[0].value}`}</Typography>
           <Typography sx={{ color: "#DC6A6A" }}>{`${payload[1].name} : ${payload[1].value}`}</Typography>
           <Typography sx={{ color: "#228B22" }}>{`${payload[2].name} : ${payload[2].value}`}</Typography>
+        </Box>
+      );
+    }
+    return null;
+  };
+
+  const CustomTooltipTenUsersWhoBuyTheMostChart = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "8px" }}>
+          <Typography sx={{ color: "#FFF", textAlign: "center"}}>USER-ID: {`${payload[0].payload.userId}`}</Typography>
+          <Typography sx={{ color: "#FFF", textAlign: "center", marginBottom: "10px", borderBottom: "1px solid #FFF" }}>{`${label}`}</Typography>
+          <Typography sx={{ color: "#708090" }}>{`${payload[0].name} : ${payload[0].value}`}</Typography>
         </Box>
       );
     }
@@ -119,7 +133,7 @@ const Dashboard = () => {
     };
   }, {});
   const topTenUsersWhoBuyTheMost = Object.entries(orderTotalByUser)
-    .map(([userId, orderTotal]) => ({ userInfo: `${usersWithRoles.find(user => user.id === parseInt(userId))?.fullname} (ID: ${userId})`, Total: orderTotal }))
+    .map(([userId, orderTotal]) => ({ userId, fullname: `${usersWithRoles.find(user => user.id === parseInt(userId))?.fullname}`, Total: orderTotal }))
     .sort((a, b) => b.Total - a.Total)
     .slice(0, 10);
 
@@ -178,293 +192,322 @@ const Dashboard = () => {
   return (
     <Box m="20px">
       {/* HEADER */}
-      <Header title="DASHBOARD" />
+      <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 
-      {/* GRID */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
-        {/* ROW 1 */}
-        {/* <CircularProgress /> */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            total={userStatistics.total}
-            title="Users"
-            progress={1 - userStatistics.percentGrowth / 100}
-            increase={userStatistics.percentGrowth}
-            icon={
-              <GroupIcon
-                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            total={productStatistics.total}
-            title="Products"
-            progress={1 - productStatistics.percentGrowth / 100}
-            increase={productStatistics.percentGrowth}
-            icon={
-              <CheckBoxOutlineBlankIcon
-                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            total={invoiceStatistics.total}
-            title="Invoices"
-            progress={1 - invoiceStatistics.percentGrowth / 100}
-            increase={invoiceStatistics.percentGrowth}
-            icon={
-              <ReceiptOutlinedIcon
-                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            total={moneyStatistics.total}
-            title="Revenue"
-            progress={1 - moneyStatistics.percentGrowth / 100}
-            increase={moneyStatistics.percentGrowth}
-            icon={
-              <PaidIcon
-                sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
+      {/* ROW 1 */}
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} >
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              total={userStatistics.total}
+              title="Users"
+              progress={1 - userStatistics.percentGrowth / 100}
+              increase={userStatistics.percentGrowth}
+              icon={
+                <GroupIcon
+                  sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              total={productStatistics.total}
+              title="Products"
+              progress={1 - productStatistics.percentGrowth / 100}
+              increase={productStatistics.percentGrowth}
+              icon={
+                <CheckBoxOutlineBlankIcon
+                  sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              total={invoiceStatistics.total}
+              title="Invoices"
+              progress={1 - invoiceStatistics.percentGrowth / 100}
+              increase={invoiceStatistics.percentGrowth}
+              icon={
+                <ReceiptOutlinedIcon
+                  sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              total={moneyStatistics.total}
+              title="Revenue"
+              progress={1 - moneyStatistics.percentGrowth / 100}
+              increase={moneyStatistics.percentGrowth}
+              icon={
+                <PaidIcon
+                  sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
+                />
+              }
+            />
+          </Box>
+        </Grid>
+      </Grid>
 
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 4"
-          backgroundColor={colors.primary[400]}
-        >
+      {/* ROW 2 */}
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{xs: "4px",  sm: "8px"}}>
+        <Grid xs={12} xl={8}>
           <Box
-            p="0 30px"
+            width="100%"
+            height="600px"
+            backgroundColor={colors.primary[400]}
             display="flex"
-            height="15%"
-            justifyContent="center"
             alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                REVENUE, COGS, AND GROSS PROFIT CHART
-              </Typography>
-            </Box>
-          </Box>
-          <Box width="100%" height="85%">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={revenueStatistics}
-                margin={{
-                  right: 50,
-                  left: 10,
-                  bottom: 10,
-                }}
-                barSize={20}
-              >
-                <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
-                <XAxis dataKey="month" />
-                <Tooltip content={<CustomTooltipRevenueChart />} />
-                <YAxis />
-                <Legend />
-                <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
-                  <LabelList dataKey="revenue" position="top" fill="#6495ED" />
-                </Bar>
-                <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
-                  <LabelList dataKey="cogs" position="top" fill="#DC6A6A"></LabelList>
-                </Bar>
-                <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
-                  <LabelList dataKey="grossProfit" position="top" fill="#228B22"></LabelList>
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 4"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            p="0 30px"
-            display="flex"
-            height="15%"
             justifyContent="center"
-            alignItems="center"
+            flexDirection="column"
           >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                BEST SELLING CATEGORIES
-              </Typography>
-            </Box>
-          </Box>
-          <Box width="100%" height="85%">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categoriesPieChart}
-                  dataKey="qty"
-                  outerRadius={64}
+            <Box
+              p="0 30px"
+              display="flex"
+              height="15%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
                 >
-                  <LabelList dataKey="name" />
-                  {categoriesPieChart.map((item) => (
-                    <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
-                  ))}
-                </Pie>
-                <Pie
-                  data={subCategoriesPieChart}
-                  dataKey="qty"
-                  innerRadius={65}
-                  outerRadius={200}
-                  label
+                  REVENUE, COGS, AND GROSS PROFIT CHART
+                </Typography>
+              </Box>
+            </Box>
+            <Box width="100%" height="85%">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={revenueStatistics}
+                  margin={{
+                    right: 50,
+                    left: 10,
+                    bottom: 10,
+                  }}
+                  barSize={20}
                 >
-                  <LabelList dataKey="name" position="right" />
-                  {subCategoriesPieChart.map((item) => (
-                    <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 6"
-          gridRow="span 3"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            p="0 30px"
-            display="flex"
-            height="15%"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                TOP 10 USERS WHO BUY THE MOST
-              </Typography>
+                  <CartesianGrid strokeDasharray="5 5" vertical={() => { return true }} />
+                  <XAxis dataKey="month" />
+                  <Tooltip content={<CustomTooltipRevenueChart />} />
+                  <YAxis />
+                  <Legend />
+                  <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
+                    <LabelList dataKey="revenue" position="top" fill="#6495ED" />
+                  </Bar>
+                  <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
+                    <LabelList dataKey="cogs" position="top" fill="#DC6A6A"></LabelList>
+                  </Bar>
+                  <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
+                    <LabelList dataKey="grossProfit" position="top" fill="#228B22"></LabelList>
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </Box>
           </Box>
-          <Box width="100%" height="85%">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart width={400} height={400} data={topTenUsersWhoBuyTheMost} layout="vertical" margin={{
-                right: 60,
-                left: 20,
-                bottom: 20,
-              }}
-                barSize={15}>
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="userInfo" width={190} tick={{ fill: colors.greenAccent[300], fontSize: "1rem", fontWeight: '600' }} />
-                <Legend />
-                <Bar dataKey="Total" fill="#708090">
-                  <LabelList dataKey="Total" position="right" fill="#708090" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 6"
-          gridRow="span 3"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-        >
+        </Grid>
+        <Grid xs={12} xl={4}>
           <Box
-            p="0 30px"
+            width="100%"
+            height="600px"
+            backgroundColor={colors.primary[400]}
             display="flex"
-            height="15%"
-            justifyContent="center"
             alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
           >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                TOP 10 BEST SELLING PRODUCTS
-              </Typography>
+            <Box
+              p="0 30px"
+              display="flex"
+              height="15%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                >
+                  BEST SELLING CATEGORIES
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-          <TableContainer sx={{ maxHeight: "85%" }} >
-            <Table stickyHeader sx={{ minHeight: "85%" }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }}>IMAGE</TableCell>
-                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center", minWidth: "50px" }}>ID</TableCell>
-                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0" }}>NAME</TableCell>
-                  <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }} align="right">QUANTITY</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {topTenBestSellingProducts.map((item) => (
-                  <TableRow
-                    key={item.productId}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "100px" }}
+            <Box width="100%" height="85%">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoriesPieChart}
+                    dataKey="qty"
+                    outerRadius={70}
                   >
-                    <TableCell sx={{ padding: "0", textAlign: "center" }}>
-                      <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width={90} style={{ padding: "5px" }} />
-                    </TableCell>
-                    <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center", minWidth: "50px" }}>{item.productId}</TableCell>
-                    <TableCell sx={{ fontSize: "1rem", color: colors.redAccent[400], padding: "0", fontWeight: "800" }}>{item.name}</TableCell>
-                    <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center" }} align="right">{item.qty}</TableCell>
+                    <LabelList dataKey="name" />
+                    {categoriesPieChart.map((item) => (
+                      <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
+                    ))}
+                  </Pie>
+                  <Pie
+                    data={subCategoriesPieChart}
+                    dataKey="qty"
+                    innerRadius={71}
+                    outerRadius={190}
+                    label
+                  >
+                    <LabelList dataKey="name" position="right" />
+                    {subCategoriesPieChart.map((item) => (
+                      <Cell key={`cell-${item.id}`} fill={item.color} stroke={colors.primary[400]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* ROW 3 */}
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{xs: "4px",  sm: "8px"}}>
+        <Grid xs={12} xl={6}>
+          <Box
+            width="100%"
+            height="600px"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+          >
+            <Box
+              p="0 30px"
+              display="flex"
+              height="15%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                >
+                  TOP 10 USERS WHO BUY THE MOST
+                </Typography>
+              </Box>
+            </Box>
+            <Box width="100%" height="85%">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart width={400} height={400} data={topTenUsersWhoBuyTheMost} layout="vertical" margin={{
+                  right: 60,
+                  left: 20,
+                  bottom: 20,
+                }}
+                  barSize={15}>
+                  <XAxis type="number" />
+                  <Tooltip content={<CustomTooltipTenUsersWhoBuyTheMostChart />} />
+                  <YAxis type="category" dataKey="fullname" width={190} tick={{ fill: colors.greenAccent[300], fontSize: "1rem", fontWeight: '600' }} />
+                  <Legend />
+                  <Bar dataKey="Total" fill="#708090">
+                    <LabelList dataKey="Total" position="right" fill="#708090" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
+          </Box>
+        </Grid>
+        <Grid xs={12} xl={6}>
+          <Box
+            width="100%"
+            height="600px"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+          >
+            <Box
+              p="0 30px"
+              display="flex"
+              height="15%"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color={colors.grey[100]}
+                >
+                  TOP 10 BEST SELLING PRODUCTS
+                </Typography>
+              </Box>
+            </Box>
+            <TableContainer sx={{ maxHeight: "85%" }} >
+              <Table stickyHeader sx={{ minHeight: "85%" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }}>IMAGE</TableCell>
+                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center", minWidth: "50px" }}>ID</TableCell>
+                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0" }}>NAME</TableCell>
+                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }} align="right">QUANTITY</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      </Box>
-    </Box>
+                </TableHead>
+                <TableBody>
+                  {topTenBestSellingProducts.map((item) => (
+                    <TableRow
+                      key={item.productId}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "100px" }}
+                    >
+                      <TableCell sx={{ padding: "0", textAlign: "center" }}>
+                        <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width={90} style={{ padding: "5px" }} />
+                      </TableCell>
+                      <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center", minWidth: "50px" }}>{item.productId}</TableCell>
+                      <TableCell sx={{ fontSize: "1rem", color: colors.redAccent[400], padding: "0", fontWeight: "800" }}>{item.name}</TableCell>
+                      <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center" }} align="right">{item.qty}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box >
   );
 };
 

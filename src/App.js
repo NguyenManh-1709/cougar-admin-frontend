@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
-import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import FormCreateUser from "./scenes/create-user";
 import FormCreateProduct from "./scenes/formcreateproduct";
@@ -22,6 +21,8 @@ import { ToastContainer } from "react-toastify";
 import { authorityGetAll, productItemGetAll, invoiceGetAll, invoiceDetailsGetAll, categoriesGetAll, subCategoriesGetAll, getUserById, productGetAll, contactGetAll } from "./store/apis";
 import { loginStatusState } from "./store/selectors";
 import FormEditUser from "./scenes/edit-user";
+
+import { MyProSidebarProvider } from "./scenes/global/sidebar/sidebarContext"
 
 function App() {
   const dispatch = useDispatch();
@@ -44,16 +45,15 @@ function App() {
   }, [dispatch, userLogedIn, loginStatus])
 
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
 
   return (
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div className="app">
-            <Sidebar isSidebar={isSidebar} />
-            <main className="content">
-              <Topbar setIsSidebar={setIsSidebar} />
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <MyProSidebarProvider>
+          <div style={{ height: "100%", width: "100%" }}>
+            <main>
+              <Topbar />
               <Routes>
                 <Route path="/" element={(loginStatus === false) ? <FormLogin /> : <Navigate to={-1} />} />
                 <Route path="/dashboard" element={loginStatus === true ? <Dashboard /> : <Navigate to="/" />} />
@@ -68,11 +68,12 @@ function App() {
                 <Route path="/forgot-password" element={!loginStatus === true ? <FormForgotPassword /> : <Navigate to="/" />} />
                 <Route path="/reset-password" element={!loginStatus === true ? <FormResetPassword /> : <Navigate to="/" />} />
               </Routes>
-              <ToastContainer/>
+              <ToastContainer />
             </main>
           </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+        </MyProSidebarProvider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

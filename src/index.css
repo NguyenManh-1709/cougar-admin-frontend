@@ -5,17 +5,7 @@ body,
 #root,
 .app,
 .content {
-  width: 100%;
-  font-family: "Source Sans Pro", sans-serif;
-}
-
-.app {
-  min-height: 100vh;
-}
-
-.app {
-  display: flex;
-  position: relative;
+  font-family: "Source Sance Pro", sans-serif;
 }
 
 ::-webkit-scrollbar {

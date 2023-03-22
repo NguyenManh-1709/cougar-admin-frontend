@@ -8,7 +8,7 @@ const StatBox = ({ total, title, icon, progress, increase }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box width="100%" m="0 30px">
+    <Box width="100%" m="0 30px" p="30px 0">
       <Box display="flex" justifyContent="space-between">
         <Box>
           {icon}
@@ -33,7 +33,7 @@ const StatBox = ({ total, title, icon, progress, increase }) => {
           fontStyle="italic"
           sx={{ color: colors.greenAccent[200] }}
         >
-          <Tooltip title="Percent growth over the previous month" sx={{ cursor: "default" }}>
+          <Tooltip title="Percent growth over the previous month" placement="left-end" sx={{ cursor: "default" }}>
             <Box display="flex" alignItems="center" gap="10px">
               <TrendingUpIcon />
               <Box>{increase} %</Box>
