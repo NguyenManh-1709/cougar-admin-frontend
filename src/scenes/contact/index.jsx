@@ -1,4 +1,4 @@
-import { AccordionDetails, AccordionSummary, Typography, Accordion, Box, useTheme, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { AccordionDetails, AccordionSummary, Typography, Accordion, Box, useTheme, FormControl, InputLabel, Select, MenuItem, TextField, TextareaAutosize, Button, IconButton, Backdrop, CircularProgress } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-date-range/dist/styles.css";
@@ -6,20 +6,26 @@ import "react-date-range/dist/theme/default.css";
 import Header from "../../components/Header";
 import "react-toastify/dist/ReactToastify.css";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { tokens } from "../../theme";
 import { contactsState } from "../../store/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { contactStatusPut } from "../../store/apis";
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import SendIcon from '@mui/icons-material/Send';
+
+import emailjs from '@emailjs/browser';
+import { toast } from "react-toastify";
 
 const Contact = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const dispatch = useDispatch();
 
   const [expanded, setExpanded] = useState(false);
-  const handleChange = (panel) => (event, isExpanded) => {
+  const handleChangeExpand = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
@@ -75,10 +81,69 @@ const Contact = () => {
     setContactsToShow(Object.values(result).sort((a, b) => new Date(b.createDate) - new Date(a.createDate)));
   }, [statusFilter, contacts, startDate, endDate])
 
+  const [emailReply, setEmailReply] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [currentId, setCurrentId] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const replyForm = useRef();
+
+  const [open, setOpen] = useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs.sendForm(
+      `service_v14uukq`,
+      `template_nj96k0d`,
+      replyForm.current,
+      `tTjkPKrYPrVzwwvBd`
+    )
+      .then((result) => {
+        handleClose();
+        const contact = contacts.find(item => item.id === currentId);
+        const temp = { ...contact, status: true };
+        dispatch(contactStatusPut(temp));
+        setEmailReply("");
+        setCustomerName("");
+        setMessage("");
+        setCurrentId(null);
+        setExpanded(false)
+        toast.success("Successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }, (error) => {
+        handleClose();
+        toast.error(error.text, {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      });
+  };
+
   return (
     <Box m="20px">
       <Header title="Contact" />
-      <Box display="flex" alignItems="center" justifyContent="end" gap="20px" pb="20px" flexDirection="row">
+      <Box display="flex" alignItems="center" gap="20px" pb="20px" flexDirection="row">
         <FormControl
           variant="filled"
           sx={{
@@ -151,43 +216,97 @@ const Contact = () => {
         )}
       </Box>
       <Box>
-        <Box sx={{ background: colors.primary[400], padding: "16px" }}>
-          <Typography sx={{ display: "inline-block", minWidth: "100px" }}>Status</Typography>
-          <Typography sx={{ display: "inline-block", minWidth: "150px" }}>Create date</Typography>
-          <Typography sx={{ display: "inline-block" }}>Email</Typography>
+        <Box display="flex" gap="20px">
+          <Box sx={{ width: "50%", height: "65vh", overflow: "auto" }}>
+            {contactsToShow.map((item) => (
+              <Accordion key={item.id} expanded={expanded === `panel${item.id}`} onChange={handleChangeExpand(`panel${item.id}`)} sx={{ background: colors.primary[400] }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1bh-content"
+                  id="panel1bh-header"
+                >
+                  {item.status
+                    ? <CheckIcon sx={{ color: "green", minWidth: "35px", marginRight: "65px" }} />
+                    : <CloseIcon sx={{ color: "gray", minWidth: "35px", marginRight: "65px" }} />
+                  }
+                  <Typography sx={{ flexShrink: 0, minWidth: "150px" }}>{new Date(item.createDate).toISOString().slice(0, 10)}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box>
+                      <Typography p="10px" pt="0">Email: {item.email}</Typography>
+                      <Typography p="10px" pt="0">Phone: {item.phone}</Typography>
+                    </Box>
+                    <IconButton onClick={(e) => { e.preventDefault(); setEmailReply(item.email); setCustomerName(item.fullname); setCurrentId(item.id) }}>
+                      <SendIcon />
+                    </IconButton>
+                  </Box>
+
+                  <textarea
+                    value={item.content}
+                    disabled
+                    style={{
+                      width: "100%",
+                      minHeight: "100px",
+                      background: "transparent",
+                      border: `1px solid ${colors.grey[100]}`,
+                      color: colors.grey[100],
+                      padding: "10px",
+                      borderRadius: "5px"
+                    }}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
+          <Box sx={{ width: "50%" }}>
+            <form ref={replyForm} onSubmit={sendEmail}>
+              <Box sx={{ display: "flex", gap: "20px", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <TextField
+                  sx={{ width: "50%" }}
+                  variant="filled"
+                  name="user_name"
+                  value={customerName}
+                  placeholder="Customer Name" />
+                <TextField
+                  sx={{ width: "50%" }}
+                  variant="filled"
+                  type="email" name="user_email"
+                  value={emailReply}
+                  placeholder="To Email" />
+              </Box>
+              <Box sx={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
+                <TextareaAutosize
+                  minRows={10}
+                  placeholder="Reply message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  style={{
+                    width: "100%",
+                    outline: "none",
+                    border: `1px solid ${colors.grey[100]}`,
+                    borderRadius: "5px",
+                    padding: "10px",
+                    background: colors.primary[400],
+                    color: colors.grey[100]
+                  }}
+                  name="message"
+                />
+              </Box>
+              <Box sx={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "end" }}>
+                <Button type="submit" variant="contained" color="secondary" onClick={handleToggle}>Reply</Button>
+              </Box>
+            </form>
+          </Box>
         </Box>
-        {contactsToShow.map((item) => (
-          <Accordion key={item.id} expanded={expanded === `panel${item.id}`} onChange={handleChange(`panel${item.id}`)} sx={{ background: colors.primary[400] }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1bh-content"
-              id="panel1bh-header"
-            >
-              {item.status
-                ? <CheckIcon sx={{ color: "green", minWidth: "35px", marginRight: "65px" }} />
-                : <CloseIcon sx={{ color: "gray", minWidth: "35px", marginRight: "65px" }} />
-              }
-              <Typography sx={{ flexShrink: 0, minWidth: "150px" }}>{item.createDate}</Typography>
-              <Typography>{item.email}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <textarea
-                value={item.content}
-                disabled
-                style={{
-                  width: "100%",
-                  minHeight: "100px",
-                  background: "transparent",
-                  border: `1px solid ${colors.grey[100]}`,
-                  color: colors.grey[100],
-                  padding: "10px",
-                  borderRadius: "5px"
-                }}
-              />
-            </AccordionDetails>
-          </Accordion>
-        ))}
       </Box>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

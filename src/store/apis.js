@@ -224,3 +224,10 @@ export const contactGetAll = createAsyncThunk('contactGetAll', async () => {
   const response = await axios.get(`http://localhost:8080/api/contacts`);
   return response.data;
 });
+
+// PUT CONTACT STATUS
+export const contactStatusPut = createAsyncThunk('contactStatusPut', async (contact) => {
+  const abc = { ...contact };
+  const response = await axios.put(`http://localhost:8080/api/contacts/change-status`, abc);
+  return response.data;
+});

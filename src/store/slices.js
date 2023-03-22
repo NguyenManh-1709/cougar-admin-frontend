@@ -19,6 +19,7 @@ import {
   forgotPassword,
   resetPassword,
   contactGetAll,
+  contactStatusPut
 } from "./apis";
 
 
@@ -273,6 +274,17 @@ const mySlice = createSlice({
       })
       .addCase(contactGetAll.fulfilled, (state, action) => {
         state.contacts = action.payload;
+        state.status = "idle";
+      })
+
+      // PUT CONTACT STATUS
+      .addCase(contactStatusPut.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(contactStatusPut.fulfilled, (state, action) => {
+        const contactUpdated = action.payload;
+        state.contacts = state.contacts.map(item => item.id === contactUpdated.id ? contactUpdated : item);
+
         state.status = "idle";
       });
   },
