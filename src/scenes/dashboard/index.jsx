@@ -6,8 +6,6 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import GroupIcon from '@mui/icons-material/Group';
 import PaidIcon from '@mui/icons-material/Paid';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { usersWithRolesState, invoicesState, invoiceDetailsState, productsState, categoriesState } from "../../store/selectors";
 import { useSelector } from "react-redux";
 
@@ -28,54 +26,60 @@ const Dashboard = () => {
 
   const today = new Date();
 
-  // Thống kê tổng số lượng user và phần trăm tăng của tháng hiện tại so với trước
+  // Thống kê tổng số lượng user và phần trăm tăng của tháng hiện tại so với tháng trước
   const userStatistics = (() => {
-    const totalUserCreatedInThisMonth = usersWithRoles.filter(user => {
-      const userCreateDate = new Date(user.createDate);
-      return userCreateDate.getMonth() === today.getMonth() && userCreateDate.getFullYear() === today.getFullYear();
-    }).length;
-    return {
-      total: usersWithRoles.length,
-      percentGrowth: (totalUserCreatedInThisMonth / (usersWithRoles.length - totalUserCreatedInThisMonth) * 100).toFixed(1),
-    }
-  })();
-
-  // Thống kê tổng số lượng hóa đơn và phần trăm tăng của tháng hiện tại so với trước
-  const invoiceStatistics = (() => {
-    const totalInvoiceCreatedInThisMonth = paidInvoices.filter(invoice => {
-      const invoiceCreateDate = new Date(invoice.createDate);
-      return invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear();
-    }).length;
-    return {
-      total: paidInvoices.length,
-      percentGrowth: (totalInvoiceCreatedInThisMonth / (paidInvoices.length - totalInvoiceCreatedInThisMonth) * 100).toFixed(1),
-    }
-  })();
-
-  // Thống kê tổng số lượng productItem và phần trăm tăng của tháng hiện tại so với trước
-  const productStatistics = (() => {
-    const totalProductCreatedInThisMonth = products.filter(invoice => {
-      const productCreateDate = new Date(invoice.createDate);
-      return productCreateDate.getMonth() === today.getMonth() && productCreateDate.getFullYear() === today.getFullYear();
-    }).length;
-    return {
-      total: products.length,
-      percentGrowth: (totalProductCreatedInThisMonth / (products.length - totalProductCreatedInThisMonth) * 100).toFixed(1),
-    }
-  })();
-
-  // Thống kê tổng số tiền thu được và phần trăm tăng của tháng hiện tại so với trước
-  const moneyStatistics = (() => {
-    const [totalMoneyInThisMonth, totalMoney] = paidInvoices.reduce(([temp, temp2], { createDate, orderTotal }) => {
-      const invoiceCreateDate = new Date(createDate);
-      return [
-        (invoiceCreateDate.getMonth() === today.getMonth() && invoiceCreateDate.getFullYear() === today.getFullYear()) ? temp + orderTotal : temp,
-        temp2 + orderTotal,
-      ];
+    const result = usersWithRoles.reduce((acc, { createDate }) => {
+      const date = new Date(createDate);
+      if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) acc[0]++;
+      if (date.getMonth() === today.getMonth() - 1 && date.getFullYear() === today.getFullYear()) acc[1]++;
+      return acc;
     }, [0, 0]);
     return {
-      total: totalMoney,
-      percentGrowth: (totalMoneyInThisMonth / (totalMoney - totalMoneyInThisMonth) * 100).toFixed(1)
+      total: usersWithRoles.length,
+      percentGrowth: (result[0] / result[1] * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số lượng hóa đơn và phần trăm tăng của tháng hiện tại so với tháng trước
+  const invoiceStatistics = (() => {
+    const result = paidInvoices.reduce((acc, { createDate }) => {
+      const date = new Date(createDate);
+      if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) acc[0]++;
+      if (date.getMonth() === today.getMonth() - 1 && date.getFullYear() === today.getFullYear()) acc[1]++;
+      return acc;
+    }, [0, 0]);
+    return {
+      total: paidInvoices.length,
+      percentGrowth: (result[0] / result[1] * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số lượng productItem và phần trăm tăng của tháng hiện tại so với tháng trước
+  const productStatistics = (() => {
+    const result = products.reduce((acc, { createDate }) => {
+      const date = new Date(createDate);
+      if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) acc[0]++;
+      if (date.getMonth() === today.getMonth() - 1 && date.getFullYear() === today.getFullYear()) acc[1]++;
+      return acc;
+    }, [0, 0]);
+    return {
+      total: products.length,
+      percentGrowth: (result[0] / result[1] * 100).toFixed(1),
+    }
+  })();
+
+  // Thống kê tổng số tiền thu được và phần trăm tăng của tháng hiện tại so với tháng trước
+  const moneyStatistics = (() => {
+    const result = paidInvoices.reduce((acc, { createDate, orderTotal }) => {
+      const date = new Date(createDate);
+      if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) acc[0] += orderTotal;
+      if (date.getMonth() === today.getMonth() - 1 && date.getFullYear() === today.getFullYear()) acc[1] += orderTotal;
+      acc[2] += orderTotal;
+      return acc;
+    }, [0, 0, 0]);
+    return {
+      total: result[2],
+      percentGrowth: (result[0] / result[1] * 100).toFixed(1),
     }
   })();
 
@@ -138,23 +142,23 @@ const Dashboard = () => {
 
   const subCategoriesPieChart = Object.values(
     paidInvoicesDetails
-    .map(({ qty, productItem: { product: { subcategory: { id, name, category: { id: categoryId, name: categoryName } } } } }) => ({ id, name, categoryId, categoryName, qty }))
-    .reduce((acc, { id, name, categoryId, categoryName, qty }) => {
-      const existingSubCategory = acc.find(item => item.id === id);
-      if (existingSubCategory) {
-        existingSubCategory.qty += qty;
-      } else {
-        acc.push({ id, name, categoryId, categoryName, qty });
-      }
-      return acc;
-    }, []).map(item => ({
-      id: item.id,
-      name: item.name,
-      qty: item.qty,
-      categoryId: item.categoryId,
-      categoryName: item.categoryName,
-      color: pieChartColors.find(color => color.id === item.categoryId)?.color
-    }))).sort((a, b) => a.id - b.id);
+      .map(({ qty, productItem: { product: { subcategory: { id, name, category: { id: categoryId, name: categoryName } } } } }) => ({ id, name, categoryId, categoryName, qty }))
+      .reduce((acc, { id, name, categoryId, categoryName, qty }) => {
+        const existingSubCategory = acc.find(item => item.id === id);
+        if (existingSubCategory) {
+          existingSubCategory.qty += qty;
+        } else {
+          acc.push({ id, name, categoryId, categoryName, qty });
+        }
+        return acc;
+      }, []).map(item => ({
+        id: item.id,
+        name: item.name,
+        qty: item.qty,
+        categoryId: item.categoryId,
+        categoryName: item.categoryName,
+        color: pieChartColors.find(color => color.id === item.categoryId)?.color
+      }))).sort((a, b) => a.id - b.id);
 
   const categoriesPieChart = subCategoriesPieChart.reduce((acc, { categoryId, categoryName, qty }) => {
     const existingCategory = acc.find(item => item.id === categoryId);
@@ -193,16 +197,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={userStatistics.total}
-            subtitle="Users"
+            total={userStatistics.total}
+            title="Users"
             progress={1 - userStatistics.percentGrowth / 100}
-            increase={
-              <Box display="flex" alignItems="center" gap="10px">
-                {userStatistics.percentGrowth > 0 && <TrendingUpIcon />}
-                {userStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{userStatistics.percentGrowth + " %"}</Box>
-              </Box>
-            }
+            increase={userStatistics.percentGrowth}
             icon={
               <GroupIcon
                 sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
@@ -218,16 +216,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={productStatistics.total}
-            subtitle="Products"
+            total={productStatistics.total}
+            title="Products"
             progress={1 - productStatistics.percentGrowth / 100}
-            increase={
-              <Box display="flex" alignItems="center" gap="10px">
-                {productStatistics.percentGrowth > 0 && <TrendingUpIcon />}
-                {productStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{productStatistics.percentGrowth + " %"}</Box>
-              </Box>
-            }
+            increase={productStatistics.percentGrowth}
             icon={
               <CheckBoxOutlineBlankIcon
                 sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
@@ -243,16 +235,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={invoiceStatistics.total}
-            subtitle="Invoices"
+            total={invoiceStatistics.total}
+            title="Invoices"
             progress={1 - invoiceStatistics.percentGrowth / 100}
-            increase={
-              <Box display="flex" alignItems="center" gap="10px">
-                {invoiceStatistics.percentGrowth > 0 && <TrendingUpIcon />}
-                {invoiceStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{invoiceStatistics.percentGrowth + " %"}</Box>
-              </Box>
-            }
+            increase={invoiceStatistics.percentGrowth}
             icon={
               <ReceiptOutlinedIcon
                 sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
@@ -268,16 +254,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title={moneyStatistics.total}
-            subtitle="Money"
+            total={moneyStatistics.total}
+            title="Revenue"
             progress={1 - moneyStatistics.percentGrowth / 100}
-            increase={
-              <Box display="flex" alignItems="center" gap="10px">
-                {moneyStatistics.percentGrowth > 0 && <TrendingUpIcon />}
-                {moneyStatistics.percentGrowth < 0 && <TrendingDownIcon sx={{ color: "red" }} />}
-                <Box>{moneyStatistics.percentGrowth + " %"}</Box>
-              </Box>
-            }
+            increase={moneyStatistics.percentGrowth}
             icon={
               <PaidIcon
                 sx={{ color: colors.greenAccent[200], fontSize: "26px" }}
