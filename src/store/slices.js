@@ -18,6 +18,7 @@ import {
   changePassword,
   forgotPassword,
   resetPassword,
+  brandGetAll,
   contactGetAll,
   contactStatusPut
 } from "./apis";
@@ -37,6 +38,7 @@ const mySlice = createSlice({
     loginStatus: false,
     productItems: [],
     products: [],
+    brands: [],
     contacts: []
   },
   reducers: {
@@ -52,6 +54,7 @@ const mySlice = createSlice({
       state.loginStatus = false;
       state.productItems = [];
       state.products = [];
+      state.brands = [];
     },
   },
 
@@ -266,6 +269,16 @@ const mySlice = createSlice({
       .addCase(resetPassword.fulfilled, (state, action) => {
       })
       .addCase(resetPassword.rejected, (state, action) => {
+      })
+
+      //get all brand
+      .addCase(brandGetAll.fulfilled, (state, action)=>{
+        state.brands = action.payload;
+        state.status = "Successed"
+      })
+
+      .addCase(brandGetAll.rejected, (state)=>{
+        state.status = "Error"
       })
 
       // GET ALL CONTACTS

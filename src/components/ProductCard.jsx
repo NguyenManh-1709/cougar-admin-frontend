@@ -26,7 +26,7 @@ const ExpandMore = styled((props) => {
 }));
 
 const ProductCard = (props) => {
-  const { productItem } = props;
+  const { product } = props;
   const [expanded, setExpanded] = React.useState(false);
   const navigate = useNavigate();
 
@@ -38,23 +38,26 @@ const ProductCard = (props) => {
   };
 
   return (
-    <div className="productItem-card" style={{ border: `1px solid ${colors.primary[100]}` }}>
+    <div
+      className="product-card"
+      style={{ border: `1px solid ${colors.primary[100]}` }}
+    >
       <CardMedia
         sx={{ background: "lightgray", height: "260px", objectFit: "contain" }}
         component="img"
-        image={`https://res.cloudinary.com/dmjh7imwd/image/upload/${productItem.image}`}
+        image={`https://res.cloudinary.com/dmjh7imwd/image/upload/${product.image}`}
         alt=""
       />
       <CardContent style={{ height: "60px" }}>
         <Typography variant="body2" fontSize={"1.3rem"}>
-          {productItem.product.name}
+          {product.name}
         </Typography>
       </CardContent>
       <CardActions className="justify-content-between dropdown">
         <Tooltip title="Edit">
           <IconButton
             onClick={() => {
-              navigate(`/createproduct/${productItem.id}`);
+              navigate(`/createproduct/${product.id}`);
             }}
           >
             <EditIcon />
@@ -70,34 +73,30 @@ const ProductCard = (props) => {
           <ExpandMoreIcon />
         </div>
 
-        <CardContent style={{backgroundColor: colors.grey[100], color: colors.primary[900] }} className="detail dropdown-menu">
+        <CardContent
+          style={{
+            backgroundColor: colors.grey[100],
+            color: colors.primary[900],
+          }}
+          className="detail dropdown-menu"
+        >
           <Typography fontSize={"1rem"} paragraph>
-            Category: {productItem.product.subcategory.category.name}
+            Category: {product.subcategory.category.name}
           </Typography>
           <Typography fontSize={"1rem"} paragraph>
-            SubCategory: {productItem.product.subcategory.name}
+            SubCategory: {product.subcategory.name}
           </Typography>
           <Typography fontSize={"1rem"} paragraph>
-            Brand: {productItem.product.brand.name}
+            Brand: {product.brand.name}
           </Typography>
           <Typography fontSize={"1rem"} paragraph>
-            Create date: {productItem.product.createDate}
+            Create date: {product.createDate}
           </Typography>
           <Typography fontSize={"1rem"} paragraph>
-            Description: {productItem.product.description}
+            Description: {product.description}
           </Typography>
         </CardContent>
       </CardActions>
-
-      {/* <Collapse style={{backgroundColor: "red"}} in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <Typography fontSize={"1rem"} paragraph>Category: {productItem.product.subcategory.category.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>SubCategory: {productItem.product.subcategory.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Brand: {productItem.product.brand.name}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Create date: {productItem.product.createDate}</Typography>
-                    <Typography fontSize={"1rem"} paragraph>Description: {productItem.product.description}</Typography>
-                </CardContent>
-            </Collapse> */}
     </div>
   );
 };

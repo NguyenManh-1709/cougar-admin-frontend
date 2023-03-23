@@ -52,9 +52,9 @@ const Product = () => {
         </Box>
 
         <Box className="row" display="flex" flexWrap="wrap">
-          {productItems.map((item) => (
+          {products.map((item) => (
             <Box className="col-lg-3 col-md-4 col-sm-6 col-12 p-2" key={item.id}>
-              <ProductCard productItem={item} />
+              <ProductCard product={item} />
             </Box>
           ))}
         </Box>
