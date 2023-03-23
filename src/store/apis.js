@@ -222,7 +222,10 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
 // Get All brand
 export const brandGetAll = createAsyncThunk('brandGetAll/get', async () => {
   const response = await axios.get(`http://localhost:8080/api/brands`);
-})
+  return response.data;
+});
+
+
 // Get All Contacts
 export const contactGetAll = createAsyncThunk('contactGetAll', async () => {
   const response = await axios.get(`http://localhost:8080/api/contacts`);

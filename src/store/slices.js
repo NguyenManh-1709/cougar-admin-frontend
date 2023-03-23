@@ -54,6 +54,7 @@ const mySlice = createSlice({
       state.loginStatus = false;
       state.productItems = [];
       state.products = [];
+      state.brands = [];
     },
   },
 
@@ -276,7 +277,7 @@ const mySlice = createSlice({
         state.status = "Successed"
       })
 
-      .addCase(brandGetAll.rejected, (state, action)=>{
+      .addCase(brandGetAll.rejected, (state)=>{
         state.status = "Error"
       })
 
