@@ -17,7 +17,8 @@ import {
   userPutAndUploadAvatarToCloud,
   changePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  brandGetAll
 } from "./apis";
 
 const mySlice = createSlice({
@@ -33,6 +34,7 @@ const mySlice = createSlice({
     loginStatus: false,
     productItems: [],
     products: [],
+    brands: [],
   },
   reducers: {
     // ...
@@ -261,7 +263,17 @@ const mySlice = createSlice({
       .addCase(resetPassword.fulfilled, (state, action) => {
       })
       .addCase(resetPassword.rejected, (state, action) => {
-      });
+      })
+
+      //get all brand
+      .addCase(brandGetAll.fulfilled, (state, action)=>{
+        state.brands = action.payload;
+        state.status = "Successed"
+      })
+
+      .addCase(brandGetAll.rejected, (state, action)=>{
+        state.status = "Error"
+      })
   },
 });
 

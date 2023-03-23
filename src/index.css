@@ -66,7 +66,7 @@ body,
 }
 
 
-.productItem-card .detail{
+.product-card .detail{
   transform: translate(0px, 0px)!important;
-  width: 150%;
+  width: 100%;
 }
