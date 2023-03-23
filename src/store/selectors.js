@@ -1,3 +1,4 @@
+
 export const usersWithRolesState = (state) => state.myStore.usersWithRoles;
 export const categoriesState = (state) => state.myStore.categories;
 export const invoicesState = (state) => state.myStore.invoices;
@@ -14,3 +15,4 @@ export const getProductByIdSelector = (id) => (state) =>
   state.myStore.products.find((pr) => pr.id === +id);
 
 export const brandsState = (state) => state.myStore.brands;
+export const contactsState = (state) => state.myStore.contacts

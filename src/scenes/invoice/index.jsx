@@ -15,7 +15,8 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: "70%",
   bgcolor: 'background.paper',
-  borderRadius: "8px"
+  borderRadius: "8px",
+  zIndex: 1001,
 };
 
 const Invoice = () => {
@@ -98,7 +99,7 @@ const Invoice = () => {
       renderCell: ({ row: { address } }) => {
         if (address != null) {
           const temp = address.unitNumber + ", " + address.addressLine + ", " + address.district;
-          const toShow = temp.length > 15 ? temp.slice(0, 15) + "..." : temp.length;
+          const toShow = temp.length > 15 ? temp.slice(0, 15) + "..." : temp + "...";
           return (
             toShow
           );
@@ -217,7 +218,7 @@ const Invoice = () => {
         >
           <Box sx={style}>
             <Box sx={{ background: colors.primary[300], borderRadius: "8px", padding: "10px", display: "flex", gap: "10px", maxHeight: "70vh" }}>
-              <Card sx={{ background: "#FFF", width: "50%" }}>
+              <Card sx={{ background: "#FFF", width: "50%", overflow: "auto" }}>
                 <Box sx={{ display: "flex" }}>
                   <CardMedia
                     sx={{ width: "150px", objectFit: "contain", padding: "10px 0 0 10px" }}

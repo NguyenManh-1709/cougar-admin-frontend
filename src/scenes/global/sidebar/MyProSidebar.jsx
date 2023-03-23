@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Menu, Sidebar, MenuItem } from "react-pro-sidebar";
+import { useProSidebar } from "react-pro-sidebar";
+
 import { Link, useLocation } from "react-router-dom";
-import "react-pro-sidebar/dist/css/styles.css";
+import { tokens } from "../../../theme";
+import { useTheme, Box, Typography, IconButton } from "@mui/material";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import LockResetIcon from '@mui/icons-material/LockReset';
@@ -13,16 +16,20 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
-import { useSelector } from "react-redux";
-import { userLogedInState } from "../../store/selectors";
-import mySlice from "../../store/slices";
-import { useDispatch } from "react-redux";
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { useEffect } from "react";
+import { userLogedInState } from "../../../store/selectors";
+import mySlice from "../../../store/slices";
 
-const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const MyProSidebar = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const { collapseSidebar, toggleSidebar, collapsed, broken } = useProSidebar();
+
   const [selected, setSelected] = useState();
   const dispatch = useDispatch();
-
   const location = useLocation();
   useEffect(() => {
     setSelected(location.pathname);
@@ -44,55 +51,79 @@ const Sidebar = () => {
         height: "100vh",
         top: 0,
         bottom: 0,
-        zIndex: 10000,
-        "& .pro-sidebar-inner": {
-          background: `#1F2A40 !important`,
+        zIndex: 100,
+        "& .sidebar": {
+          border: "none",
         },
-        "& .pro-icon-wrapper": {
+        "& .menu-icon": {
           backgroundColor: "transparent !important",
         },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
+        "& .menu-item": {
+          color: "#FFF !important",
+          backgroundColor: "transparent !important",
         },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
+        "& .menu-anchor": {
+          color: "inherit !important",
+          backgroundColor: "transparent !important",
         },
-        "& .pro-menu-item.active": {
-          color: "#6870fa !important",
+        "& .menu-item:hover": {
+          color: `${colors.greenAccent[500]} !important`,
+          backgroundColor: "transparent !important",
+        },
+        "& .menu-item.active": {
+          color: `${colors.greenAccent[500]} !important`,
+          backgroundColor: "transparent !important",
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
-        <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
+      <Sidebar
+        breakPoint="lg"
+        backgroundColor={"#1F2A40"}
+      >
+        <Menu iconshape="square">
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+            icon={
+              collapsed ? (
+                <MenuOutlinedIcon onClick={() => collapseSidebar()} />
+              ) : undefined
+            }
             style={{
               margin: "10px 0 20px 0",
-              color: "#FFF"
+              color: colors.grey[100],
             }}
           >
-            {!isCollapsed && (
+            {!collapsed && (
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                ml="15px"
               >
-                <IconButton sx={{ color: "#FFF" }} onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
+                <IconButton
+                  sx={{ color: "#FFF" }}
+                  onClick={
+                    broken ? () => toggleSidebar() : () => collapseSidebar()
+                  }
+                >
+                  <CloseOutlinedIcon />
                 </IconButton>
-                <Typography variant="h3" color="#FFF">
+                <Typography variant="h3" color={"#FFF"}>
                   Cougar Store
                 </Typography>
               </Box>
             )}
           </MenuItem>
-
-          {(!isCollapsed && userLogedIn) && (
+          {(!collapsed && userLogedIn) && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  "& .avater-image": {
+                    backgroundColor: colors.primary[500],
+                  },
+                }}
+              >
                 <img
                   alt="profile-user"
                   width="100px"
@@ -104,7 +135,7 @@ const Sidebar = () => {
               <Box textAlign="center">
                 <Typography
                   variant="h3"
-                  color="#FFF"
+                  color={"#FFF"}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
@@ -116,26 +147,24 @@ const Sidebar = () => {
               </Box>
             </Box>
           )}
-
-          {/* {userLogedIn && ( */}
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          <Box paddingLeft={collapsed ? undefined : "10%"}>
             {!userLogedIn && (
               <>
                 <MenuItem
                   active={selected === "/"}
                   style={{ color: "#FFF" }}
                   icon={<LoginIcon />}
+                  routerLink={<Link to={"/"} />}
                 >
                   <Typography>Login</Typography>
-                  <Link to={"/"} />
                 </MenuItem>
                 <MenuItem
                   active={selected === "/forgot-password"}
                   style={{ color: "#FFF" }}
                   icon={<LockResetIcon />}
+                  routerLink={<Link to={"/forgot-password"} />}
                 >
                   <Typography>Forgot Password</Typography>
-                  <Link to={"/forgot-password"} />
                 </MenuItem>
               </>
             )}
@@ -145,74 +174,83 @@ const Sidebar = () => {
                   active={selected === "/dashboard"}
                   style={{ color: "#FFF" }}
                   icon={<HomeOutlinedIcon />}
+                  routerLink={<Link to={"dashboard"} />}
                 >
                   <Typography>Dashboard</Typography>
-                  <Link to={"/dashboard"} />
                 </MenuItem>
 
-                <Typography variant="h6" color={"gray"} display={isCollapsed ? "none" : undefined} >Management</Typography>
+                <Typography variant="h6" color={"gray"} display={collapsed ? "none" : undefined} >Management</Typography>
 
                 <MenuItem
                   active={selected === "/users"}
                   style={{ color: "#FFF" }}
                   icon={<GroupIcon />}
+                  routerLink={<Link to={"users"} />}
                 >
                   <Typography>Users</Typography>
-                  <Link to={"/users"} />
                 </MenuItem>
 
                 <MenuItem
                   active={selected === "/products"}
                   style={{ color: "#FFF" }}
                   icon={<CheckBoxOutlineBlankIcon />}
+                  routerLink={<Link to={"/products"} />}
                 >
                   <Typography>Products</Typography>
-                  <Link to={"/products"} />
                 </MenuItem>
 
                 <MenuItem
                   active={selected === "/invoices"}
                   style={{ color: "#FFF" }}
                   icon={<ReceiptIcon />}
+                  routerLink={<Link to={"/invoices"} />}
                 >
                   <Typography>Invoices</Typography>
-                  <Link to={"/invoices"} />
                 </MenuItem>
 
-                <Typography variant="h6" color={"gray"} display={isCollapsed ? "none" : undefined} >Your account</Typography>
+                <MenuItem
+                  active={selected === "/contacts"}
+                  style={{ color: "#FFF" }}
+                  icon={<MailOutlineIcon />}
+                  routerLink={<Link to={"/contacts"} />}
+                >
+                  <Typography>Contact</Typography>
+                </MenuItem>
+
+                <Typography variant="h6" color={"gray"} display={collapsed ? "none" : undefined} >Your account</Typography>
                 <MenuItem
                   active={selected === `/edit-admin/${userLogedIn.id}`}
                   style={{ color: "#FFF" }}
                   icon={<PermContactCalendarIcon />}
+                  routerLink={<Link to={`/edit-admin/${userLogedIn.id}`} />}
                 >
                   <Typography>Profile</Typography>
-                  <Link to={`/edit-admin/${userLogedIn.id}`} />
                 </MenuItem>
-                
+
                 <MenuItem
                   active={selected === "/change-password"}
                   style={{ color: "#FFF" }}
                   icon={<SettingsIcon />}
+                  routerLink={<Link to={"/change-password"} />}
                 >
                   <Typography>Change password</Typography>
-                  <Link to={"/change-password"} />
                 </MenuItem>
 
                 <MenuItem
                   active={selected === "/"}
                   style={{ color: "#FFF" }}
                   icon={<LogoutIcon />}
+                  routerLink={<Link to={"/"} onClick={(e) => { e.preventDefault(); handleLogout() }} />}
                 >
                   <Typography>Logout</Typography>
-                  <Link to={"/"} onClick={(e) => { e.preventDefault(); handleLogout() }} />
                 </MenuItem>
               </>
             )}
           </Box>
         </Menu>
-      </ProSidebar>
+      </Sidebar>
     </Box>
   );
 };
 
-export default Sidebar;
+export default MyProSidebar;

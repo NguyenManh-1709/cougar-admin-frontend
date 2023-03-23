@@ -18,8 +18,12 @@ import {
   changePassword,
   forgotPassword,
   resetPassword,
-  brandGetAll
+  brandGetAll,
+  contactGetAll,
+  contactStatusPut
 } from "./apis";
+
+
 
 const mySlice = createSlice({
   name: "mySlice",
@@ -35,6 +39,7 @@ const mySlice = createSlice({
     productItems: [],
     products: [],
     brands: [],
+    contacts: []
   },
   reducers: {
     // ...
@@ -253,13 +258,13 @@ const mySlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
       })
 
-      //FORGOT PASSWORD
+      // FORGOT PASSWORD
       .addCase(forgotPassword.fulfilled, (state, action) => {
       })
       .addCase(forgotPassword.rejected, (state, action) => {
       })
 
-      //RESET PASSWORD
+      // RESET PASSWORD
       .addCase(resetPassword.fulfilled, (state, action) => {
       })
       .addCase(resetPassword.rejected, (state, action) => {
@@ -274,6 +279,26 @@ const mySlice = createSlice({
       .addCase(brandGetAll.rejected, (state, action)=>{
         state.status = "Error"
       })
+
+      // GET ALL CONTACTS
+      .addCase(contactGetAll.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(contactGetAll.fulfilled, (state, action) => {
+        state.contacts = action.payload;
+        state.status = "idle";
+      })
+
+      // PUT CONTACT STATUS
+      .addCase(contactStatusPut.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(contactStatusPut.fulfilled, (state, action) => {
+        const contactUpdated = action.payload;
+        state.contacts = state.contacts.map(item => item.id === contactUpdated.id ? contactUpdated : item);
+
+        state.status = "idle";
+      });
   },
 });
 

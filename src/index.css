@@ -5,18 +5,7 @@ body,
 #root,
 .app,
 .content {
-  /* height: 100%; */
-  width: 100%;
-  font-family: "Source Sans Pro", sans-serif;
-}
-
-.app {
-  min-height: 100vh;
-}
-
-.app {
-  display: flex;
-  position: relative;
+  font-family: "Source Sance Pro", sans-serif;
 }
 
 ::-webkit-scrollbar {
@@ -52,6 +41,7 @@ body,
   font-size: 1.2rem !important;
   font-weight: bold !important;
 }
+
 .css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root,
 .css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root,
 .css-2lgwlz-MuiStepLabel-label,
@@ -65,8 +55,44 @@ body,
   font-weight: bold !important;
 }
 
+svg:focus,
+g:focus,
+path:focus {
+  outline: none !important;
+}
+
+.recharts-pie .recharts-text.recharts-label {
+  stroke: unset !important;
+  fill: white !important;
+}
+
+.recharts-pie .recharts-text.recharts-pie-label-text > tspan{
+  font-size: 1.2rem !important;
+}
 
 .product-card .detail{
   transform: translate(0px, 0px)!important;
   width: 100%;
+  width: 150%;
+}
+
+.react-datepicker__input-container > input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  outline: none;
+  background-color: lightgray;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.react-datepicker__current-month {
+  color: #008B8B !important;
+  padding: 5px;
+}
+
+.react-datepicker__month-select, .react-datepicker__year-select {
+  padding: 5px;
 }

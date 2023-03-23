@@ -1,13 +1,14 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import ProgressCircle from "./ProgressCircle";
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
-const StatBox = ({ title, subtitle, icon, progress, increase }) => {
+const StatBox = ({ total, title, icon, progress, increase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box width="100%" m="0 30px">
+    <Box width="100%" m="0 30px" p="30px 0">
       <Box display="flex" justifyContent="space-between">
         <Box>
           {icon}
@@ -16,7 +17,7 @@ const StatBox = ({ title, subtitle, icon, progress, increase }) => {
             fontWeight="bold"
             sx={{ color: colors.greenAccent[200] }}
           >
-            {title}
+            {total}
           </Typography>
         </Box>
         <Box>
@@ -25,14 +26,19 @@ const StatBox = ({ title, subtitle, icon, progress, increase }) => {
       </Box>
       <Box display="flex" justifyContent="space-between" mt="2px">
         <Typography variant="h5" sx={{ color: colors.greenAccent[200] }}>
-          {subtitle}
+          {title}
         </Typography>
         <Typography
           variant="h5"
           fontStyle="italic"
           sx={{ color: colors.greenAccent[200] }}
         >
-          {increase}
+          <Tooltip title="Percent growth over the previous month" placement="left-end" sx={{ cursor: "default" }}>
+            <Box display="flex" alignItems="center" gap="10px">
+              <TrendingUpIcon />
+              <Box>{increase} %</Box>
+            </Box>
+          </Tooltip>
         </Typography>
       </Box>
     </Box>

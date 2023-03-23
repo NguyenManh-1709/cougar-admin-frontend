@@ -222,5 +222,16 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadA
 // Get All brand
 export const brandGetAll = createAsyncThunk('brandGetAll/get', async () => {
   const response = await axios.get(`http://localhost:8080/api/brands`);
+})
+// Get All Contacts
+export const contactGetAll = createAsyncThunk('contactGetAll', async () => {
+  const response = await axios.get(`http://localhost:8080/api/contacts`);
+  return response.data;
+});
+
+// PUT CONTACT STATUS
+export const contactStatusPut = createAsyncThunk('contactStatusPut', async (contact) => {
+  const abc = { ...contact };
+  const response = await axios.put(`http://localhost:8080/api/contacts/change-status`, abc);
   return response.data;
 });
