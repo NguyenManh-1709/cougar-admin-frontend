@@ -328,13 +328,13 @@ const Dashboard = () => {
                   <YAxis />
                   <Legend />
                   <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
-                    <LabelList dataKey="revenue" position="top" fill="#6495ED" />
+                    <LabelList dataKey="revenue" position="inside" angle={-90} fill="#FFF" />
                   </Bar>
                   <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
-                    <LabelList dataKey="cogs" position="top" fill="#DC6A6A"></LabelList>
+                    <LabelList dataKey="cogs" position="inside" angle={-90} fill="#FFF"></LabelList>
                   </Bar>
                   <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
-                    <LabelList dataKey="grossProfit" position="top" fill="#228B22"></LabelList>
+                    <LabelList dataKey="grossProfit" position="inside" angle={-90} fill="#FFF"></LabelList>
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>

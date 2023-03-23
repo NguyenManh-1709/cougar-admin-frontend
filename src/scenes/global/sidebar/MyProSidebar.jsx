@@ -77,8 +77,9 @@ const MyProSidebar = () => {
       }}
     >
       <Sidebar
+        image="https://res.cloudinary.com/dmjh7imwd/image/upload/v1679583754/CougarStore/bg_sidebar_iwfi1q.jpg"
         breakPoint="lg"
-        backgroundColor={"#1F2A40"}
+        backgroundColor={"rgba(31,42,64,0.7)"}
       >
         <Menu iconshape="square">
           <MenuItem
