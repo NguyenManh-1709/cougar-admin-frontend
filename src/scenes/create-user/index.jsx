@@ -64,7 +64,9 @@ const FormCreateUser = () => {
     if (validFile) {
       const canvas = editor.getImage();
       const dataURL = canvas.toDataURL();
-      dispatch(userPostAndUploadAvatarToCloud([values, dataURL])).then((response) => {
+      const data = { ...values, avatar: dataURL}
+      dispatch(userPostAndUploadAvatarToCloud(data)).then((response) => {
+        console.log(response);
         if (response.type === "userPostAndUploadAvatarToCloud/rejected") {
           toast.error(response.payload.message, {
             position: "top-right",
@@ -267,7 +269,7 @@ const FormCreateUser = () => {
                   background: "#1F2A40",
                   color: "white",
                 }}
-                onClick={handleToggle}>
+                  onClick={handleToggle}>
                   <Box display="flex" alignItems="center">
                     <SaveAltIcon></SaveAltIcon>
                     <Box ml="5px">Create</Box>
