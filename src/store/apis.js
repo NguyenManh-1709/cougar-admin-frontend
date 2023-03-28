@@ -238,3 +238,24 @@ export const contactStatusPut = createAsyncThunk('contactStatusPut', async (cont
   const response = await axios.put(`http://localhost:8080/api/contacts/change-status`, abc);
   return response.data;
 });
+
+// Get All option
+export const getOptions = createAsyncThunk('option/getOptions', async () => {
+  const response = await axios.get(`http://localhost:8080/rest/options`);
+  return response.data;
+});
+
+export const createOrUpdateProduct = createAsyncThunk("product/createOrUpdate", async (product)=>{
+  const response = await axios.post('http://localhost:8080/api/products', product);
+  return response.data;
+});
+
+export const createOrUpdateProductItem = createAsyncThunk("productItem/createOrUpdate", async (productItem)=>{
+  const response = await axios.post('http://localhost:8080/api/productItems', productItem);
+  return response.data;
+});
+
+export const updateProduct = createAsyncThunk("product/updateProduct", async (productItem)=>{
+  const response = await axios.put('http://localhost:8080/api/products', productItem);
+  return response.data;
+});

@@ -15,4 +15,5 @@ export const getProductByIdSelector = (id) => (state) =>
   state.myStore.products.find((pr) => pr.id === +id);
 
 export const brandsState = (state) => state.myStore.brands;
-export const contactsState = (state) => state.myStore.contacts
+export const contactsState = (state) => state.myStore.contacts;
+export const optionsState = (state) => state.myStore.options;
