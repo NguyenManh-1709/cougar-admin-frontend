@@ -66,7 +66,7 @@ export const login = createAsyncThunk('login', async (credentials, { rejectWithV
 
 // Get User By Id
 export const getUserById = createAsyncThunk('getUserById', async (id) => {
-  const response = await axios.get(`http://localhost:8080/rest/users/${id}`);
+  const response = await axios.get(`http://localhost:8080/api/users/${id}`);
   return response.data;
 });
 
@@ -131,7 +131,7 @@ export const resetPassword = createAsyncThunk('resetPassword', async ({ password
 // Post user (Role = "ADMIN")
 export const userPost = createAsyncThunk('userPost', async (user, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`http://localhost:8080/rest/users`, user);
+    const response = await axios.post(`http://localhost:8080/api/users/create-admin`, user);
     return response.data;
   } catch (error) {
     if (error.response.data) {
@@ -142,32 +142,10 @@ export const userPost = createAsyncThunk('userPost', async (user, { rejectWithVa
   }
 });
 
-export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploadAvatarToCloud', async ([values, dataURL], { rejectWithValue }) => {
+export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploadAvatarToCloud', async (values, { rejectWithValue }) => {
   try {
-    const userResponse = await axios.post(`http://localhost:8080/rest/users`, values);
-
-    const formData = new FormData();
-    formData.append('file', dataURL);
-    formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
-    formData.append('public_id', `avatar-user-id-${userResponse.data.id}`);
-    const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-
-    // UPDATE USER WITH AVATAR
-    const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
-    const userUpdated = { ...userResponse.data, avatar: url };
-
-    try {
-      const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
-      return response.data;
-    } catch (error) {
-      if (error.response.data) {
-        return rejectWithValue(error.response.data);
-      } else {
-        throw error;
-      }
-    }
+    const response = await axios.post(`http://localhost:8080/api/users/create-admin-with-avatar`, values);
+    return response.data;
   } catch (error) {
     if (error.response.data) {
       return rejectWithValue(error.response.data);
@@ -180,7 +158,7 @@ export const userPostAndUploadAvatarToCloud = createAsyncThunk('userPostAndUploa
 // Put user (Role = "ADMIN")
 export const userPut = createAsyncThunk('userPut', async (user, { rejectWithValue }) => {
   try {
-    const response = await axios.put(`http://localhost:8080/rest/users`, user);
+    const response = await axios.put(`http://localhost:8080/api/users/update-admin`, user);
     return response.data;
   } catch (error) {
     if (error.response.data) {
@@ -191,24 +169,9 @@ export const userPut = createAsyncThunk('userPut', async (user, { rejectWithValu
   }
 });
 
-export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadAvatarToCloud', async ([values, dataURL], { rejectWithValue }) => {
-  // CREATE FormData (to custom name) AND UPLOAD TO CLOUD
-  const formData = new FormData();
-  formData.append('file', dataURL);
-  formData.append('upload_preset', `${process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET}`);
-  formData.append('public_id', `avatar-user-id-${values.id}`);
-  // formData.append('overwrite', true);
-  const avatarRes = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-
-  // UPDATE USER WITH AVATAR
-  const url = avatarRes.data.secure_url.replace(`https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload/`, "");
-  const userUpdated = { ...values, avatar: url };
-
-
+export const userPutAndUploadAvatarToCloud = createAsyncThunk('userPutAndUploadAvatarToCloud', async (values, { rejectWithValue }) => {
   try {
-    const response = await axios.put(`http://localhost:8080/rest/users`, userUpdated);
+    const response = await axios.put(`http://localhost:8080/api/users/update-admin-with-avatar`, values);
     return response.data;
   } catch (error) {
     if (error.response.data) {

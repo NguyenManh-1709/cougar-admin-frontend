@@ -64,7 +64,8 @@ const FormEditUser = () => {
     if (validFile) {
       const canvas = editor.getImage();
       const dataURL = canvas.toDataURL();
-      dispatch(userPutAndUploadAvatarToCloud([values, dataURL])).then((response) => {
+      const data = { ...values, avatar: dataURL }
+      dispatch(userPutAndUploadAvatarToCloud(data)).then((response) => {
         if (response.type === "userPutAndUploadAvatarToCloud/rejected") {
           toast.error(response.payload.message, {
             position: "top-right",
@@ -254,7 +255,7 @@ const FormEditUser = () => {
                   background: "#1F2A40",
                   color: "white",
                 }}
-                onClick={handleToggle}>
+                  onClick={handleToggle}>
                   <Box display="flex" alignItems="center">
                     <SaveAltIcon></SaveAltIcon>
                     <Box ml="5px">Edit</Box>
