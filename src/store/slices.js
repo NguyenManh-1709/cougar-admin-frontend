@@ -22,9 +22,8 @@ import {
   contactGetAll,
   contactStatusPut,
   getOptions,
-  createOrUpdateProduct,
   createOrUpdateProductItem,
-  updateProduct
+  createOrUpdateProduct
 } from "./apis";
 
 
@@ -317,27 +316,26 @@ const mySlice = createSlice({
         state.status = "Error"
       })
 
-      //createOrUpdateProduct
+
+      //create or update product
       .addCase(createOrUpdateProduct.fulfilled, (state, action)=>{
         const product = action.payload;
 
-        const dateString = product.createDate;
-        const date = new Date(dateString);
+        const date = new Date(product.createDate);
         const day = date.getDate().toString().padStart(2, "0");
         const month = (date.getMonth() + 1).toString().padStart(2, "0");
         const year = date.getFullYear().toString();
         const formattedDate = `${year}-${month}-${day}`;
         product.createDate = formattedDate;
 
-        const exist = state.products.find(pro=>pro.id === product.id);
+        const exist = state.products.find(proI=>proI.id === product.id);
 
         if (exist) {
           Object.assign(exist, product);
-          console.log("sua product");
+          console.log("sua product slice");
         }else{
           state.products.push(product);
-          console.log("them product");
-
+          console.log("them product slice");
         }
         state.status = "Successed"
       })
@@ -346,8 +344,9 @@ const mySlice = createSlice({
         state.status = action.error.message;
       })
 
-      //create Or Update ProductItem
-      .addCase(createOrUpdateProductItem.fulfilled, (state, action)=>{
+
+       //create Or Update ProductItem
+       .addCase(createOrUpdateProductItem.fulfilled, (state, action)=>{
         const productItem = action.payload;
 
         const date = new Date(productItem.createDate);
@@ -361,44 +360,16 @@ const mySlice = createSlice({
 
         if (exist) {
           Object.assign(exist, productItem);
-          console.log("sua product item");
+          console.log("sua product item slice");
         }else{
           state.productItems.push(productItem);
-          console.log("them product item");
+          console.log("them product item slice");
 
         }
         state.status = "Successed"
       })
 
       .addCase(createOrUpdateProductItem.rejected, (state, action)=>{
-        state.status = action.error.message;
-      })
-
-      //update product
-      .addCase(updateProduct.fulfilled, (state, action)=>{
-        const productItem = action.payload;
-
-        const date = new Date(productItem.createDate);
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear().toString();
-        const formattedDate = `${year}-${month}-${day}`;
-        productItem.createDate = formattedDate;
-
-        const exist = state.productItems.find(proI=>proI.id === productItem.id);
-
-        if (exist) {
-          Object.assign(exist, productItem);
-          console.log("sua product item");
-        }else{
-          state.productItems.push(productItem);
-          console.log("them product item");
-
-        }
-        state.status = "Successed"
-      })
-
-      .addCase(updateProduct.rejected, (state, action)=>{
         state.status = action.error.message;
       })
   },
