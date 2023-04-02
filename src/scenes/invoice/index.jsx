@@ -1,12 +1,12 @@
-import { Box, Button, Card, CardContent, CardMedia, IconButton, List, ListItem, Modal, Step, StepLabel, Stepper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, Grid, List, ListItem, Modal, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
 import { invoicesState, invoiceDetailsState } from "../../store/selectors";
-import MyTable from "../../components/MyTable";
 import { useSelector } from "react-redux";
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { invoiceStatusPut } from "../../store/apis";
 import { useDispatch } from "react-redux";
 import { tokens } from "../../theme";
+import Header from "../../components/Header";
+import { DataGrid } from "@mui/x-data-grid";
 
 const style = {
   position: 'absolute',
@@ -26,23 +26,11 @@ const Invoice = () => {
   const invoiceDetails = useSelector(invoiceDetailsState);
   const invoices = useSelector(invoicesState).filter(item => item.orderStatus !== null);
 
+  const invoicesSorted = Object.values(invoices).sort((a, b) => new Date(b.createDate) - (new Date(a.createDate)));
+
   const [openInvoiceDetails, setOpenInvoiceDetails] = useState(false);
   const [invoiceDetailsToShow, setInvoiceDetailsToShow] = useState();
   const [invoiceSelected, setInvoiceSelected] = useState();
-
-  const handleOpenInvoiceDetails = (id) => {
-    const temp = invoices.find(item => item.id === id);
-    setInvoiceSelected(temp);
-
-    setOpenInvoiceDetails(true);
-    const resultToShow = invoiceDetails
-      .filter(({ shopOrder }) => shopOrder.id === id)
-      .map(({ qty, price, productItem }) => {
-        const { id: productItemId, product: { name }, image, sku } = productItem;
-        return { productItemId, name, qty, price, image, sku };
-      });
-    setInvoiceDetailsToShow(resultToShow);
-  };
 
   const handleCloseInvoiceDetails = () => setOpenInvoiceDetails(false);
 
@@ -56,10 +44,6 @@ const Invoice = () => {
   }
 
   const invoicesColumns = [
-    {
-      field: "id",
-      headerName: "ID"
-    },
     {
       field: "user",
       headerName: "USER",
@@ -86,24 +70,9 @@ const Invoice = () => {
       headerName: "CREATE DATE",
       flex: 1,
       renderCell: ({ row: { createDate } }) => {
-        const temp = new Date(createDate).toISOString().slice(0, 10);
         return (
-          temp
+          new Date(createDate).toLocaleDateString('en-GB')
         );
-      },
-    },
-    {
-      field: "address",
-      headerName: "ADDRESS",
-      flex: 1,
-      renderCell: ({ row: { address } }) => {
-        if (address != null) {
-          const temp = address.unitNumber + ", " + address.addressLine + ", " + address.district;
-          const toShow = temp.length > 15 ? temp.slice(0, 15) + "..." : temp + "...";
-          return (
-            toShow
-          );
-        }
       },
     },
     {
@@ -159,8 +128,8 @@ const Invoice = () => {
       },
     },
     {
-      field: "CHANGE STATUS",
-      headerName: "CHANGE STATUS",
+      field: "ACTION",
+      headerName: "ACTION",
       flex: 1,
       renderCell: ({ row: { id, orderStatus } }) => {
         const text = orderStatus === 0
@@ -185,29 +154,148 @@ const Invoice = () => {
         );
       },
     },
+  ];
+
+  const invoiceDetailsColumns = [
     {
-      field: "SHOW DETAILS",
-      headerName: "SHOW DETAILS",
-      flex: 1,
-      renderCell: ({ row: { id } }) => {
+      field: "image",
+      headerName: "IMAGE",
+      renderCell: ({ row: { image } }) => {
         return (
-          <Tooltip title="Show details" placement="right">
-            <IconButton onClick={() => handleOpenInvoiceDetails(id)}>
-              <VisibilityIcon />
-            </IconButton>
-          </Tooltip>
+          <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${image}`} alt="" width="50px" />
+        );
+      },
+    },
+    {
+      field: "sku",
+      headerName: "SKU",
+      renderCell: ({ row: { sku } }) => {
+        return (
+          sku
+        );
+      },
+    },
+    {
+      field: "name",
+      headerName: "NAME",
+      flex: 1,
+      cellClassName: "name-column--cell",
+      renderCell: ({ row: { name } }) => {
+        return (
+          name
+        );
+      },
+    },
+    {
+      field: "qty",
+      headerName: "QUANTITY",
+      renderCell: ({ row: { qty } }) => {
+        return (
+          qty
+        );
+      },
+    },
+    {
+      field: "price",
+      headerName: "PRICE",
+      renderCell: ({ row: { price } }) => {
+        return (
+          "$ " + price
         );
       },
     },
   ];
 
+  const [pageSize, setPageSize] = useState(10);
+
+  const handlePageSizeChange = (params) => {
+    setPageSize(params.pageSize);
+  };
+
+  const handleCellClick = (params) => {
+    if (params.field !== "ACTION") {
+      const temp = invoices.find(item => item.id === params.row.id);
+      setInvoiceSelected(temp);
+
+      setOpenInvoiceDetails(true);
+      const resultToShow = invoiceDetails
+        .filter(({ shopOrder }) => shopOrder.id === params.row.id)
+        .map(({ qty, price, productItem }) => {
+          const { id: productItemId, product: { name }, image, sku } = productItem;
+          return { productItemId, name, qty, price, image, sku };
+        });
+      setInvoiceDetailsToShow(resultToShow);
+    }
+  };
+
   return (
     <Box m="20px">
-      <MyTable
-        rows={invoices}
-        columns={invoicesColumns}
-        title={"MANAGEMENT YOUR INVOICES"}
-      />
+      <Header title="MANAGEMENT YOUR INVOICES" />
+      <Box
+        m="40px 0 0 0"
+        height="65vh"
+        sx={{
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+            cursor: "pointer"
+          },
+          "& .name-column--cell": {
+            color: colors.greenAccent[300],
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+          "& .css-57oisa-MuiDataGrid-root .MuiDataGrid-columnHeader:focus": {
+            outline: "none !important"
+          },
+          "& .MuiDataGrid-root .MuiDataGrid-cell:focus": {
+            outline: "none !important"
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: `${colors.grey[100]} !important`,
+          },
+          "& .MuiDataGrid-selectedRowCount": {},
+          "& .MuiDataGrid-columnSeparator--sideRight": {
+            display: "none !important"
+          },
+          "& .MuiDataGrid-menuIcon": {
+            display: "none !important"
+          },
+          "& .MuiTablePagination-selectLabel.css-1rt5bto-MuiTablePagination-selectLabel": {
+            marginBottom: "0"
+          },
+          "& .MuiTablePagination-displayedRows.css-7ms3qr-MuiTablePagination-displayedRows": {
+            marginBottom: "0"
+          }
+        }}
+      >
+        <DataGrid
+          sx={{ fontSize: "1rem" }}
+          rows={invoicesSorted}
+          columns={invoicesColumns}
+          getRowId={(row) => row.id}
+          onCellClick={handleCellClick}
+          isRowSelectable={() => { return false }}
+          pageSize={pageSize}
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      </Box>
+
+      <Typography mt="1rem">
+        Click on the row to see details.
+      </Typography>
 
       {invoiceSelected && (
         <Modal
@@ -217,97 +305,131 @@ const Invoice = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Box sx={{ background: colors.primary[300], borderRadius: "8px", padding: "10px", display: "flex", gap: "10px", maxHeight: "70vh" }}>
-              <Card sx={{ background: "#FFF", width: "50%", overflow: "auto" }}>
-                <Box sx={{ display: "flex" }}>
-                  <CardMedia
-                    sx={{ width: "150px", objectFit: "contain", padding: "10px 0 0 10px" }}
-                    component="img"
-                    image={`https://res.cloudinary.com/dmjh7imwd/image/upload/v1678996695/CougarStore/logo512_jiqu4e.png`}
-                    alt=""
-                  />
-                  <Typography variant="h1" color={"#008B8B"} display="flex" alignItems="center">
-                    Cougar Store
-                  </Typography>
-                  <Box sx={{ flex: 1, display: "flex", justifyContent: "end", alignItems: "center" }}>
+            <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} sx={{ maxHeight: "80vh", overflow: "auto", padding: "10px", backgroundColor: colors.grey[400] }}>
+              <Grid xs={12} xl={5}>
+                <Card sx={{ background: "#FFF", height: "70vh" }}>
+                  <Box sx={{ display: "flex" }}>
                     <CardMedia
-                      sx={{ width: "150px", objectFit: "contain", padding: "10px 10px 0 0" }}
+                      sx={{ width: "150px", objectFit: "contain", padding: "10px 0 0 10px" }}
                       component="img"
-                      image={`https://res.cloudinary.com/dmjh7imwd/image/upload/v1679013232/CougarStore/seal_xkpiqc.png`}
+                      image={`https://res.cloudinary.com/dmjh7imwd/image/upload/v1678996695/CougarStore/logo512_jiqu4e.png`}
                       alt=""
                     />
+                    <Typography variant="h1" color={"#008B8B"} display="flex" alignItems="center">
+                      Cougar Store
+                    </Typography>
+                    <Box sx={{ flex: 1, display: "flex", justifyContent: "end", alignItems: "center" }}>
+                      <CardMedia
+                        sx={{ width: "150px", objectFit: "contain", padding: "10px 10px 0 0" }}
+                        component="img"
+                        image={`https://res.cloudinary.com/dmjh7imwd/image/upload/v1679013232/CougarStore/seal_xkpiqc.png`}
+                        alt=""
+                      />
+                    </Box>
                   </Box>
+                  <CardContent sx={{ color: "#000", padding: "0 16px" }}>
+                    <List>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>ID</Box> {invoiceSelected.id}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>User</Box> {invoiceSelected.user.fullname}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>Payment method</Box> {invoiceSelected.userPaymentMethod === null ? "Cash on delivery" : invoiceSelected.userPaymentMethod.paymentType.value}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>Create date</Box> {new Date(invoiceSelected.createDate).toLocaleDateString('en-GB')}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>Delivery method</Box> {invoiceSelected.deliveryMethod.name}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>Total</Box> $ {invoiceSelected.orderTotal}
+                      </ListItem>
+                      <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
+                        <Box sx={{ minWidth: "150px" }}>Address</Box> {invoiceSelected.address.unitNumber} {invoiceSelected.address.addressLine}, {invoiceSelected.address.district}, {invoiceSelected.address.province}, {invoiceSelected.address.countryName}
+                      </ListItem>
+                    </List>
+                    <Stepper activeStep={invoiceSelected.orderStatus + 1} alternativeLabel sx={{ marginTop: "50px" }}>
+                      <Step sx={{ padding: 0 }}>
+                        <StepLabel>Pending</StepLabel>
+                      </Step>
+                      <Step sx={{ padding: 0 }}>
+                        <StepLabel>Processing</StepLabel>
+                      </Step>
+                      <Step sx={{ padding: 0 }}>
+                        <StepLabel>In transit</StepLabel>
+                      </Step>
+                      <Step sx={{ padding: 0 }}>
+                        <StepLabel>Completed</StepLabel>
+                      </Step>
+                    </Stepper>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid xs={12} xl={7}>
+                <Box
+                  height="70vh"
+                  sx={{
+                    "& .MuiDataGrid-root": {
+                      border: "none",
+                    },
+                    "& .MuiDataGrid-cell": {
+                      borderBottom: "none",
+                      cursor: "pointer"
+                    },
+                    "& .name-column--cell": {
+                      color: colors.greenAccent[300],
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: colors.blueAccent[700],
+                      borderBottom: "none",
+                    },
+                    "& .css-57oisa-MuiDataGrid-root .MuiDataGrid-columnHeader:focus": {
+                      outline: "none !important"
+                    },
+                    "& .MuiDataGrid-root .MuiDataGrid-cell:focus": {
+                      outline: "none !important"
+                    },
+                    "& .MuiDataGrid-virtualScroller": {
+                      backgroundColor: colors.primary[400],
+                    },
+                    "& .MuiDataGrid-footerContainer": {
+                      borderTop: "none",
+                      backgroundColor: colors.blueAccent[700],
+                    },
+                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                      color: `${colors.grey[100]} !important`,
+                    },
+                    "& .MuiDataGrid-selectedRowCount": {},
+                    "& .MuiDataGrid-columnSeparator--sideRight": {
+                      display: "none !important"
+                    },
+                    "& .MuiDataGrid-menuIcon": {
+                      display: "none !important"
+                    },
+                    "& .MuiTablePagination-selectLabel.css-1rt5bto-MuiTablePagination-selectLabel": {
+                      marginBottom: "0"
+                    },
+                    "& .MuiTablePagination-displayedRows.css-7ms3qr-MuiTablePagination-displayedRows": {
+                      marginBottom: "0"
+                    }
+                  }}
+                >
+                  <DataGrid
+                    sx={{ fontSize: "0.9rem" }}
+                    rows={invoiceDetailsToShow}
+                    columns={invoiceDetailsColumns}
+                    getRowId={(row) => row.productItemId}
+                    isRowSelectable={() => { return false }}
+                    pageSize={pageSize}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
                 </Box>
-                <CardContent sx={{ color: "#000", padding: "0 16px" }}>
-                  <List>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>ID</Box> {invoiceSelected.id}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>User</Box> {invoiceSelected.user.fullname}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Payment method</Box> {invoiceSelected.userPaymentMethod === null ? "Cash on delivery" : invoiceSelected.userPaymentMethod.paymentType.value}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Create date</Box> {invoiceSelected.createDate}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Address</Box> {invoiceSelected.address.unitNumber} {invoiceSelected.address.addressLine}, {invoiceSelected.address.district}, {invoiceSelected.address.province}, {invoiceSelected.address.countryName}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Delivery method</Box> {invoiceSelected.deliveryMethod.name}
-                    </ListItem>
-                    <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                      <Box sx={{ minWidth: "150px" }}>Total</Box> $ {invoiceSelected.orderTotal}
-                    </ListItem>
-                  </List>
-                  <Stepper activeStep={invoiceSelected.orderStatus + 1} alternativeLabel sx={{ marginTop: "50px" }}>
-                    <Step sx={{ padding: 0 }}>
-                      <StepLabel>Pending</StepLabel>
-                    </Step>
-                    <Step sx={{ padding: 0 }}>
-                      <StepLabel>Processing</StepLabel>
-                    </Step>
-                    <Step sx={{ padding: 0 }}>
-                      <StepLabel>In transit</StepLabel>
-                    </Step>
-                    <Step sx={{ padding: 0 }}>
-                      <StepLabel>Completed</StepLabel>
-                    </Step>
-                  </Stepper>
-                </CardContent>
-              </Card>
-              <TableContainer sx={{ width: "50%", maxHeight: "100%", borderRadius: "6px" }} >
-                <Table stickyHeader sx={{ background: "#FFF", minHeight: "100%" }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: "700", fontSize: "1rem", background: "#FFF", color: "#008B8B", padding: "10px 0", textAlign: "center" }}>IMAGE</TableCell>
-                      <TableCell sx={{ fontWeight: "700", fontSize: "1rem", background: "#FFF", color: "#008B8B", padding: "10px 0", textAlign: "center" }}>SKU</TableCell>
-                      <TableCell sx={{ fontWeight: "700", fontSize: "1rem", background: "#FFF", color: "#008B8B", padding: "10px 0" }}>NAME</TableCell>
-                      <TableCell sx={{ fontWeight: "700", fontSize: "1rem", background: "#FFF", color: "#008B8B", padding: "10px 0", textAlign: "center" }} align="right">PRICE</TableCell>
-                      <TableCell sx={{ fontWeight: "700", fontSize: "1rem", background: "#FFF", color: "#008B8B", padding: "10px 0", textAlign: "center" }} align="right">QUANTITY</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {invoiceDetailsToShow.map((item) => (
-                      <TableRow
-                        key={item.productItemId}
-                        sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "100px" }}
-                      >
-                        <TableCell sx={{ padding: "0", textAlign: "center" }}>
-                          <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width={90} style={{ padding: "5px" }} />
-                        </TableCell>
-                        <TableCell sx={{ fontSize: "1rem", color: "#000", padding: "0", textAlign: "center" }}>{item.sku}</TableCell>
-                        <TableCell sx={{ fontSize: "1rem", color: colors.redAccent[500], padding: "0", fontWeight: "800" }}>{item.name}</TableCell>
-                        <TableCell sx={{ fontSize: "1rem", color: "#000", padding: "0", textAlign: "center" }} align="right">{item.price}</TableCell>
-                        <TableCell sx={{ fontSize: "1rem", color: "#000", padding: "0", textAlign: "center" }} align="right">{item.qty}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+              </Grid>
+            </Grid>
           </Box>
         </Modal>
       )}

@@ -115,7 +115,7 @@ const Dashboard = () => {
     if (active && payload && payload.length) {
       return (
         <Box sx={{ background: colors.primary[600], padding: "10px", borderRadius: "8px" }}>
-          <Typography sx={{ color: "#FFF", textAlign: "center"}}>USER-ID: {`${payload[0].payload.userId}`}</Typography>
+          <Typography sx={{ color: "#FFF", textAlign: "center" }}>USER-ID: {`${payload[0].payload.userId}`}</Typography>
           <Typography sx={{ color: "#FFF", textAlign: "center", marginBottom: "10px", borderBottom: "1px solid #FFF" }}>{`${label}`}</Typography>
           <Typography sx={{ color: "#708090" }}>{`${payload[0].name} : ${payload[0].value}`}</Typography>
         </Box>
@@ -141,8 +141,8 @@ const Dashboard = () => {
   const topTenBestSellingProducts = Object.values(
     paidInvoicesDetails
       .reduce((acc, { productItem: { product }, qty }) => {
-        const { id: productId, name, image } = product;
-        acc[productId] = { productId, name, image, qty: (acc[productId]?.qty || 0) + qty };
+        const { id: productId, name } = product;
+        acc[productId] = { productId, name, qty: (acc[productId]?.qty || 0) + qty };
         return acc;
       }, {})
   ).sort((a, b) => b.qty - a.qty).slice(0, 10);
@@ -195,7 +195,7 @@ const Dashboard = () => {
       <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 
       {/* ROW 1 */}
-      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} >
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} id="dashboard-row-1">
         <Grid xs={12} sm={6} md={6} xl={3}>
           <Box
             width="100%"
@@ -283,7 +283,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* ROW 2 */}
-      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{xs: "4px",  sm: "8px"}}>
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{ xs: "4px", sm: "8px" }}>
         <Grid xs={12} xl={8}>
           <Box
             width="100%"
@@ -304,10 +304,10 @@ const Dashboard = () => {
               <Box>
                 <Typography
                   variant="h5"
-                  fontWeight="600"
+                  fontWeight="700"
                   color={colors.grey[100]}
                 >
-                  REVENUE, COGS, AND GROSS PROFIT CHART
+                  REVENUE, COGS, AND GROSS PROFIT CHART ($)
                 </Typography>
               </Box>
             </Box>
@@ -327,15 +327,9 @@ const Dashboard = () => {
                   <Tooltip content={<CustomTooltipRevenueChart />} />
                   <YAxis />
                   <Legend />
-                  <Bar dataKey="revenue" fill="#6495ED" name="Revenue">
-                    <LabelList dataKey="revenue" position="inside" angle={-90} fill="#FFF" />
-                  </Bar>
-                  <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)">
-                    <LabelList dataKey="cogs" position="inside" angle={-90} fill="#FFF"></LabelList>
-                  </Bar>
-                  <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit">
-                    <LabelList dataKey="grossProfit" position="inside" angle={-90} fill="#FFF"></LabelList>
-                  </Bar>
+                  <Bar dataKey="revenue" fill="#6495ED" name="Revenue" />
+                  <Bar dataKey="cogs" fill="#DC6A6A" name="COGS (Cost of goods sold)" />
+                  <Bar dataKey="grossProfit" fill="#228B22" name="Gross profit" />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -361,7 +355,7 @@ const Dashboard = () => {
               <Box>
                 <Typography
                   variant="h5"
-                  fontWeight="600"
+                  fontWeight="700"
                   color={colors.grey[100]}
                 >
                   BEST SELLING CATEGORIES
@@ -402,7 +396,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* ROW 3 */}
-      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{xs: "4px",  sm: "8px"}}>
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} mt={{ xs: "4px", sm: "8px" }}>
         <Grid xs={12} xl={6}>
           <Box
             width="100%"
@@ -410,7 +404,6 @@ const Dashboard = () => {
             backgroundColor={colors.primary[400]}
             display="flex"
             alignItems="center"
-            justifyContent="center"
             flexDirection="column"
           >
             <Box
@@ -423,10 +416,10 @@ const Dashboard = () => {
               <Box>
                 <Typography
                   variant="h5"
-                  fontWeight="600"
+                  fontWeight="700"
                   color={colors.grey[100]}
                 >
-                  TOP 10 USERS WHO BUY THE MOST
+                  TOP 10 USERS WHO BUY THE MOST ($)
                 </Typography>
               </Box>
             </Box>
@@ -457,7 +450,6 @@ const Dashboard = () => {
             backgroundColor={colors.primary[400]}
             display="flex"
             alignItems="center"
-            justifyContent="center"
             flexDirection="column"
           >
             <Box
@@ -470,7 +462,7 @@ const Dashboard = () => {
               <Box>
                 <Typography
                   variant="h5"
-                  fontWeight="600"
+                  fontWeight="700"
                   color={colors.grey[100]}
                 >
                   TOP 10 BEST SELLING PRODUCTS
@@ -478,25 +470,19 @@ const Dashboard = () => {
               </Box>
             </Box>
             <TableContainer sx={{ maxHeight: "85%" }} >
-              <Table stickyHeader sx={{ minHeight: "85%" }}>
+              <Table stickyHeader sx={{ minHeight: "85%", padding: "0 10px" }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }}>IMAGE</TableCell>
-                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center", minWidth: "50px" }}>ID</TableCell>
-                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0" }}>NAME</TableCell>
-                    <TableCell sx={{ fontWeight: "700", fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }} align="right">QUANTITY</TableCell>
+                    <TableCell sx={{ fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0" }}>Product name</TableCell>
+                    <TableCell sx={{ fontSize: "1rem", backgroundColor: colors.primary[400], padding: "10px 0", textAlign: "center" }} align="right">Quantity sold</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {topTenBestSellingProducts.map((item) => (
                     <TableRow
                       key={item.productId}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "100px" }}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, height: "50px" }}
                     >
-                      <TableCell sx={{ padding: "0", textAlign: "center" }}>
-                        <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${item.image}`} alt="" width={90} style={{ padding: "5px" }} />
-                      </TableCell>
-                      <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center", minWidth: "50px" }}>{item.productId}</TableCell>
                       <TableCell sx={{ fontSize: "1rem", color: colors.redAccent[400], padding: "0", fontWeight: "800" }}>{item.name}</TableCell>
                       <TableCell sx={{ fontSize: "1rem", color: colors.grey[100], padding: "0", fontWeight: "800", textAlign: "center" }} align="right">{item.qty}</TableCell>
                     </TableRow>

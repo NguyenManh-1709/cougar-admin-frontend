@@ -18,7 +18,7 @@ const StatBox = ({ total, title, icon, progress, increase }) => {
             sx={{ color: colors.greenAccent[200] }}
             mt={"4px"}
           >
-            {total}
+            {total.toLocaleString()}
           </Typography>
         </Box>
         <Box>

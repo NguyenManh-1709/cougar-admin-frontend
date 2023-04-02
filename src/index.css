@@ -48,8 +48,8 @@ body,
 .css-9h48zc-MuiStepLabel-label,
 .css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
 .css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
-.css-2lgwlz-MuiStepLabel-label.Mui-active,
-.css-9h48zc-MuiStepLabel-label.Mui-active {
+.css-197zbz7-MuiStepLabel-label.Mui-active,
+.css-y8lbgt-MuiStepLabel-label.Mui-active {
   color: #A9A9A9 !important;
   font-size: 1.2rem !important;
   font-weight: bold !important;
@@ -66,17 +66,17 @@ path:focus {
   fill: white !important;
 }
 
-.recharts-pie .recharts-text.recharts-pie-label-text > tspan{
+.recharts-pie .recharts-text.recharts-pie-label-text>tspan {
   font-size: 1.2rem !important;
 }
 
-.product-card .detail{
-  transform: translate(0px, 0px)!important;
+.product-card .detail {
+  transform: translate(0px, 0px) !important;
   width: 100%;
   width: 150%;
 }
 
-.react-datepicker__input-container > input {
+.react-datepicker__input-container>input {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
@@ -93,6 +93,44 @@ path:focus {
   padding: 5px;
 }
 
-.react-datepicker__month-select, .react-datepicker__year-select {
+.react-datepicker__month-select,
+.react-datepicker__year-select {
   padding: 5px;
+}
+
+#dashboard-row-1 {
+  position: relative;
+  animation: dashboard-row-1-move 1s ease-out backwards;
+}
+
+@keyframes dashboard-row-1-move {
+  0% {
+    top: -300px;
+    opacity: 0;
+  }
+
+  20% {
+    top: 35px;
+    opacity: 0.6;
+  }
+
+  40% {
+    top: -25px;
+    opacity: 0.7;
+  }
+
+  60% {
+    top: 15px;
+    opacity: 0.8;
+  }
+
+  80% {
+    top: -10px;
+    opacity: 0.9;
+  }
+
+  100% {
+    top: 0;
+    opacity: 1;
+  }
 }
