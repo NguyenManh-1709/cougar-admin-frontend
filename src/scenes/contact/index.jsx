@@ -1,4 +1,4 @@
-import { AccordionDetails, AccordionSummary, Typography, Accordion, Box, useTheme, FormControl, InputLabel, Select, MenuItem, TextField, TextareaAutosize, Button, IconButton, Backdrop, CircularProgress } from "@mui/material";
+import { AccordionDetails, AccordionSummary, Typography, Accordion, Box, useTheme, FormControl, InputLabel, Select, MenuItem, TextField, TextareaAutosize, Button, Backdrop, CircularProgress } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-date-range/dist/styles.css";
@@ -14,7 +14,6 @@ import { contactStatusPut } from "../../store/apis";
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
 
 import emailjs from '@emailjs/browser';
 import { toast } from "react-toastify";
@@ -232,29 +231,20 @@ const Contact = () => {
                   <Typography sx={{ flexShrink: 0, minWidth: "150px" }}>{new Date(item.createDate).toISOString().slice(0, 10)}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography p="10px" pt="0">Email: {item.email}</Typography>
-                      <Typography p="10px" pt="0">Phone: {item.phone}</Typography>
-                    </Box>
-                    <IconButton onClick={(e) => { e.preventDefault(); setEmailReply(item.email); setCustomerName(item.fullname); setCurrentId(item.id) }}>
-                      <SendIcon />
-                    </IconButton>
+                  <Box display="flex" alignItems="center">
+                    <Typography sx={{ width: "100px", padding: "5px 0" }}>Email:</Typography> {item.email}
                   </Box>
-
-                  <textarea
-                    value={item.content}
-                    disabled
-                    style={{
-                      width: "100%",
-                      minHeight: "100px",
-                      background: "transparent",
-                      border: `1px solid ${colors.grey[100]}`,
-                      color: colors.grey[100],
-                      padding: "10px",
-                      borderRadius: "5px"
-                    }}
-                  />
+                  <Box display="flex" alignItems="center">
+                    <Typography sx={{ width: "100px", padding: "5px 0" }}>Phone:</Typography> {item.phone}
+                  </Box>
+                  <Box display="flex" alignItems="center">
+                    <Typography sx={{ width: "100px", padding: "5px 0" }}>Content:</Typography> {item.content}
+                  </Box>
+                  <Box display="flex" alignItems="center" justifyContent="end">
+                    <Button variant="contained" color="success" onClick={(e) => { e.preventDefault(); setEmailReply(item.email); setCustomerName(item.fullname); setCurrentId(item.id) }}>
+                      Click to reply this contact
+                    </Button>
+                  </Box>
                 </AccordionDetails>
               </Accordion>
             ))}
@@ -294,7 +284,7 @@ const Contact = () => {
                 />
               </Box>
               <Box sx={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "end" }}>
-                <Button type="submit" variant="contained" color="secondary" onClick={handleToggle}>Reply</Button>
+                <Button type="submit" variant="contained" color="success" onClick={handleToggle}>Send</Button>
               </Box>
             </form>
           </Box>
