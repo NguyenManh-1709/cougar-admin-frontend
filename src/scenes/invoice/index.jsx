@@ -1,4 +1,5 @@
-import { Box, Button, Card, CardContent, CardMedia, Grid, List, ListItem, Modal, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, FormControl, InputLabel, List, ListItem, MenuItem, Modal, Select, Step, StepLabel, Stepper, TextField, Typography, useTheme } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
 import { useState } from "react";
 import { invoicesState, invoiceDetailsState } from "../../store/selectors";
 import { useSelector } from "react-redux";
@@ -7,6 +8,9 @@ import { useDispatch } from "react-redux";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import { DataGrid } from "@mui/x-data-grid";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useEffect } from "react";
 
 const style = {
   position: 'absolute',
@@ -22,11 +26,11 @@ const style = {
 const Invoice = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const dispatch = useDispatch();
-  const invoiceDetails = useSelector(invoiceDetailsState);
-  const invoices = useSelector(invoicesState).filter(item => item.orderStatus !== null);
 
-  const invoicesSorted = Object.values(invoices).sort((a, b) => new Date(b.createDate) - (new Date(a.createDate)));
+  const dispatch = useDispatch();
+
+  const invoices = useSelector(invoicesState);
+  const invoiceDetails = useSelector(invoiceDetailsState);
 
   const [openInvoiceDetails, setOpenInvoiceDetails] = useState(false);
   const [invoiceDetailsToShow, setInvoiceDetailsToShow] = useState();
@@ -158,15 +162,6 @@ const Invoice = () => {
 
   const invoiceDetailsColumns = [
     {
-      field: "image",
-      headerName: "IMAGE",
-      renderCell: ({ row: { image } }) => {
-        return (
-          <img src={`https://res.cloudinary.com/dmjh7imwd/image/upload/${image}`} alt="" width="50px" />
-        );
-      },
-    },
-    {
       field: "sku",
       headerName: "SKU",
       renderCell: ({ row: { sku } }) => {
@@ -207,7 +202,6 @@ const Invoice = () => {
   ];
 
   const [pageSize, setPageSize] = useState(10);
-
   const handlePageSizeChange = (params) => {
     setPageSize(params.pageSize);
   };
@@ -228,11 +222,191 @@ const Invoice = () => {
     }
   };
 
+  const [invoicesToShow, setInvoicesToShow] = useState([]);
+
+  const [statusFilter, setStatusFilter] = useState(-1);
+  const [dateFilter, setDateFilter] = useState(-1);
+  const [keywordFilter, setKeywordFilter] = useState("");
+
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+
+  const handleChangeDateFilter = (e) => {
+    setDateFilter(e.target.value);
+
+    if (e.target.value !== -2) {
+      var today = new Date();
+      if (e.target.value === 0) {
+        setDateRange([today.getTime() - (7 * 24 * 60 * 60 * 1000), today]);
+      } else if (e.target.value === 1) {
+        setDateRange([today.getTime() - (30 * 24 * 60 * 60 * 1000), today])
+      } else {
+        setDateRange([null, null])
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (startDate === null && endDate === null) {
+      setDateFilter(-1)
+    }
+  }, [startDate, endDate])
+
+  useEffect(() => {
+    // Filter status
+    const step1 = statusFilter === -1
+      ? invoices
+      : invoices.filter(item => item.orderStatus === statusFilter);
+
+    // Filter date
+    const startTime = new Date(startDate).getTime();
+    const endDateTypeDate = new Date(endDate);
+    const endTime = new Date(endDateTypeDate.setDate(endDateTypeDate.getDate() + 1)).getTime();
+
+    const step2 = (startDate !== null && endDate !== null)
+      ? step1.filter(item => {
+        const createDate = new Date(item.createDate).getTime();
+        return createDate >= startTime && createDate <= endTime;
+      })
+      : step1;
+
+    // Search
+    const result = keywordFilter === ""
+      ? step2
+      : step2.filter(item => {
+        const { user: { fullname } } = item;
+
+        const searchRegex = new RegExp(keywordFilter, 'i');
+        return searchRegex.test(fullname);
+      });
+
+    setInvoicesToShow(Object.values(result).sort((a, b) => new Date(b.createDate) - new Date(a.createDate)));
+  }, [keywordFilter, invoices, statusFilter, startDate, endDate]);
+
   return (
     <Box m="20px">
       <Header title="MANAGEMENT YOUR INVOICES" />
+
+      <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }}>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <TextField
+              label="Search by customer name"
+              variant="filled"
+              sx={{ width: "100%" }}
+              value={keywordFilter}
+              onChange={(e) => setKeywordFilter(e.target.value)}
+            />
+          </Box>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <FormControl
+              variant="filled"
+              sx={{
+                width: "100%",
+                "& .Mui-focused.css-1m1f1hj-MuiFormLabel-root-MuiInputLabel-root": {
+                  color: colors.grey[100],
+                  fontSize: "1rem"
+                }
+              }}
+            >
+              <InputLabel id="status-filter-label">Status</InputLabel>
+              <Select
+                labelId="status-filter-label"
+                id="status-filter"
+                value={statusFilter}
+                label="Status"
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value={-1}>All</MenuItem>
+                <MenuItem value={0}>Pending</MenuItem>
+                <MenuItem value={1}>Processing</MenuItem>
+                <MenuItem value={2}>In transit</MenuItem>
+                <MenuItem value={3}>Completed</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} xl={3}>
+          <Box
+            width="100%"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <FormControl
+              variant="filled"
+              sx={{
+                width: "100%",
+                "& .Mui-focused.css-1m1f1hj-MuiFormLabel-root-MuiInputLabel-root": {
+                  color: colors.grey[100],
+                  fontSize: "1rem"
+                }
+              }}
+            >
+              <InputLabel id="date-filter-label">Date</InputLabel>
+              <Select
+                labelId="date-filter-label"
+                id="date-filter-select"
+                value={dateFilter}
+                label="Date"
+                onChange={handleChangeDateFilter}
+              >
+                <MenuItem value={-2}>
+                  Custom range
+                </MenuItem>
+                <MenuItem value={-1}>All</MenuItem>
+                <MenuItem value={0}>Last 7 days</MenuItem>
+                <MenuItem value={1}>Last 30 days</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Grid>
+        {dateFilter === -2 && (
+          <Grid xs={12} sm={6} md={6} xl={3}>
+            <Box
+              width="100%"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Box sx={{ width: "100%" }}>
+                <DatePicker
+                  selectsRange={true}
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={(update) => {
+                    setDateRange(update);
+                  }}
+                  withPortal
+                  isClearable
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  fixedHeight
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="From - To"
+                  maxDate={new Date()}
+                />
+              </Box>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+
       <Box
-        m="40px 0 0 0"
+        m="20px 0 0 0"
         height="65vh"
         sx={{
           "& .MuiDataGrid-root": {
@@ -282,7 +456,7 @@ const Invoice = () => {
       >
         <DataGrid
           sx={{ fontSize: "1rem" }}
-          rows={invoicesSorted}
+          rows={invoicesToShow}
           columns={invoicesColumns}
           getRowId={(row) => row.id}
           onCellClick={handleCellClick}
@@ -305,7 +479,7 @@ const Invoice = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} sx={{ maxHeight: "80vh", overflow: "auto", padding: "10px", backgroundColor: colors.grey[400] }}>
+            <Grid container rowSpacing={{ xs: 1, sm: 2 }} columnSpacing={{ xs: 1, sm: 2 }} sx={{ maxHeight: "80vh", overflow: "auto", backgroundColor: colors.grey[400] }}>
               <Grid xs={12} xl={5}>
                 <Card sx={{ background: "#FFF", height: "70vh" }}>
                   <Box sx={{ display: "flex" }}>
@@ -339,7 +513,9 @@ const Invoice = () => {
                         <Box sx={{ minWidth: "150px" }}>Payment method</Box> {invoiceSelected.userPaymentMethod === null ? "Cash on delivery" : invoiceSelected.userPaymentMethod.paymentType.value}
                       </ListItem>
                       <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
-                        <Box sx={{ minWidth: "150px" }}>Create date</Box> {new Date(invoiceSelected.createDate).toLocaleDateString('en-GB')}
+                        <Box sx={{ minWidth: "150px" }}>Create date</Box>
+                        {new Date(invoiceSelected.createDate).toLocaleDateString('en-GB')}
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{new Date(invoiceSelected.createDate).getHours() + ":" + new Date(invoiceSelected.createDate).getMinutes() + ":" + new Date(invoiceSelected.createDate).getSeconds()}</span>
                       </ListItem>
                       <ListItem sx={{ padding: "10px 0", borderBottom: "1px solid #000" }}>
                         <Box sx={{ minWidth: "150px" }}>Delivery method</Box> {invoiceSelected.deliveryMethod.name}

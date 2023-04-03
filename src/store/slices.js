@@ -139,7 +139,7 @@ const mySlice = createSlice({
         state.status = "loading";
       })
       .addCase(invoiceGetAll.fulfilled, (state, action) => {
-        state.invoices = action.payload;
+        state.invoices = action.payload.filter(item => item.orderStatus !== null);
         state.status = "idle";
       })
 

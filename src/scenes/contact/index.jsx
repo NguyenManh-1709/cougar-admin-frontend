@@ -60,22 +60,24 @@ const Contact = () => {
 
   useEffect(() => {
     // Filter status
-    const filteredByStatus = statusFilter === 0
+    const step1 = statusFilter === 0
       ? contacts.filter(item => item.status === false)
       : statusFilter === 1
         ? contacts.filter(item => item.status === true)
         : contacts;
 
     // Filter date
+    const startTime = new Date(startDate).getTime();
+    const endDateTypeDate = new Date(endDate);
+    const endTime = new Date(endDateTypeDate.setDate(endDateTypeDate.getDate() + 1)).getTime();
+
     const result = (startDate !== null && endDate !== null)
-      ? filteredByStatus.filter(item => {
+      ? step1.filter(item => {
         const createDate = new Date(item.createDate);
-        const start = new Date(startDate).toLocaleDateString();
-        const end = new Date(endDate).toLocaleDateString();
-        const dateStr = createDate.toLocaleDateString();
-        return dateStr >= start && dateStr <= end;
+        const dateStr = createDate.getTime();
+        return dateStr >= startTime && dateStr <= endTime;
       })
-      : filteredByStatus;
+      : step1;
 
     setContactsToShow(Object.values(result).sort((a, b) => new Date(b.createDate) - new Date(a.createDate)));
   }, [statusFilter, contacts, startDate, endDate])
@@ -232,12 +234,15 @@ const Contact = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box display="flex" alignItems="center">
+                    <Typography sx={{ width: "100px", padding: "5px 0" }}>Fullname:</Typography> {item.fullname}
+                  </Box>
+                  <Box display="flex" alignItems="center">
                     <Typography sx={{ width: "100px", padding: "5px 0" }}>Email:</Typography> {item.email}
                   </Box>
                   <Box display="flex" alignItems="center">
                     <Typography sx={{ width: "100px", padding: "5px 0" }}>Phone:</Typography> {item.phone}
                   </Box>
-                  <Box display="flex" alignItems="center">
+                  <Box display="flex" alignItems="center" sx={{borderTop: "1px solid gray"}}>
                     <Typography sx={{ width: "100px", padding: "5px 0" }}>Content:</Typography> {item.content}
                   </Box>
                   <Box display="flex" alignItems="center" justifyContent="end">
