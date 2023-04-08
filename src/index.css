@@ -32,24 +32,18 @@ body,
   fill: transparent;
 }
 
-/* Color for Stepper - Show invoice details */
-.css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed,
-.css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed,
-.css-197zbz7-MuiStepLabel-label.Mui-completed,
-.css-y8lbgt-MuiStepLabel-label.Mui-completed {
+.MuiStep-root.MuiStep-horizontal.MuiStep-alternativeLabel.Mui-completed.css-1upucw3-MuiStep-root > span > span > svg > path {
+  color: #008B8B !important;
+}
+.MuiStep-root.MuiStep-horizontal.MuiStep-alternativeLabel.Mui-completed.css-1upucw3-MuiStep-root > span > span > span {
   color: #008B8B !important;
   font-size: 1.2rem !important;
   font-weight: bold !important;
 }
-
-.css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root,
-.css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root,
-.css-2lgwlz-MuiStepLabel-label,
-.css-9h48zc-MuiStepLabel-label,
-.css-oxf95d-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
-.css-1uizxs6-MuiSvgIcon-root-MuiStepIcon-root.Mui-active,
-.css-197zbz7-MuiStepLabel-label.Mui-active,
-.css-y8lbgt-MuiStepLabel-label.Mui-active {
+.MuiStep-root.MuiStep-horizontal.MuiStep-alternativeLabel.css-1upucw3-MuiStep-root > span > span > svg > circle  {
+  color: #A9A9A9 !important;
+}
+.MuiStep-root.MuiStep-horizontal.MuiStep-alternativeLabel.css-1upucw3-MuiStep-root > span > span > span  {
   color: #A9A9A9 !important;
   font-size: 1.2rem !important;
   font-weight: bold !important;
