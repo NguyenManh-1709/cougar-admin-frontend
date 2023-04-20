@@ -165,9 +165,10 @@ const Product = () => {
 
   useEffect(()=>{
     if(getProducts.length){
+      console.log("loadlai", getProducts);
       setProducts(getProducts);
     }
-  },[getProducts.length > 0])
+  },[getProducts.length])
 
   const handleFilterCategory = (e) => {
     if(e.target.checked){
@@ -393,7 +394,7 @@ const Product = () => {
   };
 
   //CREATE
-  const handleCreateProduc = () => {
+  const handleCreateProduct = () => {
     if (
       changeProImageCre === true &&
       prodNameCre !== "" &&
@@ -684,7 +685,7 @@ const Product = () => {
                       <Button
                         style={{ background: "#1F2A40", color: "white" }}
                         className="float-end"
-                        onClick={handleCreateProduc}
+                        onClick={handleCreateProduct}
                       >
                         Create
                       </Button>
