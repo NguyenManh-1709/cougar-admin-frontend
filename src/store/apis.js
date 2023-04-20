@@ -295,18 +295,52 @@ export const getOptions = createAsyncThunk("option/getOptions", async () => {
   return response.data;
 });
 
+// Create option
+export const CreateOption = createAsyncThunk("option/CreateOption", async (option) => {
+  const response = await axios.post(`http://localhost:8080/rest/options`, option);
+  return response.data;
+});
 
 export const createOrUpdateProduct = createAsyncThunk(
   "product/createOrUpdateProduct",
   async (product) => {
     if (product.product.id === undefined) {
-      const response = await axios.post(
+      const reponseProduct = await axios.post(
         "http://localhost:8080/api/products",
         product.product
       );
-      console.log("them product");
 
-      return response.data;
+      const proItem = product.productItem;
+      proItem.product = reponseProduct.data;
+
+      const reponseProductItem = await axios.post(
+        "http://localhost:8080/api/productItems",
+        proItem
+      );
+
+      const prItem = reponseProductItem.data;
+      for (let propName in product.option) {
+        const confi = {
+          productItem: reponseProductItem.data,
+          option: product.option[propName]
+        };
+        
+        await axios.post(
+          "http://localhost:8080/api/productConfigurations",
+          confi
+        );
+        prItem[propName] = product.option[propName].value;
+      }
+
+      console.log("them product, productItem, option");
+      
+      
+
+      const dataSent = {
+        product: reponseProduct.data,
+        productItem: prItem,
+      };
+      return dataSent;
     } else {
       if (product.image === true) {
         const response = await axios.put(
@@ -333,12 +367,39 @@ export const createOrUpdateProductItem = createAsyncThunk(
   "productItem/createOrUpdate",
   async (item) => {
     if (item.check) {
-      const response = await axios.put(
-        "http://localhost:8080/api/productItems",
-        item.item
-      );
-      console.log("update item and image ok api");
-      return response.data;
+      if(item.item.id === undefined){
+        const itemResponse = await axios.post(
+          "http://localhost:8080/api/productItems",
+          item.item
+        );
+        const newItem =  itemResponse.data;
+        const listOp = item.listOp;
+        const listConReponse = [];
+        for (let op of listOp) {
+          const confi = {
+            productItem: newItem,
+            option: op
+          };
+          
+          const configureponse = await axios.post(
+            "http://localhost:8080/api/productConfigurations/createNewItem",
+            confi
+          );
+          listConReponse.push(configureponse.data);
+          newItem[op.variation.name] = op.value;
+        }
+
+
+        console.log("create item ok api");
+        return {newItem, listConReponse};
+      }else{
+        const response = await axios.put(
+          "http://localhost:8080/api/productItems",
+          item.item
+        );
+        console.log("update item and image ok api");
+        return response.data;
+      }
     } else {
       const response = await axios.post(
         "http://localhost:8080/api/productItems",
@@ -350,4 +411,34 @@ export const createOrUpdateProductItem = createAsyncThunk(
   }
 );
 
+//get all variation
+export const getAllVariation = createAsyncThunk(
+  "Variation/getAllVariation",
+  async () => {
+    const response = await axios.get(
+      `http://localhost:8080/api/variations`
+    );
+    return response.data;
+  }
+);
 
+//get all productConfiguration
+export const getAllProductConfigurations = createAsyncThunk(
+  "ProductConfiguration/getAllProductConfigurations",
+  async () => {
+    const response = await axios.get(
+      `http://localhost:8080/api/productConfigurations`
+    );
+    return response.data;
+  }
+);
+
+export const updateProductConfigurations = createAsyncThunk(
+  "ProductConfiguration/updateProductConfigurations",
+  async (proCon) => {
+    const response = await axios.put(
+      `http://localhost:8080/api/productConfigurations`, proCon
+    );
+    return response.data;
+  }
+);

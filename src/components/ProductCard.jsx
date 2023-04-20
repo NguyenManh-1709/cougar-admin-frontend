@@ -77,6 +77,7 @@ const ProductCard = (props) => {
           style={{
             backgroundColor: colors.grey[100],
             color: colors.primary[900],
+            width: "100%"
           }}
           className="detail dropdown-menu"
         >

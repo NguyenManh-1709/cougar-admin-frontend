@@ -23,10 +23,12 @@ import {
   contactStatusPut,
   getOptions,
   createOrUpdateProductItem,
-  createOrUpdateProduct
+  createOrUpdateProduct,
+  CreateOption,
+  getAllVariation,
+  getAllProductConfigurations,
+  updateProductConfigurations
 } from "./apis";
-
-
 
 const mySlice = createSlice({
   name: "mySlice",
@@ -43,7 +45,9 @@ const mySlice = createSlice({
     products: [],
     brands: [],
     contacts: [],
-    options: []
+    options: [],
+    variations: [],
+    configurations: []
   },
   reducers: {
     // ...
@@ -60,6 +64,18 @@ const mySlice = createSlice({
       state.products = [];
       state.brands = [];
       state.options = [];
+      state.variations = [];
+      state.configurations = [];
+    },
+
+    updateProItem: (state, action)=>{
+      state.productItems.forEach((ite, index)=>{
+        action.payload.forEach((i)=>{
+          if(ite.id === i.id){
+            state.productItems.splice(index, 1, i);
+          }
+        })
+      })
     },
   },
 
@@ -101,11 +117,11 @@ const mySlice = createSlice({
         const authorities = action.payload;
         const usersWithRoles = authorities.reduce((users, auth) => {
           const { user, role } = auth;
-          const userIndex = users.findIndex(item => item.id === user.id);
+          const userIndex = users.findIndex((item) => item.id === user.id);
           if (userIndex === -1) {
             users.push({
               ...user,
-              role: [role.name]
+              role: [role.name],
             });
           } else {
             users[userIndex].role.push(role.name);
@@ -149,9 +165,11 @@ const mySlice = createSlice({
       })
       .addCase(invoiceStatusPut.fulfilled, (state, action) => {
         const invoiceUpdated = action.payload;
-        state.invoices = state.invoices.map(item => item.id === invoiceUpdated.id ? invoiceUpdated : item);
+        state.invoices = state.invoices.map((item) =>
+          item.id === invoiceUpdated.id ? invoiceUpdated : item
+        );
 
-        const updatedArr = state.invoiceDetails.map(invoiceDetails => {
+        const updatedArr = state.invoiceDetails.map((invoiceDetails) => {
           if (invoiceDetails.shopOrder.id === invoiceUpdated.id) {
             return { ...invoiceDetails, shopOrder: invoiceUpdated };
           }
@@ -204,8 +222,7 @@ const mySlice = createSlice({
         state.usersWithRoles.push(userSaved);
         state.status = "idle";
       })
-      .addCase(userPost.rejected, (state, action) => {
-      })
+      .addCase(userPost.rejected, (state, action) => {})
 
       // CREATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
       .addCase(userPostAndUploadAvatarToCloud.fulfilled, (state, action) => {
@@ -214,13 +231,12 @@ const mySlice = createSlice({
         state.usersWithRoles.push(userSaved);
         state.status = "idle";
       })
-      .addCase(userPostAndUploadAvatarToCloud.rejected, (state, action) => {
-      })
+      .addCase(userPostAndUploadAvatarToCloud.rejected, (state, action) => {})
 
       // UPDATE USER (ROLE ADMIN)
       .addCase(userPut.fulfilled, (state, action) => {
         const userUpdated = action.payload;
-        const updatedArr = state.usersWithRoles.map(item => {
+        const updatedArr = state.usersWithRoles.map((item) => {
           if (item.id === userUpdated.id) {
             return { ...userUpdated, role: item.role };
           }
@@ -230,13 +246,12 @@ const mySlice = createSlice({
         state.usersWithRoles = updatedArr;
         state.status = "successfully";
       })
-      .addCase(userPut.rejected, (state, action) => {
-      })
+      .addCase(userPut.rejected, (state, action) => {})
 
       // UPDATE USER (ROLE ADMIN) AND UPLOAD AVATAR TO CLOUD
       .addCase(userPutAndUploadAvatarToCloud.fulfilled, (state, action) => {
         const userUpdated = action.payload;
-        const updatedArr = state.usersWithRoles.map(item => {
+        const updatedArr = state.usersWithRoles.map((item) => {
           if (item.id === userUpdated.id) {
             return { ...userUpdated, role: item.role };
           }
@@ -246,8 +261,7 @@ const mySlice = createSlice({
         state.usersWithRoles = updatedArr;
         state.status = "successfully";
       })
-      .addCase(userPutAndUploadAvatarToCloud.rejected, (state, action) => {
-      })
+      .addCase(userPutAndUploadAvatarToCloud.rejected, (state, action) => {})
 
       // GET ALL PRODUCTS
       .addCase(productGetAll.pending, (state) => {
@@ -259,31 +273,25 @@ const mySlice = createSlice({
       })
 
       // CHANGE PASSWORD
-      .addCase(changePassword.fulfilled, (state, action) => {
-      })
-      .addCase(changePassword.rejected, (state, action) => {
-      })
+      .addCase(changePassword.fulfilled, (state, action) => {})
+      .addCase(changePassword.rejected, (state, action) => {})
 
       // FORGOT PASSWORD
-      .addCase(forgotPassword.fulfilled, (state, action) => {
-      })
-      .addCase(forgotPassword.rejected, (state, action) => {
-      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {})
+      .addCase(forgotPassword.rejected, (state, action) => {})
 
       // RESET PASSWORD
-      .addCase(resetPassword.fulfilled, (state, action) => {
-      })
-      .addCase(resetPassword.rejected, (state, action) => {
-      })
+      .addCase(resetPassword.fulfilled, (state, action) => {})
+      .addCase(resetPassword.rejected, (state, action) => {})
 
       //get all brand
-      .addCase(brandGetAll.fulfilled, (state, action)=>{
+      .addCase(brandGetAll.fulfilled, (state, action) => {
         state.brands = action.payload;
-        state.status = "Successed"
+        state.status = "Successed";
       })
 
-      .addCase(brandGetAll.rejected, (state)=>{
-        state.status = "Error"
+      .addCase(brandGetAll.rejected, (state) => {
+        state.status = "Error";
       })
 
       // GET ALL CONTACTS
@@ -301,53 +309,119 @@ const mySlice = createSlice({
       })
       .addCase(contactStatusPut.fulfilled, (state, action) => {
         const contactUpdated = action.payload;
-        state.contacts = state.contacts.map(item => item.id === contactUpdated.id ? contactUpdated : item);
+        state.contacts = state.contacts.map((item) =>
+          item.id === contactUpdated.id ? contactUpdated : item
+        );
 
         state.status = "idle";
       })
 
       //get Options
-      .addCase(getOptions.fulfilled, (state, action)=>{
+      .addCase(getOptions.fulfilled, (state, action) => {
         state.options = action.payload;
-        state.status = "Successed"
+        state.status = "Successed";
       })
 
-      .addCase(getOptions.rejected, (state)=>{
-        state.status = "Error"
+      .addCase(getOptions.rejected, (state) => {
+        state.status = "Error";
       })
 
+      //get all variation
+      .addCase(getAllVariation.fulfilled, (state, action) => {
+        state.variations = action.payload;
+        state.status = "Successed";
+      })
+
+      .addCase(getAllVariation.rejected, (state) => {
+        state.status = "Error";
+      })
+
+
+      //get all productConfiguration
+      .addCase(getAllProductConfigurations.fulfilled, (state, action) => {
+        state.configurations = action.payload;
+        state.status = "Successed";
+      })
+
+      .addCase(getAllProductConfigurations.rejected, (state) => {
+        state.status = "Error";
+      })
+
+      //Create Options
+      .addCase(CreateOption.fulfilled, (state, action) => {
+        state.options.push(action.payload);
+        state.status = "Successed";
+      })
+
+      .addCase(CreateOption.rejected, (state) => {
+        state.status = "Error";
+      })
 
       //create or update product
-      .addCase(createOrUpdateProduct.fulfilled, (state, action)=>{
+      .addCase(createOrUpdateProduct.fulfilled, (state, action) => {
         const product = action.payload;
+        
+        if (product.productItem === undefined) {
+          const date = new Date(product.createDate);
+          const day = date.getDate().toString().padStart(2, "0");
+          const month = (date.getMonth() + 1).toString().padStart(2, "0");
+          const year = date.getFullYear().toString();
+          const formattedDate = `${year}-${month}-${day}`;
+          product.createDate = formattedDate;
 
-        const date = new Date(product.createDate);
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear().toString();
-        const formattedDate = `${year}-${month}-${day}`;
-        product.createDate = formattedDate;
+          const exist = state.products.find((proI) => proI.id === product.id);
 
-        const exist = state.products.find(proI=>proI.id === product.id);
-
-        if (exist) {
-          Object.assign(exist, product);
-          console.log("sua product slice");
+          if (exist) {
+            Object.assign(exist, product);
+            console.log("sua product slice");
+          }
         }else{
-          state.products.push(product);
+          const pro = product.product;
+          const date = new Date(pro.createDate);
+          const day = date.getDate().toString().padStart(2, "0");
+          const month = (date.getMonth() + 1).toString().padStart(2, "0");
+          const year = date.getFullYear().toString();
+          const formattedDate = `${year}-${month}-${day}`;
+          pro.createDate = formattedDate;
+
+          const proI = product.productItem;
+          const dateI = new Date(proI.createDate);
+          const dayI = dateI.getDate().toString().padStart(2, "0");
+          const monthI = (dateI.getMonth() + 1).toString().padStart(2, "0");
+          const yearI = dateI.getFullYear().toString();
+          const formattedDateI = `${yearI}-${monthI}-${dayI}`;
+          proI.createDate = formattedDateI;
+
+
+
+
+          state.products.push(pro);
+          state.productItems.push(proI);
           console.log("them product slice");
+          
         }
-        state.status = "Successed"
+
+        state.status = "Successed";
       })
 
-      .addCase(createOrUpdateProduct.rejected, (state, action)=>{
+      .addCase(createOrUpdateProduct.rejected, (state, action) => {
         state.status = action.error.message;
       })
 
+      //create Or Update ProductItem
+      .addCase(createOrUpdateProductItem.fulfilled, (state, action) => {
+        var productItem = {};
 
-       //create Or Update ProductItem
-       .addCase(createOrUpdateProductItem.fulfilled, (state, action)=>{
-        const productItem = action.payload;
+        if(action.payload.listConReponse){
+          productItem = action.payload.newItem;
+          action.payload.listConReponse.forEach(con=>{
+            state.configurations.push(con);
+          })
+        }else{
+          productItem = action.payload;
+        }
+        
+        
 
         const date = new Date(productItem.createDate);
         const day = date.getDate().toString().padStart(2, "0");
@@ -356,21 +430,39 @@ const mySlice = createSlice({
         const formattedDate = `${year}-${month}-${day}`;
         productItem.createDate = formattedDate;
 
-        const exist = state.productItems.find(proI=>proI.id === productItem.id);
+        const exist = state.productItems.find(
+          (proI) => proI.id === productItem.id
+        );
 
         if (exist) {
           Object.assign(exist, productItem);
           console.log("sua product item slice");
-        }else{
+        } else {
           state.productItems.push(productItem);
           console.log("them product item slice");
-
         }
-        state.status = "Successed"
+        state.status = "Successed";
       })
 
-      .addCase(createOrUpdateProductItem.rejected, (state, action)=>{
+      .addCase(createOrUpdateProductItem.rejected, (state, action) => {
         state.status = action.error.message;
+      })
+
+      //update update Product Configurations
+      .addCase(updateProductConfigurations.fulfilled, (state, action)=>{
+        const confi = action.payload;
+        const exist = state.configurations.find(
+          (con) => con.id === confi.id
+        );
+
+        if (exist) {
+          Object.assign(exist, confi);
+          console.log("sua product configuation slice");
+        } 
+      })
+
+      .addCase(updateProductConfigurations.rejected, (state, action)=>{
+        console.log("Khong sua dc product Configuation");
       })
   },
 });

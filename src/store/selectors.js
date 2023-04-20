@@ -17,3 +17,6 @@ export const getProductByIdSelector = (id) => (state) =>
 export const brandsState = (state) => state.myStore.brands;
 export const contactsState = (state) => state.myStore.contacts;
 export const optionsState = (state) => state.myStore.options;
+export const getOptionsByVariationID = (variationID) => (state) => state.myStore.options.filter(op=>op.variation.id === variationID);
+export const getVariationsSelector = (state) => state.myStore.variations;
+export const getconfigurationsSelector = (state) => state.myStore.configurations;

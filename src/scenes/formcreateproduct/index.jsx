@@ -10,14 +10,20 @@ import {
   subCategoriesState,
   brandsState,
   optionsState,
+  getconfigurationsSelector,
+  getVariationsSelector,
 } from "../../store/selectors";
 import {
   brandGetAll,
   getOptions,
   createOrUpdateProductItem,
   createOrUpdateProduct,
+  getAllProductConfigurations,
+  getAllVariation,
+  updateProductConfigurations,
 } from "../../store/apis";
 import AvatarEditor from "react-avatar-editor";
+import mySlice from "../../store/slices";
 
 // import { useTheme } from "@emotion/react";
 // import { tokens } from "../../theme";
@@ -29,10 +35,9 @@ const FormCreateProduct = () => {
 
   useEffect(() => {
     dispatch(getOptions());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(brandGetAll());
+    dispatch(getAllProductConfigurations());
+    dispatch(getAllVariation());
   }, [dispatch]);
 
   const productItems = useSelector(getProductItemByProductIdSelector(id));
@@ -40,11 +45,20 @@ const FormCreateProduct = () => {
   const subCategories = useSelector(subCategoriesState);
   const brands = useSelector(brandsState);
   const options = useSelector(optionsState);
+  const configurations = useSelector(getconfigurationsSelector);
   const getProduct = useSelector(getProductByIdSelector(id));
+  const variations = useSelector(getVariationsSelector);
 
+  const [listVariation, setListVariation] = useState([]);
   const [listSub, setListSub] = useState([]);
+  const [listConfigurationCurrent, setListConfigurationCurrent] = useState([]);
+  const [listOption, setListOption] = useState({});
+
   const [checkChange, setCheckChange] = useState(false);
   const [checkChange2, setCheckChange2] = useState(false);
+  const [checkChangeOption, setCheckChangeOption] = useState(false);
+  const [checkChangeCateOrSub, setCheckChangeCateOrSub] = useState(false);
+  const [checkChangeCre, setCheckChangeCre] = useState(false);
 
   //update product
   const [prodName, setProdName] = useState("");
@@ -61,15 +75,12 @@ const FormCreateProduct = () => {
   //----------
 
   //update item
-  const [proItemId, setProItemId] = useState(0);
+  const [proItem, setProItem] = useState({});
   const [sku, setSku] = useState("");
-  const [itemCrDate, setItemCrDate] = useState("");
+  const [itemUpDate, setItemUpDate] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
-  const [listColor, setListColor] = useState([]);
-  const [listSize, setListSize] = useState([]);
+  const [option, setOption] = useState([]);
 
   const [borderColor, setBorderColor] = useState(0);
   //image
@@ -82,20 +93,13 @@ const FormCreateProduct = () => {
   //CREATE ITEM
   const [proItemIdCr, setProItemIdCr] = useState(0);
   const [skuCr, setSkuCr] = useState("");
-  const [itemCrDateCr, setItemCrDateCr] = useState("");
   const [stockCr, setStockCr] = useState(0);
   const [priceCr, setPriceCr] = useState(0);
-  const [colorCr, setColorCr] = useState("");
-  const [sizeCr, setSizeCr] = useState("");
-  const [listColorCr, setListColorCr] = useState([]);
-  const [listSizeCr, setListSizeCr] = useState([]);
+  const [listOptionCreate, setListOptionCreate] = useState("");
 
-  const [borderColorCr, setBorderColorCr] = useState(0);
   //image
   const [proItemImageCr, setProItemImageCr] = useState(null);
   const [proItemEditorCr, setProItemEditorCr] = useState(null);
-  const [changeProItemImageCr, setChangeProItemImageCr] = useState(false);
-  const [fileImageItemCr, setFileImageItemCr] = useState(null);
   //------
 
   useEffect(() => {
@@ -110,46 +114,61 @@ const FormCreateProduct = () => {
         `https://res.cloudinary.com/dmjh7imwd/image/upload/${getProduct.image}`
       );
       setFileImage(getProduct.image);
-      const listSub = subCategories.filter(
+      const listSubca = subCategories.filter(
         (sub) => sub.category.id === getProduct.subcategory.category.id
       );
 
-      setListSub(listSub);
+      setListSub(listSubca);
+
+      const variationsBySubID = variations.filter(
+        (va) => va.subcategory.id === getProduct.subcategory.id
+      );
+      if (variationsBySubID.length > 0) {
+        setListVariation(variationsBySubID);
+      }
 
       if (options.length) {
-        const listCo = options.filter(
-          (op) =>
-            op.variation.name === "color" &&
-            op.variation.subcategory.id === getProduct.subcategory.id
+        const listOp = options.filter(
+          (op) => op.variation.subcategory.id === getProduct.subcategory.id
         );
-        setListColor(listCo);
-
-        const listSi = options.filter(
-          (op) =>
-            op.variation.name === "size" &&
-            op.variation.subcategory.id === getProduct.subcategory.id
+        setListOption(listOp);
+      }
+      if (configurations.length) {
+        const listConCurrentSub = configurations.filter(
+          (con) =>
+            con.option.variation.subcategory.id === getProduct.subcategory.id
         );
-        setListSize(listSi);
+        setListConfigurationCurrent(listConCurrentSub);
       }
     }
-  }, [getProduct, options.length > 0, brands.length > 0]);
+  }, [getProduct, options.length > 0, configurations.length > 0]);
 
   useEffect(() => {
     if (productItems.length) {
-      setProItemId(productItems[0].id);
+      setProItem(productItems[0]);
       setPrice(productItems[0].price);
       setProItemImage(
         `https://res.cloudinary.com/dmjh7imwd/image/upload/${productItems[0].image}`
       );
       setStock(productItems[0].qtyInStock);
-      setItemCrDate(productItems[0].createDate);
-      setColor(productItems[0].color);
-      setSize(productItems[0].size);
+      setItemUpDate(productItems[0].createDate);
+
+      if (configurations.length) {
+        const exit = configurations
+          .filter((con) => con.productItem.id === productItems[0].id)
+          .map((p) => p.option);
+
+        if (exit.length > 0) {
+          setOption(exit);
+          setListOptionCreate(exit);
+        }
+      }
+
       setSku(productItems[0].sku);
       setBorderColor(productItems[0].id);
       setFileImageItem(productItems[0].image);
     }
-  }, [productItems.length > 0]);
+  }, [productItems.length > 0, configurations.length > 0]);
 
   //HANDLE UPDATE PRODUCT
   const handleOnchangeProdName = (e) => {
@@ -162,6 +181,7 @@ const FormCreateProduct = () => {
     setCheckChange(true);
   };
 
+  //CHANG CATEGORY
   const handleChangeCategory = (e) => {
     setCateName(e.target.value);
 
@@ -171,11 +191,126 @@ const FormCreateProduct = () => {
     setListSub(listSub);
     setSubCateId(listSub[0].id);
     setCheckChange(true);
+
+    if (listSub.length > 0) {
+      const variationsBySubID = variations.filter(
+        (va) => va.subcategory.id === listSub[0].id
+      );
+      if (variationsBySubID.length > 0) {
+        setListVariation(variationsBySubID);
+      }
+
+      if (options.length > 0) {
+        const listOp = options.filter(
+          (op) => op.variation.subcategory.id === listSub[0].id
+        );
+        setListOption(listOp);
+        console.log("listopSUB", listOp[0].variation.subcategory.id);
+        console.log("proitem", proItem.product.subcategory.id);
+        if (
+          listOp.some(
+            (op) =>
+              op.variation.subcategory.id === proItem.product.subcategory.id
+          )
+        ) {
+          if (configurations.length > 0) {
+            const exit = configurations
+              .filter((con) => con.productItem.id === proItem.id)
+              .map((p) => p.option);
+
+            if (exit.length > 0) {
+              setOption(exit);
+              console.log("category co thang da chon");
+
+              setCheckChangeCateOrSub(false);
+              setCheckChangeOption(false);
+            }
+          }
+        } else {
+          console.log("khong chon gi");
+          if (listOp.length > 0) {
+            const liop = listOp.reduce((accumulator, currentValue) => {
+              if (
+                !accumulator.some(
+                  (item) => item.variation.id === currentValue.variation.id
+                )
+              ) {
+                accumulator.push(currentValue);
+              }
+              return accumulator;
+            }, []);
+            setOption(liop);
+            setListOptionCreate(liop);
+            setCheckChangeCateOrSub(true);
+            setCheckChangeOption(true);
+          } else {
+            alert("Chua co option, chon sub khac");
+            setCheckChange(false);
+          }
+        }
+      }
+    }
   };
 
   const handleChangeSubCategory = (e) => {
     setSubCateId(e.target.value);
     setCheckChange(true);
+
+    const subID = +e.target.value;
+    if (listSub.length > 0) {
+      const variationsBySubID = variations.filter(
+        (va) => va.subcategory.id === subID
+      );
+      if (variationsBySubID.length > 0) {
+        setListVariation(variationsBySubID);
+      }
+
+      if (options.length) {
+        const listOp = options.filter(
+          (op) => op.variation.subcategory.id === subID
+        );
+        setListOption(listOp);
+
+        if (
+          listOp.some(
+            (op) =>
+              op.variation.subcategory.id === proItem.product.subcategory.id
+          )
+        ) {
+          if (configurations.length) {
+            const exit = configurations
+              .filter((con) => con.productItem.id === proItem.id)
+              .map((p) => p.option);
+
+            if (exit.length > 0) {
+              setOption(exit);
+              setCheckChangeCateOrSub(false);
+              setCheckChangeOption(false);
+            }
+          }
+        } else {
+          if (listOp.length > 0) {
+            const liop = listOp.reduce((accumulator, currentValue) => {
+              if (
+                !accumulator.some(
+                  (item) => item.variation.id === currentValue.variation.id
+                )
+              ) {
+                accumulator.push(currentValue);
+              }
+              return accumulator;
+            }, []);
+            setOption(liop);
+            setListOptionCreate(liop);
+            setCheckChangeCateOrSub(true);
+            setCheckChangeOption(true);
+          } else {
+            alert("Chua co option, chon sub khac");
+            setCheckChange(false);
+          }
+        }
+      }
+    }
   };
 
   const handleOnchangeProdCrDate = (e) => {
@@ -195,45 +330,6 @@ const FormCreateProduct = () => {
     setChangeProImage(true);
     setFileImage(event.target.files[0]);
   };
-
-  const handleUpdateProduct = (e) => {
-    if (!checkChange) {
-      e.preventDefault();
-    } else {
-      if (prodName !== "" && prodCrDate !== "" && proddesc !== "") {
-        if (changeProImage) {
-          const canvas = productEditor.getImageScaledToCanvas();
-          const image = canvas.toDataURL();
-          const productUpdate = {
-            id: id,
-            name: prodName,
-            createDate: prodCrDate,
-            description: proddesc,
-            image: image,
-            subcategory: { id: subCateId },
-            brand: { id: brandId },
-          };
-
-          dispatch(createOrUpdateProduct({product:productUpdate, image:true}));
-          setCheckChange(false);
-          setChangeProImage(false);
-        } else {
-          const productUpdate = {
-            id: id,
-            name: prodName,
-            createDate: prodCrDate,
-            description: proddesc,
-            image: fileImage,
-            subcategory: { id: subCateId },
-            brand: { id: brandId },
-          };
-
-          dispatch(createOrUpdateProduct({product:productUpdate, image:false}));
-          setCheckChange(false);
-        }
-      }
-    }
-  };
   //----------
 
   //HANDLE UPDATE PRODUCT ITEM
@@ -248,7 +344,7 @@ const FormCreateProduct = () => {
   };
 
   const handleChangeItemCrDate = (e) => {
-    setItemCrDate(e.target.value);
+    setItemUpDate(e.target.value);
     setCheckChange2(true);
   };
 
@@ -257,14 +353,27 @@ const FormCreateProduct = () => {
     setCheckChange2(true);
   };
 
-  const handleChangeColor = (e) => {
-    setColor(e.target.value);
-    setCheckChange2(true);
-  };
-
-  const handleChangeSize = (e) => {
-    setSize(e.target.value);
-    setCheckChange2(true);
+  const handleOptionChange = (opt) => {
+    const pop = option;
+    if (
+      pop.some(
+        (op) => op.variation.subcategory.id === opt.variation.subcategory.id
+      )
+    ) {
+      const exit = pop.find((op) => op.id === opt.id);
+      if (!exit) {
+        const listO = pop.filter((op) => op.variation.id !== opt.variation.id);
+        listO.push(opt);
+        setOption(listO);
+        setCheckChangeOption(true);
+        // console.log(listO);
+      }
+    } else {
+      const listO = [];
+      listO.push(opt);
+      setOption(listO);
+      setCheckChangeOption(true);
+    }
   };
 
   const handleProItemImageChange = (event) => {
@@ -275,40 +384,135 @@ const FormCreateProduct = () => {
   };
 
   const handleCickProductItem = (proItem) => {
-    setProItemId(proItem.id);
-    setItemCrDate(proItem.createDate);
+    setProItem(proItem);
+    setItemUpDate(proItem.createDate);
     setPrice(proItem.price);
     setProItemImage(
       `https://res.cloudinary.com/dmjh7imwd/image/upload/${proItem.image}`
     );
     setStock(proItem.qtyInStock);
-    setColor(proItem.color);
-    setSize(proItem.size);
     setSku(proItem.sku);
     setBorderColor(proItem.id);
     setCheckChange2(false);
     setFileImageItem(proItem.image);
+
+    if (options.length) {
+      const listOp = options.filter(
+        (op) => op.variation.subcategory.id === subCateId
+      );
+
+      if (
+        listOp.some(
+          (op) => op.variation.subcategory.id === proItem.product.subcategory.id
+        )
+      ) {
+        if (configurations.length) {
+          const exit = configurations
+            .filter((con) => con.productItem.id === proItem.id)
+            .map((p) => p.option);
+
+          if (exit.length > 0) {
+            setOption(exit);
+          }
+        }
+      } else {
+        if (listOp.length > 0) {
+          const liop = listOp.reduce((accumulator, currentValue) => {
+            if (
+              !accumulator.some(
+                (item) => item.variation.id === currentValue.variation.id
+              )
+            ) {
+              accumulator.push(currentValue);
+            }
+            return accumulator;
+          }, []);
+          setOption(liop);
+        }
+      }
+    }
   };
 
-  const handleUpdateProductItem = () => {
+  const handleUpdate = () => {
+    if (checkChange) {
+      if (prodName !== "" && prodCrDate !== "" && proddesc !== "") {
+        if (changeProImage) {
+          const canvas = productEditor.getImageScaledToCanvas();
+          const image = canvas.toDataURL();
+          const productUpdate = {
+            id: id,
+            name: prodName,
+            createDate: prodCrDate,
+            description: proddesc,
+            image: image,
+            subcategory: { id: subCateId },
+            brand: { id: brandId },
+          };
+
+          dispatch(
+            createOrUpdateProduct({ product: productUpdate, image: true })
+          );
+
+          const prdit = productItems.map((it) => {
+            return {
+              ...it,
+              product: { ...it.product, subcategory: { id: subCateId } },
+            };
+          });
+
+          dispatch(mySlice.actions.updateProItem(prdit));
+
+          setCheckChange(false);
+          setChangeProImage(false);
+        } else {
+          const productUpdate = {
+            id: id,
+            name: prodName,
+            createDate: prodCrDate,
+            description: proddesc,
+            image: fileImage,
+            subcategory: { id: subCateId },
+            brand: { id: brandId },
+          };
+
+          dispatch(
+            createOrUpdateProduct({ product: productUpdate, image: false })
+          );
+
+          const prdit = productItems.map((it) => {
+            return {
+              ...it,
+              product: { ...it.product, subcategory: { id: subCateId } },
+            };
+          });
+
+          dispatch(mySlice.actions.updateProItem(prdit));
+
+          setCheckChange(false);
+        }
+      }
+    }
+
     if (checkChange2) {
       if (
         productItems.length > 0 &&
         sku !== "" &&
         +price !== 0 &&
+        !isNaN(price) &&
         price !== "" &&
         +stock !== 0 &&
         stock !== "" &&
-        itemCrDate !== ""
+        !isNaN(stock) &&
+        itemUpDate !== ""
       ) {
         if (changeProItemImage) {
           const canvas = proItemEditor.getImageScaledToCanvas();
           const image = canvas.toDataURL();
 
           const productItemUpdate = {
-            id: proItemId,
+            id: proItem.id,
             sku: sku,
-            createDate: itemCrDate,
+            createDate: itemUpDate,
             qtyInStock: stock,
             price: price,
             image: image,
@@ -322,9 +526,9 @@ const FormCreateProduct = () => {
           setChangeProItemImage(false);
         } else {
           const productItemUpdate = {
-            id: proItemId,
+            id: proItem.id,
             sku: sku,
-            createDate: itemCrDate,
+            createDate: itemUpDate,
             qtyInStock: stock,
             price: price,
             image: fileImageItem,
@@ -334,7 +538,91 @@ const FormCreateProduct = () => {
           dispatch(
             createOrUpdateProductItem({ item: productItemUpdate, check: false })
           );
+
           setCheckChange2(false);
+        }
+      }
+    }
+
+    if (checkChangeOption) {
+      if (option.length > 0) {
+        const lCon = configurations.filter(
+          (con) => con.productItem.id === proItem.id
+        );
+        if (lCon.length > 0) {
+          lCon.forEach((con) => {
+            if (!option.some((op) => con.option.id === op.id)) {
+              const phj = option.find(
+                (top) => top.variation.name === con.option.variation.name
+              );
+
+              const {
+                product: { subcategory, ...product },
+                ...rest
+              } = proItem;
+
+              // rest.product.subcate
+              var sub = {};
+              sub.id = subCateId;
+              product.subcategory = sub;
+              rest.product = product;
+              setProItem(rest);
+              const updateCon = {
+                id: con.id,
+                productItem: rest,
+                option: phj,
+              };
+              dispatch(updateProductConfigurations(updateCon));
+              console.log("sua thg dang chon", updateCon);
+              setCheckChangeOption(false);
+            }
+          });
+        }
+      }
+    }
+
+    console.log("check", checkChangeCateOrSub);
+    if (checkChangeCateOrSub) {
+      console.log("vao sua con lai");
+      const listOp = options.filter(
+        (op) => op.variation.subcategory.id === subCateId
+      );
+      if (listOp.length > 0) {
+        console.log("vao check list");
+        const liop = listOp.reduce((accumulator, currentValue) => {
+          if (
+            !accumulator.some(
+              (item) => item.variation.id === currentValue.variation.id
+            )
+          ) {
+            accumulator.push(currentValue);
+          }
+          return accumulator;
+        }, []);
+
+        if (listConfigurationCurrent.length > 0) {
+          console.log("vao check lst cu");
+          listConfigurationCurrent.forEach((con) => {
+            productItems
+              .filter((ite) => ite.id !== proItem.id)
+              .forEach((item) => {
+                if (con.productItem.id === item.id) {
+                  liop.forEach((oppp) => {
+                    if (con.option.variation.name === oppp.variation.name) {
+                      const upCO = {
+                        id: con.id,
+                        productItem: item,
+                        option: oppp,
+                      };
+                      dispatch(updateProductConfigurations(upCO));
+
+                      console.log("sua configu con lai");
+                      setCheckChangeCateOrSub(false);
+                    }
+                  });
+                }
+              });
+          });
         }
       }
     }
@@ -344,78 +632,83 @@ const FormCreateProduct = () => {
   //HANDLE CREATE PRODUCT ITEM
   const handleOnchangeSkuCr = (e) => {
     setSkuCr(e.target.value.toUpperCase());
+    setCheckChangeCre(true);
   };
 
   const handleChangePriceCr = (e) => {
     setPriceCr(e.target.value);
-  };
-
-  const handleChangeItemCrDateCr = (e) => {
-    setItemCrDateCr(e.target.value);
+    setCheckChangeCre(true);
   };
 
   const handleChangeStockCr = (e) => {
     setStockCr(e.target.value);
+    setCheckChangeCre(true);
   };
 
-  const handleChangeColorCr = (e) => {
-    setColorCr(e.target.value);
-  };
+  const handleChooseOpCre = (e) => {
+    const opIDChoose = +e.target.value;
+    const pop = listOptionCreate;
 
-  const handleChangeSizeCr = (e) => {
-    setSizeCr(e.target.value);
+    const OpCh = listOption.find((op) => op.id === opIDChoose);
+
+    if (OpCh) {
+      if (
+        pop.some(
+          (op) => op.variation.subcategory.id === OpCh.variation.subcategory.id
+        )
+      ) {
+        const exit = pop.find((op) => op.id === OpCh.id);
+        if (!exit) {
+          const listO = pop.filter(
+            (op) => op.variation.id !== OpCh.variation.id
+          );
+          listO.push(OpCh);
+          setListOptionCreate(listO);
+          // console.log(listO);
+        }
+      } else {
+        const listO = [];
+        listO.push(OpCh);
+        setListOptionCreate(listO);
+      }
+    }
   };
 
   const handleProItemImageChangeCr = (event) => {
     setProItemImageCr(event.target.files[0]);
-    setChangeProItemImageCr(true);
-    setFileImageItemCr(event.target.files[0]);
+    setCheckChangeCre(true);
   };
 
   const handleCreateProductItem = () => {
-    if (
-      productItems.length > 0 &&
-      sku !== "" &&
-      +price !== 0 &&
-      price !== "" &&
-      +stock !== 0 &&
-      stock !== "" &&
-      itemCrDate !== ""
-    ) {
-      if (changeProItemImage) {
-        const canvas = proItemEditor.getImageScaledToCanvas();
+    if (checkChangeCre) {
+      if (
+        skuCr !== "" &&
+        +priceCr !== 0 &&
+        priceCr !== "" &&
+        !isNaN(priceCr) &&
+        +stockCr !== 0 &&
+        stockCr !== "" &&
+        !isNaN(stockCr) &&
+        proItemImageCr
+      ) {
+        const canvas = proItemEditorCr.getImageScaledToCanvas();
         const image = canvas.toDataURL();
 
-        const productItemUpdate = {
-          id: proItemId,
-          sku: sku,
-          createDate: itemCrDate,
-          qtyInStock: stock,
-          price: price,
+        const productItemCreate = {
+          sku: skuCr,
+          qtyInStock: stockCr,
+          price: priceCr,
           image: image,
-          product: { id: id },
+          product: getProduct,
         };
 
         dispatch(
-          createOrUpdateProductItem({ item: productItemUpdate, check: true })
+          createOrUpdateProductItem({ item: productItemCreate, check: true, listOp: listOptionCreate})
         );
-        setCheckChange2(false);
-        setChangeProItemImage(false);
-      } else {
-        const productItemUpdate = {
-          id: proItemId,
-          sku: sku,
-          createDate: itemCrDate,
-          qtyInStock: stock,
-          price: price,
-          image: fileImageItem,
-          product: { id: id },
-        };
-
-        dispatch(
-          createOrUpdateProductItem({ item: productItemUpdate, check: false })
-        );
-        setCheckChange2(false);
+        setCheckChangeCre(false);
+        setSkuCr("");
+        setStockCr(0);
+        setPriceCr(0);
       }
     }
   };
@@ -535,13 +828,6 @@ const FormCreateProduct = () => {
                 ></textarea>
               </div>
             </div>
-            <Button
-              style={{ background: "#1F2A40", color: "white" }}
-              className="float-end"
-              onClick={handleUpdateProduct}
-            >
-              Update
-            </Button>
           </div>
         </div>
       </div>
@@ -620,8 +906,8 @@ const FormCreateProduct = () => {
                 <input
                   type="date"
                   className="form-control"
-                  id="itemCrDate"
-                  value={itemCrDate}
+                  id="itemUpDate"
+                  value={itemUpDate}
                   onChange={handleChangeItemCrDate}
                 />
               </div>
@@ -638,41 +924,36 @@ const FormCreateProduct = () => {
                 />
               </div>
 
-              <div className="col-6 mb-3">
-                <label htmlFor="color" className="form-label">
-                  Color
-                </label>
-                <select
-                  className="form-select"
-                  aria-label="Color"
-                  value={color}
-                  onChange={handleChangeColor}
-                >
-                  {listColor.map((color) => (
-                    <option value={color.value} key={color.id}>
-                      {color.value}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="col-6 mb-3">
-                <label htmlFor="size" className="form-label">
-                  Size
-                </label>
-                <select
-                  className="form-select"
-                  aria-label="size"
-                  value={size}
-                  onChange={handleChangeSize}
-                >
-                  {listSize.map((size) => (
-                    <option value={size.value} key={size.id}>
-                      {size.value}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {listVariation.map((va) => (
+                <div key={va.id} className="col-6 mb-3">
+                  <label htmlFor="color" className="form-label text-danger">
+                    {va.name}
+                  </label>
+                  <div className="row">
+                    {listOption.map(
+                      (op) =>
+                        op.variation.id === va.id && (
+                          <div key={op.id} className="form-check col-3">
+                            <input
+                              className="form-check-input"
+                              type="radio"
+                              name={va.name}
+                              id={`Radio-${op.id}`}
+                              checked={option.some((opp) => opp.id === op.id)}
+                              onChange={() => handleOptionChange(op)}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`Radio-${op.id}`}
+                            >
+                              {op.value}
+                            </label>
+                          </div>
+                        )
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -697,7 +978,7 @@ const FormCreateProduct = () => {
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className="card-body row">
-                  <div className="fw-bold">CREATE PRODUCT ITEM</div>
+                    <div className="fw-bold">CREATE PRODUCT ITEM</div>
                     <div className="text-center">Choose Image:</div>
                     <div className="col-12 text-center pb-4">
                       {proItemImageCr && (
@@ -718,23 +999,6 @@ const FormCreateProduct = () => {
 
                     <div className="col-12">
                       <div className="row">
-                      <div className="col-12 mb-3">
-                          <label htmlFor="Product" className="form-label">
-                            Product
-                          </label>
-                          <select
-                            className="form-select"
-                            aria-label="Product"
-                            value={colorCr}
-                            onChange={handleChangeColorCr}
-                          >
-                            {listColorCr.map((color) => (
-                              <option value={color.value} key={color.id}>
-                                {color.value}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
                         <div className="col-6 mb-3">
                           <label htmlFor="name" className="form-label">
                             Sku
@@ -761,21 +1025,6 @@ const FormCreateProduct = () => {
                         </div>
 
                         <div className="col-6 mb-3">
-                          <label
-                            htmlFor="exampleInputEmail1"
-                            className="form-label"
-                          >
-                            Create Date
-                          </label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            id="itemCrDate"
-                            value={itemCrDateCr}
-                            onChange={handleChangeItemCrDateCr}
-                          />
-                        </div>
-                        <div className="col-6 mb-3">
                           <label htmlFor="stock" className="form-label">
                             Stock
                           </label>
@@ -788,41 +1037,27 @@ const FormCreateProduct = () => {
                           />
                         </div>
 
-                        <div className="col-6 mb-3">
-                          <label htmlFor="color" className="form-label">
-                            Color
-                          </label>
-                          <select
-                            className="form-select"
-                            aria-label="Color"
-                            value={colorCr}
-                            onChange={handleChangeColorCr}
-                          >
-                            {listColorCr.map((color) => (
-                              <option value={color.value} key={color.id}>
-                                {color.value}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="col-6 mb-3">
-                          <label htmlFor="size" className="form-label">
-                            Size
-                          </label>
-                          <select
-                            className="form-select"
-                            aria-label="size"
-                            value={sizeCr}
-                            onChange={handleChangeSizeCr}
-                          >
-                            {listSizeCr.map((size) => (
-                              <option value={size.value} key={size.id}>
-                                {size.value}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        {listVariation.map((va) => (
+                          <div key={va.id} className="col-6 mb-3">
+                            <label htmlFor="size" className="form-label">
+                              {va.name}
+                            </label>
+                            <select
+                              className="form-select"
+                              aria-label="size"
+                              onChange={handleChooseOpCre}
+                            >
+                              {listOption.map(
+                                (op) =>
+                                  op.variation.id === va.id && (
+                                    <option value={op.id} key={op.id}>
+                                      {op.value}
+                                    </option>
+                                  )
+                              )}
+                            </select>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -841,7 +1076,7 @@ const FormCreateProduct = () => {
           <div className="ms-auto">
             <Button
               style={{ background: "#1F2A40", color: "white" }}
-              onClick={handleUpdateProductItem}
+              onClick={handleUpdate}
             >
               Update
             </Button>
