@@ -33,6 +33,8 @@ import AvatarEditor from "react-avatar-editor";
 import Modal from "@mui/material/Modal";
 import { Fragment } from "react";
 import { optionsData } from "../../until/options";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ChildModal(props) {
   const { variation } = props;
@@ -165,7 +167,6 @@ const Product = () => {
 
   useEffect(()=>{
     if(getProducts.length){
-      console.log("loadlai", getProducts);
       setProducts(getProducts);
     }
   },[getProducts.length])
@@ -262,7 +263,6 @@ const Product = () => {
             }
           });
         });
-        console.log(option);
 
         setoptionCr(option);
       }
@@ -447,6 +447,18 @@ const Product = () => {
       setSkuCr("");
       setStockCr(0);
       setPriceCr(0);
+
+
+      toast.success('Create Successed!', {
+        position: 'top-center',
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: 'light'
+      });
     }
   };
 

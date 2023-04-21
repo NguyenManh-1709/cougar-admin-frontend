@@ -24,6 +24,8 @@ import {
 } from "../../store/apis";
 import AvatarEditor from "react-avatar-editor";
 import mySlice from "../../store/slices";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // import { useTheme } from "@emotion/react";
 // import { tokens } from "../../theme";
@@ -205,8 +207,8 @@ const FormCreateProduct = () => {
           (op) => op.variation.subcategory.id === listSub[0].id
         );
         setListOption(listOp);
-        console.log("listopSUB", listOp[0].variation.subcategory.id);
-        console.log("proitem", proItem.product.subcategory.id);
+
+        //check neu sub da co option
         if (
           listOp.some(
             (op) =>
@@ -222,12 +224,11 @@ const FormCreateProduct = () => {
               setOption(exit);
               console.log("category co thang da chon");
 
-              setCheckChangeCateOrSub(false);
-              setCheckChangeOption(false);
+              setCheckChangeCateOrSub(false); //neu chon cate ma co option roi thif check lai false de khong cap nhat
             }
           }
-        } else {
-          console.log("khong chon gi");
+        } else {//khong co option trong sub dang chon
+          console.log("khong chon gi category");
           if (listOp.length > 0) {
             const liop = listOp.reduce((accumulator, currentValue) => {
               if (
@@ -239,10 +240,11 @@ const FormCreateProduct = () => {
               }
               return accumulator;
             }, []);
-            setOption(liop);
-            setListOptionCreate(liop);
-            setCheckChangeCateOrSub(true);
-            setCheckChangeOption(true);
+            setOption(liop);//set cho item dang chon
+            setListOptionCreate(liop);//set cho create item
+
+            setCheckChangeOption(true);//cap nhat option cho item dang chon
+            setCheckChangeCateOrSub(true);//check de cap nhat cac item k chon
           } else {
             alert("Chua co option, chon sub khac");
             setCheckChange(false);
@@ -250,13 +252,21 @@ const FormCreateProduct = () => {
         }
       }
     }
+    if (configurations.length) {
+      const listConCurrentSub = configurations.filter(
+        (con) =>
+          con.option.variation.subcategory.id === proItem.product.subcategory.id
+      );
+      setListConfigurationCurrent(listConCurrentSub);
+    }
   };
 
   const handleChangeSubCategory = (e) => {
-    setSubCateId(e.target.value);
+    const subID = +e.target.value;
+    setSubCateId(subID);
     setCheckChange(true);
 
-    const subID = +e.target.value;
+    
     if (listSub.length > 0) {
       const variationsBySubID = variations.filter(
         (va) => va.subcategory.id === subID
@@ -284,8 +294,7 @@ const FormCreateProduct = () => {
 
             if (exit.length > 0) {
               setOption(exit);
-              setCheckChangeCateOrSub(false);
-              setCheckChangeOption(false);
+              setCheckChangeCateOrSub(false); //neu chon cate ma co option roi thif check lai false de khong cap nhat
             }
           }
         } else {
@@ -302,14 +311,22 @@ const FormCreateProduct = () => {
             }, []);
             setOption(liop);
             setListOptionCreate(liop);
-            setCheckChangeCateOrSub(true);
-            setCheckChangeOption(true);
+
+           setCheckChangeOption(true);//cap nhat option cho item dang chon
+          setCheckChangeCateOrSub(true);//check de cap nhat cac item k chon
           } else {
             alert("Chua co option, chon sub khac");
             setCheckChange(false);
           }
         }
       }
+    }
+    if (configurations.length) {
+      const listConCurrentSub = configurations.filter(
+        (con) =>
+          con.option.variation.subcategory.id === proItem.product.subcategory.id
+      );
+      setListConfigurationCurrent(listConCurrentSub);
     }
   };
 
@@ -355,25 +372,25 @@ const FormCreateProduct = () => {
 
   const handleOptionChange = (opt) => {
     const pop = option;
+    //check neu option vua click cung sub voi option dang luu
     if (
       pop.some(
         (op) => op.variation.subcategory.id === opt.variation.subcategory.id
       )
     ) {
+      //check neu khong trung thi thay the vao theo variation
       const exit = pop.find((op) => op.id === opt.id);
       if (!exit) {
         const listO = pop.filter((op) => op.variation.id !== opt.variation.id);
         listO.push(opt);
-        setOption(listO);
-        setCheckChangeOption(true);
-        // console.log(listO);
+        setOption(listO);//set lai option luu tru cho item dang chon
       }
-    } else {
+    } else {//neu khong trung subcate thi tao list option moi cho item dang con
       const listO = [];
       listO.push(opt);
       setOption(listO);
-      setCheckChangeOption(true);
     }
+    setCheckChangeOption(true);//check de cap nhat option cho item dang chon
   };
 
   const handleProItemImageChange = (event) => {
@@ -428,12 +445,15 @@ const FormCreateProduct = () => {
             return accumulator;
           }, []);
           setOption(liop);
+          setCheckChangeCateOrSub(true);
+          setCheckChangeOption(true);
         }
       }
     }
   };
 
   const handleUpdate = () => {
+    //cap nhat product
     if (checkChange) {
       if (prodName !== "" && prodCrDate !== "" && proddesc !== "") {
         if (changeProImage) {
@@ -490,9 +510,21 @@ const FormCreateProduct = () => {
 
           setCheckChange(false);
         }
+
+        toast.success('Update Product Successed!', {
+          position: 'top-center',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: 'light'
+        });
       }
     }
 
+    //capnhat product item
     if (checkChange2) {
       if (
         productItems.length > 0 &&
@@ -541,47 +573,76 @@ const FormCreateProduct = () => {
 
           setCheckChange2(false);
         }
+
+        toast.success('Update ProductItem Successed!', {
+          position: 'top-center',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: 'light'
+        });
       }
     }
 
+    //cap nhat option cho item dang chon
     if (checkChangeOption) {
       if (option.length > 0) {
+        //list nhung configu cua item dang chon
         const lCon = configurations.filter(
           (con) => con.productItem.id === proItem.id
         );
+
         if (lCon.length > 0) {
           lCon.forEach((con) => {
+            //check neu khong trung voi option nao trong option luu tru thi cap nhat
             if (!option.some((op) => con.option.id === op.id)) {
               const phj = option.find(
                 (top) => top.variation.name === con.option.variation.name
               );
 
+              //thay sub khac cho item
               const {
                 product: { subcategory, ...product },
                 ...rest
               } = proItem;
 
-              // rest.product.subcate
               var sub = {};
               sub.id = subCateId;
               product.subcategory = sub;
               rest.product = product;
               setProItem(rest);
+              //---
+
               const updateCon = {
                 id: con.id,
                 productItem: rest,
                 option: phj,
               };
               dispatch(updateProductConfigurations(updateCon));
-              console.log("sua thg dang chon", updateCon);
               setCheckChangeOption(false);
+              console.log("sua thg dang chon xong", checkChangeOption);
+
+              
             }
+          });
+          toast.success('Update Option Successed!', {
+            position: 'top-center',
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            theme: 'light'
           });
         }
       }
     }
 
-    console.log("check", checkChangeCateOrSub);
+    //cap nhat option cho cac item con lai
     if (checkChangeCateOrSub) {
       console.log("vao sua con lai");
       const listOp = options.filter(
@@ -709,6 +770,17 @@ const FormCreateProduct = () => {
         setSkuCr("");
         setStockCr(0);
         setPriceCr(0);
+
+        toast.success('Create Successed!', {
+          position: 'top-center',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: 'light'
+        });
       }
     }
   };

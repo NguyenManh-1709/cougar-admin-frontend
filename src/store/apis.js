@@ -405,7 +405,7 @@ export const createOrUpdateProductItem = createAsyncThunk(
         "http://localhost:8080/api/productItems",
         item.item
       );
-      alert("update item no image ok-api");
+      
       return response.data;
     }
   }
