@@ -644,12 +644,10 @@ const FormCreateProduct = () => {
 
     //cap nhat option cho cac item con lai
     if (checkChangeCateOrSub) {
-      console.log("vao sua con lai");
       const listOp = options.filter(
         (op) => op.variation.subcategory.id === subCateId
       );
       if (listOp.length > 0) {
-        console.log("vao check list");
         const liop = listOp.reduce((accumulator, currentValue) => {
           if (
             !accumulator.some(
@@ -662,7 +660,6 @@ const FormCreateProduct = () => {
         }, []);
 
         if (listConfigurationCurrent.length > 0) {
-          console.log("vao check lst cu");
           listConfigurationCurrent.forEach((con) => {
             productItems
               .filter((ite) => ite.id !== proItem.id)
