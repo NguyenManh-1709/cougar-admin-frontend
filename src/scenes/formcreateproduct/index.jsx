@@ -903,7 +903,7 @@ const FormCreateProduct = () => {
       <div className="card text-dark">
         <div className="row card-header fw-bold align-items-center">
           <div className="col-lg-2 col-md-12 col-sm-12 col-12">
-            PRODUCTITEMS:
+            PRODUCT VARIANTS:
           </div>
           <div className="col-10">
             <div className="row">
