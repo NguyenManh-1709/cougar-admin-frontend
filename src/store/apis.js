@@ -4,7 +4,7 @@ import axios from "axios";
 
 // Get All Authorities => Custom list user with roles
 export const authorityGetAll = createAsyncThunk("authorityGetAll", async () => {
-  const response = await axios.get(`http://localhost:8080/rest/authorities`);
+  const response = await axios.get(`http://localhost:8080/api/v1/authorities`);
   return response.data;
 });
 
@@ -12,7 +12,7 @@ export const authorityGetAll = createAsyncThunk("authorityGetAll", async () => {
 export const categoriesGetAll = createAsyncThunk(
   "categoriesGetAll",
   async () => {
-    const response = await axios.get(`http://localhost:8080/rest/categories`);
+    const response = await axios.get(`http://localhost:8080/api/v1/categories`);
     return response.data;
   }
 );
@@ -22,7 +22,7 @@ export const subCategoriesGetAll = createAsyncThunk(
   "subCategoriesGetAll",
   async () => {
     const response = await axios.get(
-      `http://localhost:8080/rest/subCategories`
+      `http://localhost:8080/api/v1/subCategories`
     );
     return response.data;
   }
@@ -45,7 +45,7 @@ export const uploadImageToCloud = createAsyncThunk(
 
 // Get All Invoices
 export const invoiceGetAll = createAsyncThunk("invoiceGetAll", async () => {
-  const response = await axios.get(`http://localhost:8080/rest/shopOrders`);
+  const response = await axios.get(`http://localhost:8080/api/v1/shopOrders`);
   return response.data;
 });
 
@@ -53,7 +53,7 @@ export const invoiceGetAll = createAsyncThunk("invoiceGetAll", async () => {
 export const invoiceDetailsGetAll = createAsyncThunk(
   "invoiceDetailsGetAll",
   async () => {
-    const response = await axios.get(`http://localhost:8080/rest/orderDetails`);
+    const response = await axios.get(`http://localhost:8080/api/v1/orderDetails`);
     return response.data;
   }
 );
@@ -64,7 +64,7 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const loginResponse = await axios.post(
-        "http://localhost:8080/api/auth/signin",
+        "http://localhost:8080/api/v1/auth/signin",
         credentials
       );
 
@@ -97,7 +97,7 @@ export const login = createAsyncThunk(
 
 // Get User By Id
 export const getUserById = createAsyncThunk("getUserById", async (id) => {
-  const response = await axios.get(`http://localhost:8080/api/users/${id}`);
+  const response = await axios.get(`http://localhost:8080/api/v1/users/${id}`);
   return response.data;
 });
 
@@ -105,7 +105,7 @@ export const getUserById = createAsyncThunk("getUserById", async (id) => {
 export const productItemGetAll = createAsyncThunk(
   "productItemGetAll",
   async () => {
-    const response = await axios.get(`http://localhost:8080/rest/productItems`);
+    const response = await axios.get(`http://localhost:8080/api/v1/productItems`);
     return response.data;
   }
 );
@@ -115,7 +115,7 @@ export const invoiceStatusPut = createAsyncThunk(
   "invoiceStatusPut",
   async (invoice) => {
     const response = await axios.put(
-      `http://localhost:8080/rest/shopOrders/changeStatus`,
+      `http://localhost:8080/api/v1/shopOrders/changeStatus`,
       invoice
     );
     return response.data;
@@ -124,7 +124,7 @@ export const invoiceStatusPut = createAsyncThunk(
 
 // Get All Products
 export const productGetAll = createAsyncThunk("productGetAll", async () => {
-  const response = await axios.get(`http://localhost:8080/rest/products`);
+  const response = await axios.get(`http://localhost:8080/api/v1/products`);
   return response.data;
 });
 
@@ -134,7 +134,7 @@ export const changePassword = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/change-password",
+        "http://localhost:8080/api/v1/auth/change-password",
         values
       );
       return response;
@@ -153,7 +153,7 @@ export const forgotPassword = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/forgot-password",
+        "http://localhost:8080/api/v1/auth/forgot-password",
         email
       );
       return response.data;
@@ -172,7 +172,7 @@ export const resetPassword = createAsyncThunk(
   async ({ password, token }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/reset-password`,
+        `http://localhost:8080/api/v1/auth/reset-password`,
         { password, token }
       );
       return response.data;
@@ -192,7 +192,7 @@ export const userPost = createAsyncThunk(
   async (user, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/users/create-admin`,
+        `http://localhost:8080/api/v1/users/create-admin`,
         user
       );
       return response.data;
@@ -211,7 +211,7 @@ export const userPostAndUploadAvatarToCloud = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/users/create-admin-with-avatar`,
+        `http://localhost:8080/api/v1/users/create-admin-with-avatar`,
         values
       );
       return response.data;
@@ -231,7 +231,7 @@ export const userPut = createAsyncThunk(
   async (user, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/users/update-admin`,
+        `http://localhost:8080/api/v1/users/update-admin`,
         user
       );
       return response.data;
@@ -250,7 +250,7 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk(
   async (values, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/users/update-admin-with-avatar`,
+        `http://localhost:8080/api/v1/users/update-admin-with-avatar`,
         values
       );
       return response.data;
@@ -266,13 +266,13 @@ export const userPutAndUploadAvatarToCloud = createAsyncThunk(
 
 // Get All brand
 export const brandGetAll = createAsyncThunk("brandGetAll/get", async () => {
-  const response = await axios.get(`http://localhost:8080/api/brands`);
+  const response = await axios.get(`http://localhost:8080/api/v1/brands`);
   return response.data;
 });
 
 // Get All Contacts
 export const contactGetAll = createAsyncThunk("contactGetAll", async () => {
-  const response = await axios.get(`http://localhost:8080/api/contacts`);
+  const response = await axios.get(`http://localhost:8080/api/v1/contacts`);
   return response.data;
 });
 
@@ -282,7 +282,7 @@ export const contactStatusPut = createAsyncThunk(
   async (contact) => {
     const abc = { ...contact };
     const response = await axios.put(
-      `http://localhost:8080/api/contacts/change-status`,
+      `http://localhost:8080/api/v1/contacts/change-status`,
       abc
     );
     return response.data;
@@ -291,13 +291,13 @@ export const contactStatusPut = createAsyncThunk(
 
 // Get All option
 export const getOptions = createAsyncThunk("option/getOptions", async () => {
-  const response = await axios.get(`http://localhost:8080/rest/options`);
+  const response = await axios.get(`http://localhost:8080/api/v1/options`);
   return response.data;
 });
 
 // Create option
 export const CreateOption = createAsyncThunk("option/CreateOption", async (option) => {
-  const response = await axios.post(`http://localhost:8080/rest/options`, option);
+  const response = await axios.post(`http://localhost:8080/api/v1/options`, option);
   return response.data;
 });
 
@@ -306,7 +306,7 @@ export const createOrUpdateProduct = createAsyncThunk(
   async (product) => {
     if (product.product.id === undefined) {
       const reponseProduct = await axios.post(
-        "http://localhost:8080/api/products",
+        "http://localhost:8080/api/v1/products",
         product.product
       );
 
@@ -314,7 +314,7 @@ export const createOrUpdateProduct = createAsyncThunk(
       proItem.product = reponseProduct.data;
 
       const reponseProductItem = await axios.post(
-        "http://localhost:8080/api/productItems",
+        "http://localhost:8080/api/v1/productItems",
         proItem
       );
 
@@ -326,7 +326,7 @@ export const createOrUpdateProduct = createAsyncThunk(
         };
         
         await axios.post(
-          "http://localhost:8080/api/productConfigurations",
+          "http://localhost:8080/api/v1/productConfigurations",
           confi
         );
         prItem[propName] = product.option[propName].value;
@@ -344,14 +344,14 @@ export const createOrUpdateProduct = createAsyncThunk(
     } else {
       if (product.image === true) {
         const response = await axios.put(
-          "http://localhost:8080/api/products",
+          "http://localhost:8080/api/v1/products",
           product.product
         );
         console.log("sua product co hinh");
         return response.data;
       } else {
         const response = await axios.post(
-          "http://localhost:8080/api/products",
+          "http://localhost:8080/api/v1/products",
           product.product
         );
         console.log("sua product khong hinh");
@@ -369,7 +369,7 @@ export const createOrUpdateProductItem = createAsyncThunk(
     if (item.check) {
       if(item.item.id === undefined){
         const itemResponse = await axios.post(
-          "http://localhost:8080/api/productItems",
+          "http://localhost:8080/api/v1/productItems",
           item.item
         );
         const newItem =  itemResponse.data;
@@ -382,7 +382,7 @@ export const createOrUpdateProductItem = createAsyncThunk(
           };
           
           const configureponse = await axios.post(
-            "http://localhost:8080/api/productConfigurations/createNewItem",
+            "http://localhost:8080/api/v1/productConfigurations/createNewItem",
             confi
           );
           listConReponse.push(configureponse.data);
@@ -394,7 +394,7 @@ export const createOrUpdateProductItem = createAsyncThunk(
         return {newItem, listConReponse};
       }else{
         const response = await axios.put(
-          "http://localhost:8080/api/productItems",
+          "http://localhost:8080/api/v1/productItems",
           item.item
         );
         console.log("update item and image ok api");
@@ -402,7 +402,7 @@ export const createOrUpdateProductItem = createAsyncThunk(
       }
     } else {
       const response = await axios.post(
-        "http://localhost:8080/api/productItems",
+        "http://localhost:8080/api/v1/productItems",
         item.item
       );
       
@@ -416,7 +416,7 @@ export const getAllVariation = createAsyncThunk(
   "Variation/getAllVariation",
   async () => {
     const response = await axios.get(
-      `http://localhost:8080/api/variations`
+      `http://localhost:8080/api/v1/variations`
     );
     return response.data;
   }
@@ -427,7 +427,7 @@ export const getAllProductConfigurations = createAsyncThunk(
   "ProductConfiguration/getAllProductConfigurations",
   async () => {
     const response = await axios.get(
-      `http://localhost:8080/api/productConfigurations`
+      `http://localhost:8080/api/v1/productConfigurations`
     );
     return response.data;
   }
@@ -437,7 +437,7 @@ export const updateProductConfigurations = createAsyncThunk(
   "ProductConfiguration/updateProductConfigurations",
   async (proCon) => {
     const response = await axios.put(
-      `http://localhost:8080/api/productConfigurations`, proCon
+      `http://localhost:8080/api/v1/productConfigurations`, proCon
     );
     return response.data;
   }
