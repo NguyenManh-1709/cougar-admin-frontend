@@ -89,7 +89,6 @@ const FormCreateProduct = () => {
   const [proItemImage, setProItemImage] = useState(null);
   const [proItemEditor, setProItemEditor] = useState(null);
   const [changeProItemImage, setChangeProItemImage] = useState(false);
-  const [fileImageItem, setFileImageItem] = useState(null);
   //------
 
   //CREATE ITEM
@@ -168,7 +167,6 @@ const FormCreateProduct = () => {
 
       setSku(productItems[0].sku);
       setBorderColor(productItems[0].id);
-      setFileImageItem(productItems[0].image);
     }
   }, [productItems.length > 0, configurations.length > 0]);
 
@@ -397,7 +395,6 @@ const FormCreateProduct = () => {
     setProItemImage(event.target.files[0]);
     setCheckChange2(true);
     setChangeProItemImage(true);
-    setFileImageItem(event.target.files[0]);
   };
 
   const handleCickProductItem = (proItem) => {
@@ -411,7 +408,6 @@ const FormCreateProduct = () => {
     setSku(proItem.sku);
     setBorderColor(proItem.id);
     setCheckChange2(false);
-    setFileImageItem(proItem.image);
 
     if (options.length) {
       const listOp = options.filter(
@@ -563,7 +559,6 @@ const FormCreateProduct = () => {
             createDate: itemUpDate,
             qtyInStock: stock,
             price: price,
-            image: fileImageItem,
             product: { id: id },
           };
 
